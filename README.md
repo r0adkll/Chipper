@@ -1,3 +1,5 @@
+![chipper icon](http://r0adkll.net/images/play_icon_chipper.png)
+
 Chipper
 =======
 

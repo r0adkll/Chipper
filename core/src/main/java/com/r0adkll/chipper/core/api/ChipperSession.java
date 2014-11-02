@@ -4,6 +4,7 @@ import android.util.Pair;
 
 import com.google.gson.Gson;
 import com.r0adkll.chipper.core.api.model.User;
+import com.r0adkll.chipper.core.utils.GSON;
 import com.r0adkll.chipper.core.utils.Tools;
 import com.r0adkll.deadskunk.utils.Utils;
 
@@ -23,37 +24,9 @@ import io.realm.RealmObject;
  */
 public class ChipperSession extends RealmObject {
 
-    private final Gson GSON = new Gson();
-
     private User user;
     private String publicKey;
     private String privateKey;
-
-    /***********************************************************************************************
-     *
-     * Helper Methods
-     *
-     */
-
-    /**
-     * Generate the auth params and keystore hash
-     * @return
-     */
-    public String generateAuthParam(){
-        Map<String, Object> auth = new HashMap<>();
-
-        // Add auth params
-        auth.put("user_id", user.getId());
-        auth.put("public_key", publicKey);
-        auth.put("timestamp", System.currentTimeMillis()/1000);
-
-        // Now generate the hash
-        String params = GSON.toJson(auth);
-        String hash = Tools.sha256(params.concat(privateKey));
-        auth.put("hash", hash);
-
-        return GSON.toJson(auth);
-    }
 
     /***********************************************************************************************
      *

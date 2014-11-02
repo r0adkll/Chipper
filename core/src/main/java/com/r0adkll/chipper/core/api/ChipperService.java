@@ -7,9 +7,11 @@ import com.r0adkll.chipper.core.api.model.User;
 import java.util.List;
 
 import retrofit.Callback;
+import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.Field;
 import retrofit.http.GET;
+import retrofit.http.Header;
 import retrofit.http.POST;
 import retrofit.http.Path;
 
@@ -37,7 +39,10 @@ public interface ChipperService {
      * @param purchaseToken     the purchase token to verify
      */
     @POST("/user/{id}/premium")
-    void verifyPlayStorePurchase(@Path("id") String userId, @Field("auth") String auth, @Field("purchase_token") String purchaseToken, Callback cb);
+    void verifyPlayStorePurchase(@Header("auth") String auth,
+                                 @Path("id") String userId,
+                                 @Field("purchase_token") String purchaseToken,
+                                 Callback cb);
 
     /**
      * Get a list of devices for the provided user
@@ -46,7 +51,9 @@ public interface ChipperService {
      * @param cb            the callback
      */
     @GET("/user/{id}/devices")
-    void getUsersDevices(@Path("id") String userId, Callback<List<Device>> cb);
+    void getUsersDevices(@Header("auth") String auth,
+                         @Path("id") String userId,
+                         Callback<List<Device>> cb);
 
     /**
      * Register a new device, or update an existing one with a matching device_id
@@ -59,8 +66,8 @@ public interface ChipperService {
      * @param cb            the callback
      */
     @POST("/user/{id}/devices")
-    void registerDevice(@Path("id") String userId,
-                        @Field("auth") String auth,
+    void registerDevice(@Header("auth") String auth,
+                        @Path("id") String userId,
                         @Field("device_id") String deviceId,
                         @Field("model") String model,
                         @Field("sdk") int sdk,
@@ -75,8 +82,8 @@ public interface ChipperService {
      * @param cb            the callback
      */
     @GET("/user/{id}/devices/{deviceId}")
-    void getDevice(@Path("id") String userId,
-                   @Field("auth") String auth,
+    void getDevice(@Header("auth") String auth,
+                   @Path("id") String userId,
                    @Path("deviceId") String deviceId,
                    Callback<Device> cb);
 
@@ -89,9 +96,9 @@ public interface ChipperService {
      * @param cb            the callback
      */
     @POST("/user/{id}/devices/{deviceId}")
-    void registerPushToken(@Path("id") String userId,
+    void registerPushToken(@Header("auth") String auth,
+                           @Path("id") String userId,
                            @Path("deviceId") String deviceId,
-                           @Field("auth") String auth,
                            @Field("push_token") String pushToken,
                            Callback cb);
 
@@ -103,9 +110,9 @@ public interface ChipperService {
      * @param cb            the callback
      */
     @DELETE("/user/{id}/devices/{deviceId}")
-    void deleteDevice(@Path("id") String userId,
+    void deleteDevice(@Header("auth") String auth,
+                      @Path("id") String userId,
                       @Path("deviceId") String deviceId,
-                      @Field("auth") String auth,
                       Callback cb);
 
     /**
@@ -115,8 +122,8 @@ public interface ChipperService {
      * @param cb            the callback
      */
     @GET("/user/{id}/playlists")
-    void getPlaylists(@Path("id") String userId,
-                      @Field("auth") String auth,
+    void getPlaylists(@Header("auth") String auth,
+                      @Path("id") String userId,
                       Callback<List<Playlist>> cb);
 
     /**
@@ -127,9 +134,9 @@ public interface ChipperService {
      * @param body          the playlist update/create json
      */
     @POST("/user/{id}/playlists")
-    void createPlaylist(@Path("id") String userId,
-                        @Field("auth") String auth,
-                        @Field("body") String body,
+    void createPlaylist(@Header("auth") String auth,
+                        @Path("id") String userId,
+                        @Body String body,
                         Callback<Playlist> cb);
 
     /**
@@ -141,9 +148,9 @@ public interface ChipperService {
      * @param cb            the callback
      */
     @GET("/user/{id}/playlists/{pid}")
-    void getPlaylist(@Path("id") String userId,
+    void getPlaylist(@Header("auth") String auth,
+                     @Path("id") String userId,
                      @Path("pid") String playlistId,
-                     @Field("auth") String auth,
                      Callback<Playlist> cb);
 
     /**
@@ -156,10 +163,10 @@ public interface ChipperService {
      * @param cb                the callback
      */
     @POST("/user/{id}/playlists/{pid}")
-    void updatePlaylist(@Path("id") String userId,
+    void updatePlaylist(@Header("auth") String auth,
+                        @Path("id") String userId,
                         @Path("pid") String playlistId,
-                        @Field("auth") String auth,
-                        @Field("body") String body,
+                        @Body String body,
                         Callback<Playlist> cb);
 
     /**
@@ -171,10 +178,11 @@ public interface ChipperService {
      * @param cb            the callback
      */
     @DELETE("/user/{id}/playlists/{pid}")
-    void deletePlaylist(@Path("id") String userId,
+    void deletePlaylist(@Header("auth") String auth,
+                        @Path("id") String userId,
                         @Path("pid") String playlistId,
-                        @Field("auth") String auth,
                         Callback cb);
+
 
 
 

@@ -14,6 +14,6 @@ public class Playlist {
     public User updated_by_user;
     public String token;
     public List<String> permissions;
-    public List<Integer> tunes;
+    public List<Chiptune> tunes;
 
 }

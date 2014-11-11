@@ -11,7 +11,7 @@ public class Chiptune {
      *
      */
 
-    public int id;
+    public String id;
     public String title;
     public String artist;
     public String streamUrl;

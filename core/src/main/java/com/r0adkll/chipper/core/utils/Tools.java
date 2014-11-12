@@ -1,10 +1,14 @@
 package com.r0adkll.chipper.core.utils;
 
+import android.content.Context;
+import android.telephony.TelephonyManager;
+
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 
 /**
  * Created by r0adkll on 11/1/14.
@@ -18,6 +22,25 @@ public class Tools {
      */
     public static String generateToken(){
         return RandomStringUtils.randomAlphanumeric(128);
+    }
+
+    /**
+     * Generate a unique device identifier that can be replicated
+     * on the device
+     *
+     * @param ctx
+     * @return
+     */
+    public static String generateUniqueDeviceId(Context ctx){
+        final TelephonyManager tm = (TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE);
+
+        final String tmDevice, tmSerial, androidId;
+        tmDevice = "" + tm.getDeviceId();
+        tmSerial = "" + tm.getSimSerialNumber();
+        androidId = "" + android.provider.Settings.Secure.getString(ctx.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+
+        UUID deviceUuid = new UUID(androidId.hashCode(), ((long)tmDevice.hashCode() << 32) | tmSerial.hashCode());
+        return deviceUuid.toString();
     }
 
     /**

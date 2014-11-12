@@ -1,14 +1,33 @@
 package com.r0adkll.chipper.core.data;
 
 import android.app.Application;
+import android.content.Context;
+import android.content.Intent;
 
 import com.r0adkll.chipper.core.api.model.Chiptune;
 import com.r0adkll.chipper.core.api.model.Playlist;
+import com.r0adkll.chipper.core.data.model.OfflineRequest;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.RunnableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import timber.log.Timber;
 
 
 /**
@@ -17,6 +36,7 @@ import javax.inject.Inject;
  *
  * Created by r0adkll on 11/11/14.
  */
+@Singleton
 public class CashMachine {
 
     /***********************************************************************************************
@@ -41,7 +61,6 @@ public class CashMachine {
      */
     @Inject
     public CashMachine(Application app){
-
         // Set the offline directory that all the files should be cached to
         mCacheDir = new File(app.getFilesDir(), CACHE_DIRECTORY_NAME);
 
@@ -59,12 +78,16 @@ public class CashMachine {
      *
      * @param chiptune      the chiptune to offline
      */
-    public void offline(Chiptune chiptune){
+    public void offline(Context ctx, Chiptune chiptune){
 
-        // TODO: Initiate a chiptune downloader that downloads the specified chiptune
-        // TODO: to the offline directory
+        // Create OfflineRequest
+        OfflineRequest request = new OfflineRequest.Builder()
+                .addChiptune(chiptune)
+                .build();
 
-
+        Intent offlineIntent = new Intent(ctx, OfflineIntentService.class);
+        offlineIntent.putExtra(OfflineIntentService.EXTRA_OFFLINE_REQUEST, request);
+        ctx.startService(offlineIntent);
 
     }
 
@@ -73,7 +96,16 @@ public class CashMachine {
      *
      * @param playlist      the playlist to offline
      */
-    public void offline(Playlist playlist){
+    public void offline(Context ctx, Playlist playlist){
+
+        // Create OfflineRequest
+        OfflineRequest request = new OfflineRequest.Builder()
+                .addPlaylist(playlist)
+                .build();
+
+        Intent offlineIntent = new Intent(ctx, OfflineIntentService.class);
+        offlineIntent.putExtra(OfflineIntentService.EXTRA_OFFLINE_REQUEST, request);
+        ctx.startService(offlineIntent);
 
     }
 

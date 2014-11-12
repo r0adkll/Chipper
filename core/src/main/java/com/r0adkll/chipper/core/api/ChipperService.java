@@ -36,6 +36,33 @@ public interface ChipperService {
               Callback<User> cb);
 
     /**
+     * This is the login endpoint used to login in using their
+     * username and password combination.
+     *
+     * @param email         the email address they wish to use
+     * @param password      the password to use that is hashed on the server
+     * @param cb            the auth callback
+     */
+    @FormUrlEncoded
+    @POST("/auth/login")
+    void login(@Field("email") String email,
+               @Field("password") String password,
+               Callback<User> cb);
+
+    /**
+     * Create an account that doesn't use Google+ auth
+     *
+     * @param email         the email address they wish to use
+     * @param password      their password to create an account with
+     * @param cb            the callback with the user object on the server
+     */
+    @FormUrlEncoded
+    @POST("/auth/create")
+    void create(@Field("email") String email,
+                @Field("password") String password,
+                Callback<User> cb);
+
+    /**
      * Verify a PlayStore purchase against the server
      * so we can give this account premium if possible.
      *

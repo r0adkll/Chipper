@@ -1,8 +1,8 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.r0adkll.chipper">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.r0adkll.chipper.core">
     <application>
 
         <!-- The intent service used to download chiptunes for offline use -->
-        <service android:name=".core.data.OfflineIntentService" />
+        <service android:name=".data.OfflineIntentService" />
 
     </application>
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="statusBar">#b2669900</color>
+    <color name="statusBarLogin">#000</color>
+
+    <!-- New Nav Drawer Colors -->
+    <color name="navdrawer_background">#ffffffff</color>
+    <color name="colorDrawerText">#6A6A6A</color>
+
+    <color name="loginTextPrimary">#9FD700</color>
+    <color name="loginTextSecondary">#D5D5D5</color>
+
+</resources>

@@ -73,7 +73,7 @@ public final class DataModule {
     }
 
     @Provides @FavoritePlaylist
-    Playlist provideFavoritesPlaylist(User currentUser){
+    Playlist provideFavoritesPlaylist(@CurrentUser User currentUser){
         return new Select()
                 .from(Playlist.class)
                 .where("name = ?", "Favorites")
@@ -81,6 +81,7 @@ public final class DataModule {
                 .limit(1)
                 .executeSingle();
     }
+
 
 
 }

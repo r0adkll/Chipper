@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 
-import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.core.R;
 import com.r0adkll.chipper.core.api.model.Chiptune;
 import com.r0adkll.chipper.core.data.events.OfflineRequestCompletedEvent;
 import com.r0adkll.chipper.core.data.model.OfflineRequest;
@@ -51,10 +51,10 @@ public class OfflineIntentService extends IntentService {
     private NotificationManagerCompat mNotifMan;
 
     @Inject
-    private OkHttpClient mClient;
+    OkHttpClient mClient;
 
     @Inject
-    private Bus mBus;
+    Bus mBus;
 
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.

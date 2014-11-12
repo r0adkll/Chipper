@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'hugo'
 
 android {
     compileSdkVersion 21
@@ -29,7 +30,7 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.0.0'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
     compile 'com.squareup.retrofit:retrofit:1.7.1'
-    compile 'com.squareup.dagger:dagger:1.2.2'
+    compile 'com.squareup.dagger:dagger:1.2.0'
     compile 'com.squareup.dagger:dagger-compiler:1.2.2'
     compile 'com.squareup:otto:1.+'
     compile 'com.jakewharton.timber:timber:2.4.+'

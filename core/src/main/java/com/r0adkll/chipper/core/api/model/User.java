@@ -19,6 +19,8 @@ public class User extends Model implements Parcelable{
     public String public_key;
     public String private_key;
 
+
+
     /**
      * Default Constructor
      */

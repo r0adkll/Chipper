@@ -1,5 +1,6 @@
 package com.r0adkll.chipper.core.api;
 
+import com.google.gson.Gson;
 import com.squareup.okhttp.OkHttpClient;
 
 import javax.inject.Singleton;
@@ -11,6 +12,7 @@ import retrofit.Endpoints;
 import retrofit.RestAdapter;
 import retrofit.client.Client;
 import retrofit.client.OkClient;
+import retrofit.converter.GsonConverter;
 
 /**
  * This module defines all the injectable components that will be used
@@ -41,6 +43,7 @@ public final class ApiModule {
         return new RestAdapter.Builder()
                 .setClient(client)
                 .setEndpoint(endpoint)
+                .setConverter(new GsonConverter(new Gson()))
                 .build();
     }
 

@@ -1,5 +1,6 @@
 package com.r0adkll.chipper.ui.all;
 
+import com.r0adkll.chipper.core.api.ChipperService;
 import com.r0adkll.chipper.ui.UIModule;
 
 import javax.inject.Singleton;
@@ -28,8 +29,8 @@ public class ChiptunesModule {
     }
 
     @Provides @Singleton
-    ChiptunesPresenter providePresenter(){
-        return new ChiptunesPresenterImpl();
+    ChiptunesPresenter providePresenter(ChiptunesView chiptunesView, ChipperService service){
+        return new ChiptunesPresenterImpl(chiptunesView, service);
     }
 
 }

@@ -19,4 +19,7 @@
     <color name="body_text_1_inverse">#deffffff</color>
     <color name="body_text_2_inverse">#8affffff</color>
 
+    <color name="body_text_primary_light">@color/black80</color>
+    <color name="body_text_secondary_light">@color/black35</color>
+
 </resources>

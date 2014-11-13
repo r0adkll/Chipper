@@ -18,7 +18,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.core.utils.Callback;
-import com.r0adkll.chipper.ui.BaseActivity;
+import com.r0adkll.chipper.ui.model.BaseActivity;
 import com.r0adkll.postoffice.PostOffice;
 
 import java.io.IOException;

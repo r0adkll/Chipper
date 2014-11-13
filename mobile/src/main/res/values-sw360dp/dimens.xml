@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="navigation_drawer_widthd">304dp</dimen>
+    <dimen name="navdrawer_chosen_account_height">164dp</dimen>
+    <dimen name="navigation_drawer_width">304dp</dimen>
+    <dimen name="navdrawer_profile_image_size">64dp</dimen>
 </resources>

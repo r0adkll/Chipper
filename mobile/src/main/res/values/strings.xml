@@ -4,5 +4,17 @@
     <string name="app_name">Chipper 2</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="placeholder_lorem_ipsum">Lorem ipsum dolor set it</string>
+    <string name="navdrawer_item_dashboard">Dashboard</string>
+    <string name="navdrawer_item_chiptunes">Chiptunes</string>
+    <string name="navdrawer_item_popular">Popular</string>
+    <string name="navdrawer_item_featured">Featured</string>
+    <string name="navdrawer_item_playlists">Playlists</string>
+    <string name="navdrawer_item_parties">Parties</string>
+    <string name="navdrawer_item_offline">Offline mode</string>
+    <string name="navdrawer_item_settings">Settings</string>
+    <string name="navdrawer_item_feedback">Send feedback</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 
 </resources>

@@ -1,4 +1,4 @@
-package com.r0adkll.chipper.ui;
+package com.r0adkll.chipper.ui.model;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;

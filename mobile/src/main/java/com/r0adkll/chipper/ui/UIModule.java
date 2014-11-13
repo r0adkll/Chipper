@@ -1,6 +1,15 @@
 package com.r0adkll.chipper.ui;
 
+import android.content.SharedPreferences;
+
+import com.r0adkll.chipper.core.prefs.BooleanPreference;
+import com.r0adkll.chipper.core.qualifiers.GenericPrefs;
+import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
+
+import javax.inject.Singleton;
+
 import dagger.Module;
+import dagger.Provides;
 
 /**
  * Project: Chipper
@@ -16,6 +25,9 @@ import dagger.Module;
 )
 public class UIModule {
 
-
+    @Provides @Singleton @OfflineSwitchPreference
+    BooleanPreference provideOfflineSwitchPreference(@GenericPrefs SharedPreferences prefs){
+        return new BooleanPreference(prefs, "pref_offline_mode", false);
+    }
 
 }

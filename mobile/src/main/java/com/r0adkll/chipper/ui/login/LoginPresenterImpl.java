@@ -3,12 +3,17 @@ package com.r0adkll.chipper.ui.login;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.util.TypedValue;
+import android.os.Build;
 
+import com.activeandroid.query.Select;
+import com.r0adkll.chipper.core.api.ApiModule;
 import com.r0adkll.chipper.core.api.ChipperService;
 import com.r0adkll.chipper.core.api.model.ChipperError;
+import com.r0adkll.chipper.core.api.model.Device;
 import com.r0adkll.chipper.core.api.model.User;
+import com.r0adkll.chipper.core.utils.Tools;
 import com.r0adkll.chipper.ui.all.ChiptunesActivity;
+import com.r0adkll.deadskunk.utils.Utils;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -100,8 +105,31 @@ public class LoginPresenterImpl implements LoginPresenter {
             // Great Success! Forward on to the next activity
             Timber.i("Great Success! %s has been logged in to chipper with a user id of %s", user.email, user.id);
 
-            // Launch main activity
-            launchMainActivity();
+            // Now register a device
+            mChipperService.registerDevice(ApiModule.generateAuthParam(user),
+                    user.id,
+                    Tools.generateUniqueDeviceId(mCtx),
+                    Build.MODEL,
+                    Build.VERSION.SDK_INT,
+                    Utils.isTablet(mCtx),
+                    new Callback<Device>() {
+                        @Override
+                        public void success(Device device, Response response) {
+                            // Store device
+                            if(device.save() > 0){
+                                Timber.i("Device regsitered: %s", device.id);
+                                launchMainActivity();
+                            }else{
+                                mView.showErroMessage("Unable to register device, please try again");
+                            }
+
+                        }
+
+                        @Override
+                        public void failure(RetrofitError error) {
+                            handleRetrofitError(error);
+                        }
+                    });
 
         }else{
             mView.showErroMessage("Unable to save user, please try signing in again.");
@@ -113,6 +141,7 @@ public class LoginPresenterImpl implements LoginPresenter {
      */
     private void launchMainActivity(){
         Intent main = new Intent(mCtx, ChiptunesActivity.class);
+        main.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mCtx.startActivity(main);
         mView.close();
     }
@@ -122,13 +151,17 @@ public class LoginPresenterImpl implements LoginPresenter {
      * @param error
      */
     private void handleRetrofitError(RetrofitError error){
-        ChipperError cer = (ChipperError) error.getBodyAs(ChipperError.class);
-        if(cer != null){
-            Timber.e("Retrofit Error[%s] - %s", error.getMessage(), cer.technical);
-            mView.showErroMessage(cer.readable);
-        }else{
-            Timber.e("Retrofit Error: %s", error.getKind().toString());
-            mView.showErroMessage(error.getLocalizedMessage());
+        try {
+            ChipperError cer = (ChipperError) error.getBodyAs(ChipperError.class);
+            if (cer != null) {
+                Timber.e("Retrofit Error[%s] - %s", error.getMessage(), cer.technical);
+                mView.showErroMessage(cer.readable);
+            } else {
+                Timber.e("Retrofit Error: %s", error.getKind().toString());
+                mView.showErroMessage(error.getLocalizedMessage());
+            }
+        }catch (Exception e){
+            mView.showErroMessage(error.getMessage());
         }
     }
 

@@ -5,7 +5,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by r0adkll on 11/1/14.
@@ -13,12 +15,20 @@ import com.activeandroid.annotation.Table;
 @Table(name = "Users")
 public class User extends Model implements Parcelable{
 
+    @Column(name = "userId")
     public String id;
-    public String email;
-    public boolean premium;
-    public String public_key;
-    public String private_key;
 
+    @Column
+    public String email;
+
+    @Column
+    public boolean premium;
+
+    @Column
+    public String public_key;
+
+    @Column
+    public String private_key;
 
 
     /**

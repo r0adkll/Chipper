@@ -1,7 +1,12 @@
 package com.r0adkll.chipper.core.api;
 
 import com.google.gson.Gson;
+import com.r0adkll.chipper.core.api.model.User;
+import com.r0adkll.chipper.core.utils.Tools;
 import com.squareup.okhttp.OkHttpClient;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Singleton;
 
@@ -50,6 +55,28 @@ public final class ApiModule {
     @Provides @Singleton
     ChipperService provideChipperService(RestAdapter restAdapter) {
         return restAdapter.create(ChipperService.class);
+    }
+
+
+    /**
+     * Generate the auth params and keystore hash
+     * @return
+     */
+    public static String generateAuthParam(User user){
+        Map<String, Object> auth = new HashMap<>();
+
+        // Add auth params
+        auth.put("user_id", user.id);
+        auth.put("public_key", user.public_key);
+        auth.put("timestamp", System.currentTimeMillis()/1000);
+
+        // Now generate the hash
+        Gson gson = new Gson();
+        String params = gson.toJson(auth);
+        String hash = Tools.sha256(params.concat(user.private_key));
+        auth.put("hash", hash);
+
+        return gson.toJson(auth);
     }
 
 }

@@ -25,7 +25,7 @@ import butterknife.InjectView;
 /**
  * Created by r0adkll on 11/12/14.
  */
-public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesView, RecyclerItemClickListener.OnItemClickListener {
+public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesView, RecyclerItemClickListener.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     /***********************************************************************************************
      *
@@ -57,15 +57,20 @@ public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesVi
         setContentView(R.layout.activity_chiptunes);
         ButterKnife.inject(this);
 
+        // Setup the swipe to refresh view
+        mRefreshLayout.setColorSchemeResources(R.color.primary, R.color.primaryDark, R.color.black);
+        mRefreshLayout.setOnRefreshListener(this);
+
         // Setup the adapter with the recycler view
         mAdapter = new AllChiptuneAdapter();
         mChiptuneRecycler.setAdapter(mAdapter);
         mChiptuneRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-
         StickyRecyclerHeadersDecoration headersDecor = new StickyRecyclerHeadersDecoration(mAdapter);
         mChiptuneRecycler.addItemDecoration(headersDecor);
         mChiptuneRecycler.addOnItemTouchListener(new RecyclerItemClickListener(this, this));
 
+        //  Load all chiptunes
+        presenter.loadAllChiptunes();
     }
 
     @Override
@@ -81,6 +86,11 @@ public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesVi
     @Override
     public void onItemClick(View view, int position) {
         presenter.onChiptuneSelected(mAdapter.getItem(position));
+    }
+
+    @Override
+    public void onRefresh() {
+        presenter.loadAllChiptunes();
     }
 
     @Override
@@ -111,7 +121,7 @@ public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesVi
 
     @Override
     public void hideProgress() {
-
+        mRefreshLayout.setRefreshing(false);
     }
 
     @Override
@@ -120,4 +130,5 @@ public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesVi
                 .setMessage(msg)
                 .show(getSupportFragmentManager());
     }
+
 }

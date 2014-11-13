@@ -3,6 +3,7 @@ package com.r0adkll.chipper.ui.all;
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Select;
 import com.google.gson.Gson;
+import com.r0adkll.chipper.core.api.ApiModule;
 import com.r0adkll.chipper.core.api.ChipperService;
 import com.r0adkll.chipper.core.api.model.ChipperError;
 import com.r0adkll.chipper.core.api.model.Chiptune;
@@ -47,7 +48,7 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
                 .from(Chiptune.class)
                 .execute();
 
-        if(chiptunes == null) {
+        if(chiptunes == null || chiptunes.isEmpty()) {
 
             // Load the current user
             User currentUser = new Select()
@@ -57,7 +58,7 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
 
             if (currentUser != null) {
                 // Form the request auth header
-                String auth = generateAuthParam(currentUser);
+                String auth = ApiModule.generateAuthParam(currentUser);
 
                 // Make request
                 mService.getChiptunes(auth, new Callback<List<Chiptune>>() {
@@ -75,6 +76,8 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
                             ActiveAndroid.endTransaction();
                         }
 
+                        Timber.i("Chiptunes loaded from API: %d", chiptunes.size());
+
                         mView.hideProgress();
                         mView.setChiptunes(chiptunes);
                     }
@@ -89,6 +92,7 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
             }
 
         }else{
+            Timber.i("Chiptunes loaded from database: %d", chiptunes.size());
             mView.hideProgress();
             mView.setChiptunes(chiptunes);
         }
@@ -139,27 +143,6 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
             Timber.e("Retrofit Error: %s", error.getKind().toString());
             mView.showErrorMessage(error.getLocalizedMessage());
         }
-    }
-
-    /**
-     * Generate the auth params and keystore hash
-     * @return
-     */
-    public static String generateAuthParam(User user){
-        Map<String, Object> auth = new HashMap<>();
-
-        // Add auth params
-        auth.put("user_id", user.id);
-        auth.put("public_key", user.public_key);
-        auth.put("timestamp", System.currentTimeMillis()/1000);
-
-        // Now generate the hash
-        Gson gson = new Gson();
-        String params = gson.toJson(auth);
-        String hash = Tools.sha256(params.concat(user.private_key));
-        auth.put("hash", hash);
-
-        return gson.toJson(auth);
     }
 
 

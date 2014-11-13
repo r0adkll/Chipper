@@ -91,6 +91,12 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
         mSignIn.setOnClickListener(this);
         mTempAccount.setOnClickListener(this);
 
+        // By default disable the signin button
+        //mSignIn.setEnabled(false);
+
+        // Start attempt to connect to play services
+        mAPIClient.connect();
+
     }
 
     @Override
@@ -167,6 +173,7 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
                 mSignInClicked = true;
                 resolveSignInError();
             } else if (mAPIClient.isConnected()) {
+                mSignIn.setEnabled(false);
 
                 // Attempt to get token and register user
                 getAuthToken(new Callback<String>() {
@@ -179,6 +186,7 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
                     @Override
                     public void onFailure(String msg) {
                         // Do Nothing
+                        mSignIn.setEnabled(true);
                     }
                 });
             }
@@ -266,6 +274,23 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
         public void onConnected(Bundle bundle) {
             mSignInClicked = false;
             Timber.i("User is connected to PlayServices!");
+            mSignIn.setEnabled(false);
+
+            // Attempt to get token and register user
+            getAuthToken(new Callback<String>() {
+                @Override
+                public void onHandle(String authToken) {
+                    String email = Plus.AccountApi.getAccountName(mAPIClient);
+                    presenter.authorizeUserAccount(email, authToken);
+                }
+
+                @Override
+                public void onFailure(String msg) {
+                    // Do Nothing
+                    mSignIn.setEnabled(true);
+                }
+            });
+
         }
 
         @Override

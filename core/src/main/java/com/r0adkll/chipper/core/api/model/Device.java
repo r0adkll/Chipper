@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
 /**
@@ -12,12 +13,13 @@ import com.activeandroid.annotation.Table;
 @Table(name = "Devices")
 public class Device extends Model implements Parcelable{
 
+    @Column(name = "dev_id")
     public String id;
-    public String device_id;
-    public String model;
-    public int sdk;
-    public boolean tablet;
-    public long updated;
+    @Column public String device_id;
+    @Column public String model;
+    @Column public int sdk;
+    @Column public boolean tablet;
+    @Column public long updated;
 
     /**
      * Default constructor

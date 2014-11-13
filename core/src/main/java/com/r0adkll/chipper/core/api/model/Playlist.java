@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
 import java.util.List;
@@ -14,13 +15,27 @@ import java.util.List;
 @Table(name = "Playlists")
 public class Playlist extends Model implements Parcelable{
 
+    @Column(name = "playlist_id")
     public String id;
+
+    @Column
     public User owner;
+
+    @Column
     public String name;
+
+    @Column
     public long updated;
+
+    @Column
     public User updated_by_user;
+
+    @Column
     public String token;
+
+    @Column
     public String permissions;
+
     public List<Chiptune> tunes;
 
     /**

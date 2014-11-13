@@ -16,12 +16,16 @@ import android.widget.TextView;
 
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.core.prefs.BooleanPreference;
+import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
 import com.r0adkll.chipper.ui.widget.ScrimInsetsScrollView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -75,6 +79,9 @@ public abstract class BaseDrawerActivity extends ActionBarActivity {
     @Optional
     @InjectView(R.id.navdrawer_items_list)
     ViewGroup mDrawerItemsListContainer;
+
+    @Inject @OfflineSwitchPreference
+    BooleanPreference mOfflineSwitchPreference;
 
     private final Handler mHandler = new Handler();
     private ObjectGraph activityGraph;
@@ -272,7 +279,7 @@ public abstract class BaseDrawerActivity extends ActionBarActivity {
 
         mDrawerItems.add(new SeperatorDrawerItem());
 
-        mDrawerItems.add(new SwitchDrawerItem(NAVDRAWER_ITEM_OFFLINE_MODE, R.string.navdrawer_item_offline, null));
+        mDrawerItems.add(new SwitchDrawerItem(NAVDRAWER_ITEM_OFFLINE_MODE, R.string.navdrawer_item_offline, mOfflineSwitchPreference));
         mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_SETTINGS, R.string.navdrawer_item_settings, R.drawable.ic_launcher));
         mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_FEEDBACK, R.string.navdrawer_item_feedback, R.drawable.ic_launcher));
 

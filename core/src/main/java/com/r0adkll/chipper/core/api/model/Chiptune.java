@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
 /**
@@ -18,11 +19,12 @@ public class Chiptune extends Model implements Parcelable{
      *
      */
 
+    @Column(name = "chiptune_id")
     public String id;
-    public String title;
-    public String artist;
-    public String streamUrl;
-    public long length;
+    @Column public String title;
+    @Column public String artist;
+    @Column public String streamUrl;
+    @Column public long length;
 
     /**
      * Default Constructor

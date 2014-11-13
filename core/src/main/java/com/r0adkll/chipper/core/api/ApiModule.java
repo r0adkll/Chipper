@@ -68,7 +68,7 @@ public final class ApiModule {
         // Add auth params
         auth.put("user_id", user.id);
         auth.put("public_key", user.public_key);
-        auth.put("timestamp", System.currentTimeMillis()/1000);
+        auth.put("timestamp", System.currentTimeMillis()/1000L);
 
         // Now generate the hash
         Gson gson = new Gson();

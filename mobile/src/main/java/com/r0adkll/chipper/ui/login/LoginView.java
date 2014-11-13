@@ -9,4 +9,6 @@ public interface LoginView {
 
     public void showErroMessage(String message);
 
+    public void close();
+
 }

@@ -10,6 +10,7 @@ import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.core.api.model.User;
 import com.r0adkll.chipper.core.qualifiers.CurrentUser;
+import com.r0adkll.chipper.ui.all.ChiptunesActivity;
 import com.r0adkll.chipper.ui.login.LoginActivity;
 
 import javax.inject.Inject;
@@ -47,8 +48,8 @@ public class Chipper extends Activity {
             Timber.i("Existing user found! User[%s, %s]", mCurrentUser.email, mCurrentUser.id);
 
             // Show the Starting Activity (All List)
-            Intent allChiptunesActivity = new Intent();
-//            startActivity(allChiptunesActivity);
+            Intent main = new Intent(this, ChiptunesActivity.class);
+            startActivity(main);
             finish();
 
         }

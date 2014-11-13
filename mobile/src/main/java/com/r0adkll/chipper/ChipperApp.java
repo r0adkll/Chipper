@@ -6,6 +6,9 @@ import android.content.Context;
 import com.activeandroid.ActiveAndroid;
 import com.r0adkll.chipper.core.utils.CrashlyticsTree;
 import com.r0adkll.chipper.core.utils.FileTree;
+import com.r0adkll.postoffice.PostOffice;
+import com.r0adkll.postoffice.model.Design;
+import com.r0adkll.postoffice.model.Stamp;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -36,6 +39,15 @@ public class ChipperApp extends Application{
             Timber.plant(new CrashlyticsTree());
             Timber.plant(new FileTree(this, getLogFilename()));
         }
+
+        // Setup PostOffice stamp
+        Stamp stamp = new Stamp.Builder(this)
+                .setDesign(Design.MATERIAL_LIGHT)
+                .setThemeColorResource(R.color.primary)
+                .build();
+
+        // Lick the stamp and apply it
+        PostOffice.lick(stamp);
 
         // Setup the object graph
         buildObjectGraphAndInject();

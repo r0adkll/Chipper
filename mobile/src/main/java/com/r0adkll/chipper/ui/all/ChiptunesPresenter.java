@@ -8,6 +8,8 @@ import com.r0adkll.chipper.core.api.model.Playlist;
  */
 public interface ChiptunesPresenter {
 
+    public void loadAllChiptunes();
+
     public void onChiptuneSelected(Chiptune chiptune);
 
     public void upvoteChiptune(Chiptune chiptune);

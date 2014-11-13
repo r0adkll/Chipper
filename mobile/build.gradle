@@ -56,8 +56,8 @@ dependencies {
     compile 'com.r0adkll:postoffice:1.+'
     compile 'com.r0adkll:slidableactivity:1.+'
 
-    compile 'com.github.frankiesardo:icepick:2.3.6'
-    provided 'com.github.frankiesardo:icepick-processor:2.3.6'
+//    compile 'com.github.frankiesardo:icepick:2.3.6'
+//    provided 'com.github.frankiesardo:icepick-processor:2.3.6'
 }
 
 android.applicationVariants.all { variant ->

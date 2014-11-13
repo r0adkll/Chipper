@@ -4,11 +4,15 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.MotionEvent;
+import android.view.View;
 
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.adapters.AllChiptuneAdapter;
 import com.r0adkll.chipper.core.api.model.Chiptune;
 import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
+import com.r0adkll.chipper.ui.model.RecyclerItemClickListener;
+import com.r0adkll.postoffice.PostOffice;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
 import java.util.List;
@@ -21,7 +25,7 @@ import butterknife.InjectView;
 /**
  * Created by r0adkll on 11/12/14.
  */
-public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesView{
+public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesView, RecyclerItemClickListener.OnItemClickListener {
 
     /***********************************************************************************************
      *
@@ -37,7 +41,6 @@ public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesVi
 
     @Inject
     ChiptunesPresenter presenter;
-
 
     private AllChiptuneAdapter mAdapter;
 
@@ -60,7 +63,8 @@ public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesVi
         mChiptuneRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
         StickyRecyclerHeadersDecoration headersDecor = new StickyRecyclerHeadersDecoration(mAdapter);
-
+        mChiptuneRecycler.addItemDecoration(headersDecor);
+        mChiptuneRecycler.addOnItemTouchListener(new RecyclerItemClickListener(this, this));
 
     }
 
@@ -72,6 +76,11 @@ public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesVi
     @Override
     protected void onNavDrawerSlide(float offset) {
 
+    }
+
+    @Override
+    public void onItemClick(View view, int position) {
+        presenter.onChiptuneSelected(mAdapter.getItem(position));
     }
 
     @Override
@@ -91,7 +100,8 @@ public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesVi
 
     @Override
     public void setChiptunes(List<Chiptune> chiptunes) {
-
+        mAdapter.clear();
+        mAdapter.addAll(chiptunes);
     }
 
     @Override
@@ -104,5 +114,10 @@ public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesVi
 
     }
 
-
+    @Override
+    public void showErrorMessage(String msg) {
+        PostOffice.newMail(this)
+                .setMessage(msg)
+                .show(getSupportFragmentManager());
+    }
 }

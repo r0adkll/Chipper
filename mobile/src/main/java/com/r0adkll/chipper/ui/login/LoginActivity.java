@@ -148,6 +148,11 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
     }
 
     @Override
+    public void close() {
+        finish();
+    }
+
+    @Override
     protected Object[] getModules() {
         return new Object[]{
             new LoginModule(this)

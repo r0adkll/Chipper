@@ -15,4 +15,6 @@ public interface ChiptunesView {
 
     public void hideProgress();
 
+    public void showErrorMessage(String msg);
+
 }

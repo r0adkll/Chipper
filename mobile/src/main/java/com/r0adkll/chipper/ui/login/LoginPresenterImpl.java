@@ -2,11 +2,13 @@ package com.r0adkll.chipper.ui.login;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.util.TypedValue;
 
 import com.r0adkll.chipper.core.api.ChipperService;
 import com.r0adkll.chipper.core.api.model.ChipperError;
 import com.r0adkll.chipper.core.api.model.User;
+import com.r0adkll.chipper.ui.all.ChiptunesActivity;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -110,8 +112,9 @@ public class LoginPresenterImpl implements LoginPresenter {
      * Launch into the main portion of the application
      */
     private void launchMainActivity(){
-        // TODO: Launch Activity
-
+        Intent main = new Intent(mCtx, ChiptunesActivity.class);
+        mCtx.startActivity(main);
+        mView.close();
     }
 
     /**

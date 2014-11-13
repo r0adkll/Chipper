@@ -1,5 +1,6 @@
 package com.r0adkll.chipper.core.api;
 
+import com.r0adkll.chipper.core.api.model.Chiptune;
 import com.r0adkll.chipper.core.api.model.Device;
 import com.r0adkll.chipper.core.api.model.Playlist;
 import com.r0adkll.chipper.core.api.model.User;
@@ -380,6 +381,6 @@ public interface ChipperService {
      */
     @GET("/chiptunes")
     void getChiptunes(@Header("auth") String auth,
-                      Callback cb);
+                      Callback<List<Chiptune>> cb);
 
 }

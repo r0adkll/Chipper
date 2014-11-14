@@ -9,8 +9,10 @@ import com.r0adkll.chipper.core.api.model.ChipperError;
 import com.r0adkll.chipper.core.api.model.Chiptune;
 import com.r0adkll.chipper.core.api.model.Playlist;
 import com.r0adkll.chipper.core.api.model.User;
+import com.r0adkll.chipper.core.utils.ChiptuneComparator;
 import com.r0adkll.chipper.core.utils.Tools;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +81,7 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
                         Timber.i("Chiptunes loaded from API: %d", chiptunes.size());
 
                         mView.hideProgress();
-                        mView.setChiptunes(chiptunes);
+                        setChiptunes(chiptunes);
                     }
 
                     @Override
@@ -94,14 +96,14 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
         }else{
             Timber.i("Chiptunes loaded from database: %d", chiptunes.size());
             mView.hideProgress();
-            mView.setChiptunes(chiptunes);
+            setChiptunes(chiptunes);
         }
     }
 
     @Override
     public void onChiptuneSelected(Chiptune chiptune) {
         // Send Otto Event to start playing this selected chiptune
-
+        Timber.i("Chiptune selected[%s]: %s-%s", chiptune.id, chiptune.artist, chiptune.title);
     }
 
     @Override
@@ -126,6 +128,16 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
 
     @Override
     public void offlineChiptunes(Chiptune... chiptunes) {
+
+    }
+
+    private void setChiptunes(List<Chiptune> chiptunes){
+
+        // 1. Sort
+        Collections.sort(chiptunes, new ChiptuneComparator());
+
+        // 2. Send to view
+        mView.setChiptunes(chiptunes);
 
     }
 

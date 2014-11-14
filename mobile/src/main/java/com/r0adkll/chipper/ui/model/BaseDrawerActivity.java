@@ -270,18 +270,18 @@ public abstract class BaseDrawerActivity extends ActionBarActivity {
         mDrawerItems.clear();
 
         // Generate all the drawer items that will be used in the drawer
-        mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_DASHBOARD, R.string.navdrawer_item_dashboard, R.drawable.ic_launcher));
-        mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_CHIPTUNES, R.string.navdrawer_item_chiptunes, R.drawable.ic_launcher));
-        mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_POPULAR, R.string.navdrawer_item_popular, R.drawable.ic_launcher));
-        mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_FEATURED, R.string.navdrawer_item_featured, R.drawable.ic_launcher));
-        mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_PLAYLISTS, R.string.navdrawer_item_playlists, R.drawable.ic_launcher));
-        mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_PARTIES, R.string.navdrawer_item_parties, R.drawable.ic_launcher));
+        mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_DASHBOARD, R.string.navdrawer_item_dashboard, R.drawable.ic_dashboard));
+        mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_CHIPTUNES, R.string.navdrawer_item_chiptunes, R.drawable.ic_music));
+        mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_POPULAR, R.string.navdrawer_item_popular, R.drawable.ic_popular));
+        mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_FEATURED, R.string.navdrawer_item_featured, R.drawable.ic_featured));
+        mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_PLAYLISTS, R.string.navdrawer_item_playlists, R.drawable.ic_playlists));
+        mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_PARTIES, R.string.navdrawer_item_parties, R.drawable.ic_party));
 
         mDrawerItems.add(new SeperatorDrawerItem());
 
         mDrawerItems.add(new SwitchDrawerItem(NAVDRAWER_ITEM_OFFLINE_MODE, R.string.navdrawer_item_offline, mOfflineSwitchPreference));
-        mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_SETTINGS, R.string.navdrawer_item_settings, R.drawable.ic_launcher));
-        mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_FEEDBACK, R.string.navdrawer_item_feedback, R.drawable.ic_launcher));
+        mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_SETTINGS, R.string.navdrawer_item_settings, R.drawable.ic_settings));
+        mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_FEEDBACK, R.string.navdrawer_item_feedback, R.drawable.ic_forum));
 
         // Now generate the items into the view
         createNavDrawerItems();
@@ -299,18 +299,22 @@ public abstract class BaseDrawerActivity extends ActionBarActivity {
         mNavDrawerItemViews.clear();
         mDrawerItemsListContainer.removeAllViews();
         for (DrawerItem item: mDrawerItems) {
+            item.setSelected(item.getId() == getSelfNavDrawerItem());
             View view = item.onCreateView(getLayoutInflater(), mDrawerItemsListContainer);
             if(!(item instanceof SeperatorDrawerItem)){
                 view.setId(item.getId());
                 mNavDrawerItemViews.put(item.getId(), view);
 
                 // Set the view's click listener
-                view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        onNavDrawerItemClicked(v.getId());
-                    }
-                });
+                if(!(item instanceof SwitchDrawerItem)) {
+                    view.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            onNavDrawerItemClicked(v.getId());
+                        }
+                    });
+                }
+
             }
 
             mDrawerItemsListContainer.addView(view);
@@ -443,7 +447,7 @@ public abstract class BaseDrawerActivity extends ActionBarActivity {
      * @param selected
      */
     private void formatNavDrawerItem(DrawerItem item, boolean selected) {
-        if (item instanceof SeperatorDrawerItem) {
+        if (item instanceof SeperatorDrawerItem || item instanceof SwitchDrawerItem) {
             // not applicable
             return;
         }

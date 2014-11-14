@@ -40,7 +40,7 @@
     </style>
 
     <style name="Widget.Chipper.HeaderBar" parent="">
-        <item name="android:background">?colorPrimary</item>
+        <item name="android:background">@drawable/actionbar_background</item>
         <item name="android:elevation" tools:ignore="NewApi">@dimen/headerbar_elevation</item>
     </style>
 

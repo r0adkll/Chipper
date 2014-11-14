@@ -25,7 +25,7 @@ import butterknife.InjectView;
 /**
  * Created by r0adkll on 11/12/14.
  */
-public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesView, RecyclerItemClickListener.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesView, SwipeRefreshLayout.OnRefreshListener, AllChiptuneAdapter.OnItemClickListener {
 
     /***********************************************************************************************
      *
@@ -67,7 +67,8 @@ public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesVi
         mChiptuneRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         StickyRecyclerHeadersDecoration headersDecor = new StickyRecyclerHeadersDecoration(mAdapter);
         mChiptuneRecycler.addItemDecoration(headersDecor);
-        mChiptuneRecycler.addOnItemTouchListener(new RecyclerItemClickListener(this, this));
+//        mChiptuneRecycler.addOnItemTouchListener(new RecyclerItemClickListener(this, this));
+        mAdapter.setOnItemClickListener(this);
 
         //  Load all chiptunes
         presenter.loadAllChiptunes();
@@ -84,8 +85,8 @@ public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesVi
     }
 
     @Override
-    public void onItemClick(View view, int position) {
-        presenter.onChiptuneSelected(mAdapter.getItem(position));
+    public void onItemClick(View view, Chiptune item,  int position) {
+        presenter.onChiptuneSelected(item);
     }
 
     @Override

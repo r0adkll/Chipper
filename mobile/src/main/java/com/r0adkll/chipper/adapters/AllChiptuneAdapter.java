@@ -24,7 +24,7 @@ import butterknife.InjectView;
  * Created by drew.heavner on 11/13/14.
  */
 public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptuneAdapter.ChiptuneViewHolder>
-        implements StickyRecyclerHeadersAdapter<AllChiptuneAdapter.HeaderViewHolder>{
+        implements StickyRecyclerHeadersAdapter<AllChiptuneAdapter.HeaderViewHolder> {
 
     /***********************************************************************************************
      *
@@ -34,6 +34,7 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
 
     private List<List<Chiptune>> mHeaders = new ArrayList<>();
     private List<String> mTitles = new ArrayList<>();
+    private OnItemClickListener mItemClickListener;
 
     /**
      * Constructor
@@ -42,6 +43,14 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
     public AllChiptuneAdapter(){
         super();
         registerAdapterDataObserver(mChiptunesObserver);
+    }
+
+    /**
+     * Set the item click listener for this adapter
+     * @param listener
+     */
+    public void setOnItemClickListener(OnItemClickListener listener){
+        mItemClickListener = listener;
     }
 
     /***********************************************************************************************
@@ -59,14 +68,22 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
     }
 
     @Override
-    public void onBindViewHolder(ChiptuneViewHolder holder, int position) {
+    public void onBindViewHolder(final ChiptuneViewHolder holder, int position) {
         Chiptune data = getItem(position);
 
         holder.title.setText(data.title);
-        holder.description.setText(String.format("%d:%d",
+        holder.description.setText(String.format("%d:%02d",
                 TimeUnit.MILLISECONDS.toMinutes(data.length),
                 TimeUnit.MILLISECONDS.toSeconds(data.length) -
                 TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(data.length))));
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int i = holder.getPosition();
+                if(mItemClickListener != null) mItemClickListener.onItemClick(v, getItem(i), i);
+            }
+        });
 
     }
 
@@ -161,7 +178,7 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
     /**
      * The ViewHolder for this adapter
      */
-    public static class ChiptuneViewHolder extends RecyclerView.ViewHolder{
+    public static class ChiptuneViewHolder extends RecyclerView.ViewHolder {
 
         @InjectView(R.id.title)         TextView title;
         @InjectView(R.id.description)   TextView description;
@@ -183,6 +200,10 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
             super(itemView);
             ButterKnife.inject(this, itemView);
         }
+    }
+
+    public static interface OnItemClickListener{
+        public void onItemClick(View v, Chiptune item, int position);
     }
 
 }

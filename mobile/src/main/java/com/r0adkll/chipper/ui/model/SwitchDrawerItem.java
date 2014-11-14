@@ -15,7 +15,7 @@ import butterknife.ButterKnife;
 /**
  * Created by r0adkll on 11/13/14.
  */
-public class SwitchDrawerItem extends DrawerItem implements CompoundButton.OnCheckedChangeListener {
+public class SwitchDrawerItem extends DrawerItem implements CompoundButton.OnCheckedChangeListener, View.OnClickListener {
 
     private int mText;
     private SwitchCompat mSwitch;
@@ -49,6 +49,8 @@ public class SwitchDrawerItem extends DrawerItem implements CompoundButton.OnChe
         // Set the switch checked change listener that updates the set boolean preference
         mSwitch.setOnCheckedChangeListener(this);
 
+        view.setOnClickListener(this);
+
         // Set the title of the drawer item
         titleView.setText(mText);
         return view;
@@ -57,5 +59,10 @@ public class SwitchDrawerItem extends DrawerItem implements CompoundButton.OnChe
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         mPreference.set(isChecked);
+    }
+
+    @Override
+    public void onClick(View v) {
+        mSwitch.setChecked(!mSwitch.isChecked());
     }
 }

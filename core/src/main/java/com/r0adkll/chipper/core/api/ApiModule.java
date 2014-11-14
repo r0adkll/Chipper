@@ -5,6 +5,10 @@ import com.r0adkll.chipper.core.api.model.User;
 import com.r0adkll.chipper.core.utils.Tools;
 import com.squareup.okhttp.OkHttpClient;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +22,7 @@ import retrofit.RestAdapter;
 import retrofit.client.Client;
 import retrofit.client.OkClient;
 import retrofit.converter.GsonConverter;
+import timber.log.Timber;
 
 /**
  * This module defines all the injectable components that will be used
@@ -57,26 +62,38 @@ public final class ApiModule {
         return restAdapter.create(ChipperService.class);
     }
 
-
     /**
      * Generate the auth params and keystore hash
      * @return
      */
     public static String generateAuthParam(User user){
-        Map<String, Object> auth = new HashMap<>();
+        JSONObject auth = new JSONObject();
 
         // Add auth params
-        auth.put("user_id", user.id);
-        auth.put("public_key", user.public_key);
-        auth.put("timestamp", System.currentTimeMillis()/1000L);
+        try {
 
-        // Now generate the hash
-        Gson gson = new Gson();
-        String params = gson.toJson(auth);
-        String hash = Tools.sha256(params.concat(user.private_key));
-        auth.put("hash", hash);
+            auth.put("public_key", user.public_key);
+            auth.put("user_id", user.id);
+            auth.put("timestamp", System.currentTimeMillis()/1000L);
 
-        return gson.toJson(auth);
+            String compose = auth.toString().concat(user.private_key);
+
+            Timber.i("Compose pre-hash: %s", compose);
+
+            // Now generate the hash
+            String hash = Tools.sha256(compose);
+            auth.put("hash", hash);
+
+            Timber.i("Post-Hash: %s", hash);
+
+            return auth.toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
+
+
 
 }

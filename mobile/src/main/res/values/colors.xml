@@ -22,4 +22,5 @@
     <color name="body_text_primary_light">@color/black80</color>
     <color name="body_text_secondary_light">@color/black35</color>
 
+    <color name="black12">#1f000000</color>
 </resources>

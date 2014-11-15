@@ -1,5 +1,6 @@
 package com.r0adkll.chipper.ui.all;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,6 +13,7 @@ import com.r0adkll.chipper.adapters.AllChiptuneAdapter;
 import com.r0adkll.chipper.core.api.model.Chiptune;
 import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
 import com.r0adkll.chipper.ui.model.RecyclerItemClickListener;
+import com.r0adkll.chipper.ui.widget.StickyRecyclerHeadersElevationDecoration;
 import com.r0adkll.postoffice.PostOffice;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
@@ -25,16 +27,13 @@ import butterknife.InjectView;
 /**
  * Created by r0adkll on 11/12/14.
  */
-public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesView, SwipeRefreshLayout.OnRefreshListener, AllChiptuneAdapter.OnItemClickListener {
+public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesView, AllChiptuneAdapter.OnItemClickListener {
 
     /***********************************************************************************************
      *
      *  Variables
      *
      */
-
-    @InjectView(R.id.swipe_refresh_layout)
-    SwipeRefreshLayout mRefreshLayout;
 
     @InjectView(R.id.chiptune_recycler)
     RecyclerView mChiptuneRecycler;
@@ -57,22 +56,34 @@ public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesVi
         setContentView(R.layout.activity_chiptunes);
         ButterKnife.inject(this);
 
-        // Setup the swipe to refresh view
-        mRefreshLayout.setColorSchemeResources(R.color.primary, R.color.primaryDark, R.color.black);
-        mRefreshLayout.setOnRefreshListener(this);
-
         // Setup the adapter with the recycler view
         mAdapter = new AllChiptuneAdapter();
         mChiptuneRecycler.setAdapter(mAdapter);
         mChiptuneRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        StickyRecyclerHeadersDecoration headersDecor = new StickyRecyclerHeadersDecoration(mAdapter);
+        StickyRecyclerHeadersElevationDecoration headersDecor = new StickyRecyclerHeadersElevationDecoration(mAdapter);
         mChiptuneRecycler.addItemDecoration(headersDecor);
-//        mChiptuneRecycler.addOnItemTouchListener(new RecyclerItemClickListener(this, this));
         mAdapter.setOnItemClickListener(this);
 
         //  Load all chiptunes
         presenter.loadAllChiptunes();
     }
+
+    /***********************************************************************************************
+     *
+     * Helper Methods
+     *
+     */
+
+    @Override
+    public void onItemClick(View view, Chiptune item,  int position) {
+        presenter.onChiptuneSelected(item);
+    }
+
+    /***********************************************************************************************
+     *
+     * Base Methods
+     *
+     */
 
     @Override
     protected int getSelfNavDrawerItem() {
@@ -82,16 +93,6 @@ public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesVi
     @Override
     protected void onNavDrawerSlide(float offset) {
 
-    }
-
-    @Override
-    public void onItemClick(View view, Chiptune item,  int position) {
-        presenter.onChiptuneSelected(item);
-    }
-
-    @Override
-    public void onRefresh() {
-        presenter.loadAllChiptunes();
     }
 
     @Override
@@ -108,6 +109,10 @@ public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesVi
      *
      */
 
+    @Override
+    public Activity getActivity(){
+        return this;
+    }
 
     @Override
     public void setChiptunes(List<Chiptune> chiptunes) {
@@ -122,7 +127,7 @@ public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesVi
 
     @Override
     public void hideProgress() {
-        mRefreshLayout.setRefreshing(false);
+
     }
 
     @Override

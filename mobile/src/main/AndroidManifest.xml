@@ -3,6 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.r0adkll.chipper" >
 
+    <!--========================================================================================
+
+        Permissions
+
+    =========================================================================================-->
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="com.android.vending.BILLING" />
@@ -19,6 +25,12 @@
         android:name=".ChipperApp"
         >
 
+        <!--========================================================================================
+
+            Activity Definitions
+
+        =========================================================================================-->
+
         <activity
             android:name=".ui.Chipper"
             android:label="@string/app_name"
@@ -32,12 +44,20 @@
 
         <!-- The Login Activity -->
         <activity android:name=".ui.login.LoginActivity"
-            android:theme="@style/Theme.Chipper.NoActionbar"
-            />
+            android:theme="@style/Theme.Chipper.NoActionbar"/>
 
-        <activity android:name=".ui.all.ChiptunesActivity"
+        <!-- The main chiptune list activity -->
+        <activity android:name=".ui.all.ChiptunesActivity"/>
 
-            />
+        <!-- The Popular voted list activity-->
+        <activity android:name=".ui.popular.PopularActivity"/>
+
+
+        <!--========================================================================================
+
+            Meta-Data
+
+        =========================================================================================-->
 
         <meta-data
             android:name="AA_DB_NAME"

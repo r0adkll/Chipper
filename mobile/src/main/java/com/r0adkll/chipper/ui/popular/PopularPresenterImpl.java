@@ -1,10 +1,7 @@
-package com.r0adkll.chipper.ui.all;
+package com.r0adkll.chipper.ui.popular;
 
 import android.content.Intent;
 
-import com.activeandroid.ActiveAndroid;
-import com.activeandroid.query.Select;
-import com.google.gson.Gson;
 import com.r0adkll.chipper.core.api.ApiModule;
 import com.r0adkll.chipper.core.api.ChipperService;
 import com.r0adkll.chipper.core.api.model.ChipperError;
@@ -14,13 +11,10 @@ import com.r0adkll.chipper.core.api.model.User;
 import com.r0adkll.chipper.core.data.OfflineIntentService;
 import com.r0adkll.chipper.core.data.model.OfflineRequest;
 import com.r0adkll.chipper.core.utils.ChiptuneComparator;
-import com.r0adkll.chipper.core.utils.Tools;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -28,29 +22,28 @@ import retrofit.client.Response;
 import timber.log.Timber;
 
 /**
- * Created by r0adkll on 11/13/14.
+ * Created by r0adkll on 11/15/14.
  */
-public class ChiptunesPresenterImpl implements ChiptunesPresenter {
+public class PopularPresenterImpl implements PopularPresenter {
 
     private User mCurrentUser;
-    private ChiptunesView mView;
+    private PopularView mView;
     private ChipperService mService;
 
     /**
      * Constructor
-     *
-     * @param view          the chipper view interface
-     * @param service       the chipper API service
+     * @param view      the view interface
+     * @param service   the api service
      */
-    public ChiptunesPresenterImpl(ChiptunesView view, ChipperService service, User user){
-        mCurrentUser = user;
+    public PopularPresenterImpl(PopularView view, ChipperService service, User user){
         mView = view;
         mService = service;
+        mCurrentUser = user;
     }
+
 
     @Override
     public void loadAllChiptunes() {
-        mView.showProgress();
         ApiModule.loadChiptunes(mCurrentUser, mService, new Callback<List<Chiptune>>() {
             @Override
             public void success(List<Chiptune> chiptunes, Response response) {
@@ -67,9 +60,28 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
     }
 
     @Override
+    public void loadVotes() {
+
+        String auth = ApiModule.generateAuthParam(mCurrentUser);
+        mService.getVotes(auth, new Callback() {
+            @Override
+            public void success(Object o, Response response) {
+
+                // Set the vote data in the view
+                mView.setVoteData();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                handleRetrofitError(error);
+            }
+        });
+
+    }
+
+    @Override
     public void onChiptuneSelected(Chiptune chiptune) {
-        // Send Otto Event to start playing this selected chiptune
-        Timber.i("Chiptune selected[%s]: %s-%s", chiptune.id, chiptune.artist, chiptune.title);
+
     }
 
     @Override
@@ -105,11 +117,7 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
 
     }
 
-    /**
-     * Sort and Send the chiptune list to the view
-     *
-     * @param chiptunes     the list of chiptunes to display
-     */
+
     private void setChiptunes(List<Chiptune> chiptunes){
 
         // 1. Sort
@@ -119,7 +127,6 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
         mView.setChiptunes(chiptunes);
 
     }
-
 
     /**
      * Handle the retrofit error from the chipper api
@@ -135,6 +142,4 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
             mView.showErrorMessage(error.getLocalizedMessage());
         }
     }
-
-
 }

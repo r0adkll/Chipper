@@ -1,6 +1,9 @@
 package com.r0adkll.chipper.core.api;
 
+import com.activeandroid.ActiveAndroid;
+import com.activeandroid.query.Select;
 import com.google.gson.Gson;
+import com.r0adkll.chipper.core.api.model.Chiptune;
 import com.r0adkll.chipper.core.api.model.User;
 import com.r0adkll.chipper.core.utils.Tools;
 import com.squareup.okhttp.OkHttpClient;
@@ -10,17 +13,21 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import retrofit.Callback;
 import retrofit.Endpoint;
 import retrofit.Endpoints;
 import retrofit.RestAdapter;
+import retrofit.RetrofitError;
 import retrofit.client.Client;
 import retrofit.client.OkClient;
+import retrofit.client.Response;
 import retrofit.converter.GsonConverter;
 import timber.log.Timber;
 
@@ -94,6 +101,60 @@ public final class ApiModule {
         return "";
     }
 
+    /**
+     * Load all the chiptunes either via Database or by the API
+     *
+     * @param user          the current user to auth with
+     * @param service       the chipper api service
+     * @param cb            the callback
+     */
+    public static void loadChiptunes(User user, ChipperService service, final Callback<List<Chiptune>> cb){
+
+        // Attempt to load existing chiptunes
+        List<Chiptune> chiptunes = new Select()
+                .from(Chiptune.class)
+                .execute();
+
+        if(chiptunes == null || chiptunes.isEmpty()) {
+
+            if (user != null) {
+
+                // Form the request auth header
+                String auth = ApiModule.generateAuthParam(user);
+
+                // Make request
+                service.getChiptunes(auth, new Callback<List<Chiptune>>() {
+                    @Override
+                    public void success(List<Chiptune> chiptunes, Response response) {
+
+                        // Save all the chiptunes
+                        ActiveAndroid.beginTransaction();
+                        try{
+                            for(Chiptune chiptune: chiptunes){
+                                chiptune.save();
+                            }
+                            ActiveAndroid.setTransactionSuccessful();
+                        } finally{
+                            ActiveAndroid.endTransaction();
+                        }
+
+                        Timber.i("Chiptunes loaded from API: %d", chiptunes.size());
+                        cb.success(chiptunes, response);
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        cb.failure(error);
+                    }
+                });
+
+            }
+
+        }else{
+            Timber.i("Chiptunes loaded from database: %d", chiptunes.size());
+            cb.success(chiptunes, null);
+        }
+    }
 
 
 }

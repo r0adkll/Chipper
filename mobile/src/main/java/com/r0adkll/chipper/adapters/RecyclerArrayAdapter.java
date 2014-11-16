@@ -2,9 +2,13 @@ package com.r0adkll.chipper.adapters;
 
 import android.support.v7.widget.RecyclerView;
 
+import com.google.common.collect.Collections2;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 
 
 public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder>
@@ -17,18 +21,18 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
 
     public void add(M object) {
         items.add(object);
-        notifyItemInserted(items.size()-1);
+        notifyDataSetChanged();
     }
 
     public void add(int index, M object) {
         items.add(index, object);
-        notifyItemInserted(index);
+        notifyDataSetChanged();
     }
 
     public void addAll(Collection<? extends M> collection) {
         if (collection != null) {
             items.addAll(collection);
-            notifyItemRangeInserted(items.size()-collection.size(), collection.size());
+            notifyDataSetChanged();
         }
     }
 
@@ -45,7 +49,12 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
     public void remove(M object) {
         int index = items.indexOf(object);
         items.remove(object);
-        notifyItemRemoved(index);
+        notifyDataSetChanged();
+    }
+
+    public void sort(Comparator<M> comparator){
+        Collections.sort(items, comparator);
+        notifyDataSetChanged();
     }
 
     public M getItem(int position) {

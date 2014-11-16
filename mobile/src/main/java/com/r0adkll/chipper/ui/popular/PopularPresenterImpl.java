@@ -8,6 +8,7 @@ import com.r0adkll.chipper.core.api.model.ChipperError;
 import com.r0adkll.chipper.core.api.model.Chiptune;
 import com.r0adkll.chipper.core.api.model.Playlist;
 import com.r0adkll.chipper.core.api.model.User;
+import com.r0adkll.chipper.core.data.ChiptuneProvider;
 import com.r0adkll.chipper.core.data.OfflineIntentService;
 import com.r0adkll.chipper.core.data.model.OfflineRequest;
 import com.r0adkll.chipper.core.utils.ChiptuneComparator;
@@ -15,6 +16,7 @@ import com.r0adkll.chipper.core.utils.ChiptuneComparator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -29,22 +31,27 @@ public class PopularPresenterImpl implements PopularPresenter {
     private User mCurrentUser;
     private PopularView mView;
     private ChipperService mService;
+    private ChiptuneProvider mProvider;
 
     /**
      * Constructor
      * @param view      the view interface
      * @param service   the api service
      */
-    public PopularPresenterImpl(PopularView view, ChipperService service, User user){
+    public PopularPresenterImpl(PopularView view,
+                                ChiptuneProvider provider,
+                                ChipperService service,
+                                User user){
         mView = view;
         mService = service;
         mCurrentUser = user;
+        mProvider = provider;
     }
 
 
     @Override
     public void loadAllChiptunes() {
-        ApiModule.loadChiptunes(mCurrentUser, mService, new Callback<List<Chiptune>>() {
+        mProvider.loadChiptunes(new Callback<List<Chiptune>>() {
             @Override
             public void success(List<Chiptune> chiptunes, Response response) {
                 mView.hideProgress();
@@ -63,12 +70,11 @@ public class PopularPresenterImpl implements PopularPresenter {
     public void loadVotes() {
 
         String auth = ApiModule.generateAuthParam(mCurrentUser);
-        mService.getVotes(auth, new Callback() {
+        mService.getVotes(auth, new Callback<Map<String, Integer>>() {
             @Override
-            public void success(Object o, Response response) {
-
-                // Set the vote data in the view
-                mView.setVoteData();
+            public void success(Map<String, Integer> votes, Response response) {
+                mView.setVoteData(votes);
+                mView.hideProgress();
             }
 
             @Override
@@ -141,5 +147,6 @@ public class PopularPresenterImpl implements PopularPresenter {
             Timber.e("Retrofit Error: %s", error.getKind().toString());
             mView.showErrorMessage(error.getLocalizedMessage());
         }
+        mView.hideProgress();
     }
 }

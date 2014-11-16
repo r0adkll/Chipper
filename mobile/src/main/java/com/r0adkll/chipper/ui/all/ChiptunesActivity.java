@@ -55,6 +55,8 @@ public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesVi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chiptunes);
         ButterKnife.inject(this);
+        overridePendingTransition(0, 0);
+        getSupportActionBar().setTitle(R.string.navdrawer_item_chiptunes);
 
         // Setup the adapter with the recycler view
         mAdapter = new AllChiptuneAdapter();

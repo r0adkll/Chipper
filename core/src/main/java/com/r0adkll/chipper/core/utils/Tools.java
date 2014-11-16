@@ -3,27 +3,13 @@ package com.r0adkll.chipper.core.utils;
 import android.content.Context;
 import android.telephony.TelephonyManager;
 
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang3.RandomStringUtils;
-
-import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 /**
  * Created by r0adkll on 11/1/14.
  */
 public class Tools {
-
-    /**
-     * Generate a random AlphaNumeric string to use as a token
-     *
-     * @return      the 128 length random alpha numeric string
-     */
-    public static String generateToken(){
-        return RandomStringUtils.randomAlphanumeric(128);
-    }
 
     /**
      * Generate a unique device identifier that can be replicated
@@ -54,47 +40,11 @@ public class Tools {
     }
 
     /**
-     * Hash a string to SHA1
+     * SHA-256 hash a string
      *
-     * @param input     the string to hash
+     * @param base      the string to hash
      * @return          the hashed string
      */
-    public static String sha1(String input)  {
-        try {
-            MessageDigest mDigest = MessageDigest.getInstance("SHA1");
-            byte[] result = mDigest.digest(input.getBytes());
-            return Hex.encodeHexString(result);
-        } catch (NoSuchAlgorithmException e){
-            e.printStackTrace();
-        }
-        return "";
-    }
-
-    /**
-     * Hash a string to sha256
-     *
-     * @param input     the string to hash
-     * @return          the hashed string, or an empty one
-     */
-    public static String sha256old(String input){
-        MessageDigest md;
-        try {
-            md = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException ex) {
-            ex.printStackTrace();
-            return "";
-        }
-
-        try {
-            md.update(input.getBytes("UTF-8"));
-            byte[] shaDig = md.digest();
-            return new String(Hex.encodeHexString(shaDig));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-
     public static String sha256(String base) {
         try{
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -111,20 +61,5 @@ public class Tools {
             throw new RuntimeException(ex);
         }
     }
-
-    private static String bytesToHexString(byte[] bytes) {
-        // http://stackoverflow.com/questions/332079
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < bytes.length; i++) {
-            String hex = Integer.toHexString(0xFF & bytes[i]);
-            if (hex.length() == 1) {
-                sb.append('0');
-            }
-            sb.append(hex);
-        }
-        return sb.toString();
-    }
-
-
 
 }

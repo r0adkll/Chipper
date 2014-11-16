@@ -11,6 +11,7 @@ import com.r0adkll.chipper.core.api.model.ChipperError;
 import com.r0adkll.chipper.core.api.model.Chiptune;
 import com.r0adkll.chipper.core.api.model.Playlist;
 import com.r0adkll.chipper.core.api.model.User;
+import com.r0adkll.chipper.core.data.ChiptuneProvider;
 import com.r0adkll.chipper.core.data.OfflineIntentService;
 import com.r0adkll.chipper.core.data.model.OfflineRequest;
 import com.r0adkll.chipper.core.utils.ChiptuneComparator;
@@ -35,6 +36,7 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
     private User mCurrentUser;
     private ChiptunesView mView;
     private ChipperService mService;
+    private ChiptuneProvider mProvider;
 
     /**
      * Constructor
@@ -42,16 +44,20 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
      * @param view          the chipper view interface
      * @param service       the chipper API service
      */
-    public ChiptunesPresenterImpl(ChiptunesView view, ChipperService service, User user){
+    public ChiptunesPresenterImpl(ChiptunesView view,
+                                  ChiptuneProvider provider,
+                                  ChipperService service,
+                                  User user){
         mCurrentUser = user;
         mView = view;
         mService = service;
+        mProvider = provider;
     }
 
     @Override
     public void loadAllChiptunes() {
         mView.showProgress();
-        ApiModule.loadChiptunes(mCurrentUser, mService, new Callback<List<Chiptune>>() {
+        mProvider.loadChiptunes(new Callback<List<Chiptune>>() {
             @Override
             public void success(List<Chiptune> chiptunes, Response response) {
                 mView.hideProgress();

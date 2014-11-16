@@ -13,11 +13,14 @@ import com.activeandroid.annotation.Table;
 @Table(name = "Votes")
 public class Vote extends Model implements Parcelable{
 
-    @Column(name = "tune_id")
+    @Column(name = "vote_id")
     public String id;
 
     @Column
-    public int vote;
+    public String tune_id;
+
+    @Column
+    public int value;
 
 
     /**
@@ -30,7 +33,8 @@ public class Vote extends Model implements Parcelable{
      */
     public Vote(Parcel in){
         id = in.readString();
-        vote = in.readInt();
+        tune_id = in.readString();
+        value = in.readInt();
     }
 
     /***********************************************************************************************
@@ -47,7 +51,8 @@ public class Vote extends Model implements Parcelable{
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
-        dest.writeInt(vote);
+        dest.writeString(tune_id);
+        dest.writeInt(value);
     }
 
     public static final Creator<Vote> CREATOR = new Creator<Vote>() {

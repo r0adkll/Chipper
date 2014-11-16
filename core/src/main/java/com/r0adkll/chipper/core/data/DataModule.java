@@ -5,6 +5,7 @@ import android.content.Context;
 import android.telephony.TelephonyManager;
 
 import com.activeandroid.query.Select;
+import com.r0adkll.chipper.core.api.ChipperService;
 import com.r0adkll.chipper.core.api.model.Chiptune;
 import com.r0adkll.chipper.core.api.model.Device;
 import com.r0adkll.chipper.core.api.model.Playlist;
@@ -22,6 +23,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import hugo.weaving.DebugLog;
 
 /**
  * This module will define all the components used in storing/retreiving saved data
@@ -82,6 +84,11 @@ public final class DataModule {
                 .executeSingle();
     }
 
-
+    @DebugLog
+    @Provides @Singleton
+    ChiptuneProvider provideChiptuneProvider(@CurrentUser User user,
+                                             ChipperService service){
+        return new ChiptuneProvider(service, user);
+    }
 
 }

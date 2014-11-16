@@ -4,6 +4,7 @@ import com.r0adkll.chipper.core.api.model.Chiptune;
 import com.r0adkll.chipper.core.api.model.Device;
 import com.r0adkll.chipper.core.api.model.Playlist;
 import com.r0adkll.chipper.core.api.model.User;
+import com.r0adkll.chipper.core.api.model.Vote;
 
 import java.util.List;
 import java.util.Map;
@@ -319,7 +320,7 @@ public interface ChipperService {
     @GET("/user/{id}/votes")
     void getUserVotes(@Header("auth") String auth,
                       @Path("id") String userId,
-                      Callback<Map<String, Integer>> cb);
+                      Callback<List<Vote>> cb);
 
     /**
      * Vote on a chiptune
@@ -370,7 +371,7 @@ public interface ChipperService {
      */
     @GET("/votes")
     void getVotes(@Header("auth") String auth,
-                  Callback cb);
+                  Callback<Map<String, Integer>> cb);
 
     /**
      * Get the master list of chiptunes that give the name, title, stream url

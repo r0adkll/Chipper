@@ -53,9 +53,9 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.3.4'
     compile 'com.timehop.stickyheadersrecyclerview:library:0.3.3@aar'
 
-    compile 'com.r0adkll:postoffice:1.+'
-    compile 'com.r0adkll:slidableactivity:1.+'
+    compile 'com.r0adkll:postoffice:1.1.+'
+    compile 'com.r0adkll:slidableactivity:1.0.1'
 
-//    compile 'com.github.frankiesardo:icepick:2.3.6'
-//    provided 'com.github.frankiesardo:icepick-processor:2.3.6'
+    compile 'com.github.frankiesardo:icepick:2.3.6'
+    provided 'com.github.frankiesardo:icepick-processor:2.3.6'
 }

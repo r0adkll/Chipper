@@ -52,6 +52,8 @@
         <!-- The Popular voted list activity-->
         <activity android:name=".ui.popular.PopularActivity"/>
 
+        <!-- The Playlist Activity -->
+        <activity android:name=".ui.playlists.PlaylistActivity"/>
 
         <!--========================================================================================
 

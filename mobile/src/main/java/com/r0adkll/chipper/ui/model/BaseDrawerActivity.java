@@ -18,6 +18,8 @@ import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.core.prefs.BooleanPreference;
 import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
+import com.r0adkll.chipper.ui.all.ChiptunesActivity;
+import com.r0adkll.chipper.ui.popular.PopularActivity;
 import com.r0adkll.chipper.ui.widget.ScrimInsetsScrollView;
 
 import java.util.ArrayList;
@@ -395,14 +397,14 @@ public abstract class BaseDrawerActivity extends ActionBarActivity {
 //                finish();
                 break;
             case NAVDRAWER_ITEM_CHIPTUNES:
-//                intent = new Intent(this, BrowseSessionsActivity.class);
-//                startActivity(intent);
-//                finish();
+                intent = new Intent(this, ChiptunesActivity.class);
+                startActivity(intent);
+                finish();
                 break;
             case NAVDRAWER_ITEM_POPULAR:
-//                intent = new Intent(this, UIUtils.getMapActivityClass(this));
-//                startActivity(intent);
-//                finish();
+                intent = new Intent(this, PopularActivity.class);
+                startActivity(intent);
+                finish();
                 break;
             case NAVDRAWER_ITEM_FEATURED:
 //                intent = new Intent(this, SocialActivity.class);

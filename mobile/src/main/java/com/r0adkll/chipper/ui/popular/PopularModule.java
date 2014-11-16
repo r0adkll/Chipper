@@ -3,6 +3,7 @@ package com.r0adkll.chipper.ui.popular;
 import com.r0adkll.chipper.adapters.PopularChiptuneAdapter;
 import com.r0adkll.chipper.core.api.ChipperService;
 import com.r0adkll.chipper.core.api.model.User;
+import com.r0adkll.chipper.core.data.ChiptuneProvider;
 import com.r0adkll.chipper.core.qualifiers.CurrentUser;
 import com.r0adkll.chipper.ui.UIModule;
 
@@ -32,8 +33,11 @@ public class PopularModule {
     }
 
     @Provides @Singleton
-    PopularPresenter providePresenter(PopularView view, ChipperService service, @CurrentUser User user){
-        return new PopularPresenterImpl(view, service, user);
+    PopularPresenter providePresenter(PopularView view,
+                                      ChiptuneProvider provider,
+                                      ChipperService service,
+                                      @CurrentUser User user){
+        return new PopularPresenterImpl(view, provider, service, user);
     }
 
     @Provides

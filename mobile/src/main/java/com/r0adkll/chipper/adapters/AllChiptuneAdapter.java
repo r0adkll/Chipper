@@ -136,7 +136,7 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
         // Update Artist maps
         HashMap<String, List<Chiptune>> currMap = new HashMap<String, List<Chiptune>>();
 
-        // Loop through tunes
+        // Loop through tuneRefs
         for(int i=0; i<getItemCount(); i++){
             Chiptune tune = getItem(i);
             String artist = tune.artist.toUpperCase();

@@ -91,4 +91,9 @@ public final class DataModule {
         return new ChiptuneProvider(service, user);
     }
 
+    @Provides @Singleton
+    PlaylistManager providePlaylistManager(ChipperService service){
+        return new PlaylistManager(service);
+    }
+
 }

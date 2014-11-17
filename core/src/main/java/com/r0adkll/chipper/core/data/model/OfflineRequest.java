@@ -86,7 +86,7 @@ public class OfflineRequest implements Parcelable {
         }
 
         public Builder addPlaylist(Playlist plist){
-            request.chiptunes.addAll(plist.tunes);
+            request.chiptunes.addAll(plist.tuneRefs);
             return this;
         }
 

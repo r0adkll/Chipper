@@ -11,7 +11,9 @@ import com.r0adkll.chipper.core.api.model.User;
 import com.r0adkll.chipper.core.qualifiers.CurrentUser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -38,6 +40,7 @@ public class ChiptuneProvider {
      * The list of chiptunes to provide to the UI
      */
     private List<Chiptune> mChiptunes;
+    private Map<String, Chiptune> mChiptuneMap;
 
     private ChipperService mService;
     private User mCurrentUser;
@@ -50,8 +53,18 @@ public class ChiptuneProvider {
     @Inject
     public ChiptuneProvider(ChipperService service, @CurrentUser User user){
         mChiptunes = new ArrayList<>();
+        mChiptuneMap = new HashMap<>();
         mService = service;
         mCurrentUser = user;
+    }
+
+    /**
+     * Get a chiptune for a specified id, or null
+     * @param id
+     * @return
+     */
+    public Chiptune getChiptune(String id){
+        return mChiptuneMap.get(id);
     }
 
     /**
@@ -80,7 +93,7 @@ public class ChiptuneProvider {
 
                 if(chiptunes != null && !chiptunes.isEmpty()) {
                     Timber.i("Chiptunes loaded from database in %d ms", System.currentTimeMillis() - start);
-                    mChiptunes = new ArrayList<>(chiptunes);
+                    setChiptunes(chiptunes);
                     return chiptunes;
                 }
 
@@ -114,7 +127,7 @@ public class ChiptuneProvider {
                                 }
 
                                 Timber.i("Chiptunes loaded from API: %d", chiptunes.size());
-                                mChiptunes = new ArrayList<>(chiptunes);
+                                setChiptunes(chiptunes);
                                 cb.success(chiptunes, response);
                             }
 
@@ -128,6 +141,18 @@ public class ChiptuneProvider {
                 }
             }
         }.execute();
+    }
+
+    /**
+     * Set and hash the chiptunes
+     * @param chiptunes
+     */
+    private void setChiptunes(List<Chiptune> chiptunes){
+        mChiptunes = new ArrayList<>(chiptunes);
+        mChiptuneMap = new HashMap<>();
+        for(Chiptune chiptune:chiptunes){
+            mChiptuneMap.put(chiptune.id, chiptune);
+        }
     }
 
 }

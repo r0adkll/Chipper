@@ -46,10 +46,11 @@ public final class ApiModule {
     }
 
     @Provides @Singleton
-    RestAdapter provideRestAdapter(Endpoint endpoint, Client client) {
+    RestAdapter provideRestAdapter(Endpoint endpoint, Client client, ApiHeaders headers) {
         return new RestAdapter.Builder()
                 .setClient(client)
                 .setEndpoint(endpoint)
+                .setRequestInterceptor(headers)
                 .setConverter(new GsonConverter(new Gson()))
                 .build();
     }

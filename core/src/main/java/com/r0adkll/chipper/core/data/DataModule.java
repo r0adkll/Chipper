@@ -46,6 +46,7 @@ public final class DataModule {
     User provideCurrentUser(){
         return new Select()
                 .from(User.class)
+                .where("is_current_user=?", true)
                 .limit(1)
                 .executeSingle();
     }
@@ -86,14 +87,14 @@ public final class DataModule {
 
     @DebugLog
     @Provides @Singleton
-    ChiptuneProvider provideChiptuneProvider(@CurrentUser User user,
-                                             ChipperService service){
-        return new ChiptuneProvider(service, user);
+    ChiptuneProvider provideChiptuneProvider(ChipperService service){
+        return new ChiptuneProvider(service);
     }
 
     @Provides @Singleton
-    PlaylistManager providePlaylistManager(ChipperService service){
-        return new PlaylistManager(service);
+    PlaylistManager providePlaylistManager(ChipperService service,
+                                           @CurrentUser User user){
+        return new PlaylistManager(service, user);
     }
 
 }

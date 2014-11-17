@@ -69,13 +69,11 @@ public interface ChipperService {
      * so we can give this account premium if possible.
      *
      * @param userId            the user id
-     * @param auth              the auth body
      * @param purchaseToken     the purchase token to verify
      */
     @FormUrlEncoded
     @POST("/user/{id}/premium")
-    void verifyPlayStorePurchase(@Header("auth") String auth,
-                                 @Path("id") String userId,
+    void verifyPlayStorePurchase(@Path("id") String userId,
                                  @Field("purchase_token") String purchaseToken,
                                  Callback cb);
 
@@ -86,8 +84,7 @@ public interface ChipperService {
      * @param cb            the callback
      */
     @GET("/user/{id}/devices")
-    void getUsersDevices(@Header("auth") String auth,
-                         @Path("id") String userId,
+    void getUsersDevices(@Path("id") String userId,
                          Callback<List<Device>> cb);
 
     /**
@@ -102,8 +99,7 @@ public interface ChipperService {
      */
     @FormUrlEncoded
     @POST("/user/{id}/devices")
-    void registerDevice(@Header("auth") String auth,
-                        @Path("id") String userId,
+    void registerDevice(@Path("id") String userId,
                         @Field("device_id") String deviceId,
                         @Field("model") String model,
                         @Field("sdk") int sdk,
@@ -118,8 +114,7 @@ public interface ChipperService {
      * @param cb            the callback
      */
     @GET("/user/{id}/devices/{deviceId}")
-    void getDevice(@Header("auth") String auth,
-                   @Path("id") String userId,
+    void getDevice(@Path("id") String userId,
                    @Path("deviceId") String deviceId,
                    Callback<Device> cb);
 
@@ -133,8 +128,7 @@ public interface ChipperService {
      */
     @FormUrlEncoded
     @POST("/user/{id}/devices/{deviceId}")
-    void registerPushToken(@Header("auth") String auth,
-                           @Path("id") String userId,
+    void registerPushToken(@Path("id") String userId,
                            @Path("deviceId") String deviceId,
                            @Field("push_token") String pushToken,
                            Callback cb);
@@ -147,8 +141,7 @@ public interface ChipperService {
      * @param cb            the callback
      */
     @DELETE("/user/{id}/devices/{deviceId}")
-    void deleteDevice(@Header("auth") String auth,
-                      @Path("id") String userId,
+    void deleteDevice(@Path("id") String userId,
                       @Path("deviceId") String deviceId,
                       Callback cb);
 
@@ -159,20 +152,17 @@ public interface ChipperService {
      * @param cb            the callback
      */
     @GET("/user/{id}/playlists")
-    void getPlaylists(@Header("auth") String auth,
-                      @Path("id") String userId,
+    void getPlaylists(@Path("id") String userId,
                       Callback<List<Playlist>> cb);
 
     /**
      * Update/Create a playlist on the server under the user's account
      *
      * @param userId        the id of the user the playlist will belong to
-     * @param auth          the auth body
      * @param body          the playlist update/create json
      */
     @POST("/user/{id}/playlists")
-    void createPlaylist(@Header("auth") String auth,
-                        @Path("id") String userId,
+    void createPlaylist(@Path("id") String userId,
                         @Body Map<String, Object> body,
                         Callback<Playlist> cb);
 
@@ -181,12 +171,10 @@ public interface ChipperService {
      *
      * @param userId        the id of the user the playlist belongs to
      * @param playlistId    the id of the playlist to get
-     * @param auth          the auth body
      * @param cb            the callback
      */
     @GET("/user/{id}/playlists/{pid}")
-    void getPlaylist(@Header("auth") String auth,
-                     @Path("id") String userId,
+    void getPlaylist(@Path("id") String userId,
                      @Path("pid") String playlistId,
                      Callback<Playlist> cb);
 
@@ -195,35 +183,43 @@ public interface ChipperService {
      *
      * @param userId            the id of the user this playlist belongs to
      * @param playlistId        the id of the playlist to update
-     * @param auth              the auth body
      * @param body              the playlist update body
      * @param cb                the callback
      */
     @POST("/user/{id}/playlists/{pid}")
-    void updatePlaylist(@Header("auth") String auth,
-                        @Path("id") String userId,
+    void updatePlaylist(@Path("id") String userId,
                         @Path("pid") String playlistId,
                         @Body Map<String, Object> body,
                         Callback<Playlist> cb);
+
+    /**
+     * Synchronously update an existing playlist with the server
+     *
+     * @param userId        the user of the playlist
+     * @param playlistId    the playlist identifier
+     * @param body          the update operations body
+     * @return              the resulting playlist from the server
+     */
+    @POST("/user/{id}/playlists/{pid}")
+    Playlist updatePlaylistSync(@Path("id") String userId,
+                                @Path("pid") String playlistId,
+                                @Body Map<String, Object> body);
 
     /**
      * Delete a specified playlist
      *
      * @param userId        the id of the user the playlist belongs to
      * @param playlistId    the id of the playlist to delete
-     * @param auth          the auth body
      * @param cb            the callback
      */
     @DELETE("/user/{id}/playlists/{pid}")
-    void deletePlaylist(@Header("auth") String auth,
-                        @Path("id") String userId,
+    void deletePlaylist(@Path("id") String userId,
                         @Path("pid") String playlistId,
                         Callback cb);
 
     /**
      * Share a playlist
      *
-     * @param auth          the auth header used to authenticate the response
      * @param userId        the id of the user the playlist belongs to
      * @param playlistId    the id of the playlist to share
      * @param permission    (OPTIONAL) the permission of the now shared playlist
@@ -231,8 +227,7 @@ public interface ChipperService {
      */
     @FormUrlEncoded
     @POST("/user/{id}/playlists/{pid}/share")
-    void sharePlaylist(@Header("auth") String auth,
-                       @Path("id") String userId,
+    void sharePlaylist(@Path("id") String userId,
                        @Path("pid") String playlistId,
                        @Field("permission") String permission,
                        Callback cb);
@@ -240,26 +235,22 @@ public interface ChipperService {
     /**
      * Get a list of playlists that are shared with you
      *
-     * @param auth      the auth header used to authenticate the response
      * @param userId    the id of the user the playlists are shared with
      * @param cb        the callback
      */
     @GET("/user/{id}/shared/playlists")
-    void getSharedPlaylists(@Header("auth") String auth,
-                            @Path("id") String userId,
+    void getSharedPlaylists(@Path("id") String userId,
                             Callback<List<Playlist>> cb);
 
     /**
      * Get a specific shared playlist by it's id
      *
-     * @param auth                the auth header used to authenticate the response
      * @param userId              the id of the user that the playlist is shared with
      * @param sharedPlaylistId    the id of the shared playlist
      * @param cb                  the callback
      */
     @GET("/user/{id}/shared/playlists/{spid}")
-    void getSharedPlaylist(@Header("auth") String auth,
-                           @Path("id") String userId,
+    void getSharedPlaylist(@Path("id") String userId,
                            @Path("spid") String sharedPlaylistId,
                            Callback<Playlist> cb);
 
@@ -267,14 +258,12 @@ public interface ChipperService {
      * Update a playlist that is shared with you, but only if the owner has set the permission
      * on the playlist to 'write' or 'full'
      *
-     * @param auth                  the auth header used to authenticate the response
      * @param userId                the id of the user that the playlist is shared with
      * @param sharedPlaylistId      the id of the shared playlist
      * @param cb                    the callback
      */
     @POST("/user/{id}/shared/playlists/{spid}")
-    void updateSharedPlaylist(@Header("auth") String auth,
-                              @Path("id") String userId,
+    void updateSharedPlaylist(@Path("id") String userId,
                               @Path("spid") String sharedPlaylistId,
                               Callback<Playlist> cb);
 
@@ -283,14 +272,12 @@ public interface ChipperService {
      * Remove your link to this shared playlist. This does NOT delete the playlist itself
      * but merely makes you unable to see it (unless you re-redeem it)
      *
-     * @param auth                  the auth header used to authenticate the response
      * @param userId                the id of the user that the playlist is shared with
      * @param sharedPlaylistId      the id of the shared playlist
      * @param cb                    the callback
      */
     @DELETE("/user/{id}/shared/playlists/{spid}")
-    void removeSharedPlaylist(@Header("auth") String auth,
-                              @Path("id") String userId,
+    void removeSharedPlaylist(@Path("id") String userId,
                               @Path("spid") String sharedPlaylistId,
                               Callback cb);
 
@@ -298,42 +285,36 @@ public interface ChipperService {
      * Redeem a shared playlists' token that was received from one of the specially
      * generated links sent by the owning user.
      *
-     * @param auth      the auth header used to authenticate the response
      * @param userId    the id of the user
      * @param token     the shared playlist token used to redeem the playlist
      * @param cb        the callback
      */
     @FormUrlEncoded
     @POST("/user/{id}/shared/redeem")
-    void redeemSharedPlaylist(@Header("auth") String auth,
-                              @Path("id") String userId,
+    void redeemSharedPlaylist(@Path("id") String userId,
                               @Field("token") String token,
                               Callback cb);
 
     /**
      * Return the map of all the user's vote values
      *
-     * @param auth      the auth header used to authenticate the response
      * @param userId    the id of the user
      * @param cb        the callback
      */
     @GET("/user/{id}/votes")
-    void getUserVotes(@Header("auth") String auth,
-                      @Path("id") String userId,
+    void getUserVotes(@Path("id") String userId,
                       Callback<List<Vote>> cb);
 
     /**
      * Vote on a chiptune
      *
-     * @param auth          the auth header used to authenticate the response
      * @param userId        the id of the user
      * @param voteType      the type of vote i.e. 'up' or 'down'
      * @param tuneId        the id of the chiptune to vote upon
      * @param cb            the callback
      */
     @POST("/user/{id}/vote/{type}/{tuneId}")
-    void vote(@Header("auth") String auth,
-              @Path("id") String userId,
+    void vote(@Path("id") String userId,
               @Path("type") String voteType,
               @Path("tuneId") int tuneId,
               Callback cb);
@@ -341,47 +322,39 @@ public interface ChipperService {
     /**
      * Batch vote on several chiptunes at once
      *
-     * @param auth          the auth header used to authenticate the response
      * @param userId        the id of the user
      * @param body          the body containing the vote params
      * @param cb            the callback
      */
     @POST("/user/{id}/vote/batch")
-    void batchVote(@Header("auth") String auth,
-                   @Path("id") String userId,
+    void batchVote(@Path("id") String userId,
                    @Body List<Map<String, Object>> body,
                    Callback cb);
 
     /**
      * Get the current featured playlist
      *
-     * @param auth      the the auth header used to authenticate the response
      * @param cb        the callback
      */
     @GET("/playlists/featured")
-    void getFeaturedPlaylist(@Header("auth") String auth,
-                             Callback<Playlist> cb);
+    void getFeaturedPlaylist(Callback<Playlist> cb);
 
     /**
      * Get a map of all the collective vote values of all
      * the songs available.
      *
-     * @param auth  the auth header used to authenticate the response
      * @param cb    the callback
      */
     @GET("/votes")
-    void getVotes(@Header("auth") String auth,
-                  Callback<Map<String, Integer>> cb);
+    void getVotes(Callback<Map<String, Integer>> cb);
 
     /**
      * Get the master list of chiptunes that give the name, title, stream url
      * lenght of play time, etc.
      *
-     * @param auth      the the auth header used to authenticate the response
      * @param cb        the callback
      */
     @GET("/chiptunes")
-    void getChiptunes(@Header("auth") String auth,
-                      Callback<List<Chiptune>> cb);
+    void getChiptunes(Callback<List<Chiptune>> cb);
 
 }

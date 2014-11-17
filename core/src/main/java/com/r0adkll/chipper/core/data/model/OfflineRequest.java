@@ -1,10 +1,13 @@
 package com.r0adkll.chipper.core.data.model;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.r0adkll.chipper.core.api.model.Chiptune;
 import com.r0adkll.chipper.core.api.model.Playlist;
+import com.r0adkll.chipper.core.data.OfflineIntentService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,6 +45,9 @@ public class OfflineRequest implements Parcelable {
         return chiptunes;
     }
 
+
+
+
     @Override
     public int describeContents() {
         return 0;
@@ -64,6 +70,24 @@ public class OfflineRequest implements Parcelable {
         }
     };
 
+
+    /**
+     * Create an Offline Request Intent to send off and start an offline task
+     *
+     * @param ctx           the application context to construct the intent with
+     * @param request       the request object that outlines what the offline task should download
+     * @return              the packaged intent
+     */
+    public static Intent createOfflineRequestIntent(Context ctx, OfflineRequest request){
+        Intent intent = new Intent(ctx, OfflineIntentService.class);
+        intent.putExtra(OfflineIntentService.EXTRA_OFFLINE_REQUEST, request);
+        return intent;
+    }
+
+
+    /**
+     * The builder class that is used to construct offline requests
+     */
     public static class Builder{
 
         OfflineRequest request;
@@ -86,7 +110,7 @@ public class OfflineRequest implements Parcelable {
         }
 
         public Builder addPlaylist(Playlist plist){
-            request.chiptunes.addAll(plist.tuneRefs);
+            request.chiptunes.addAll(plist.getChiptunes());
             return this;
         }
 

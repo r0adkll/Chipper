@@ -7,19 +7,54 @@ import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
 import com.activeandroid.query.Select;
+import com.google.gson.annotations.SerializedName;
 import com.r0adkll.chipper.core.data.ChiptuneProvider;
+import com.r0adkll.chipper.core.utils.Tools;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by r0adkll on 11/2/14.
  */
 @Table(name = "Playlists")
 public class Playlist extends Model implements Parcelable{
+
+    /***********************************************************************************************
+     *
+     * Static Methods
+     *
+     */
+
+    /**
+     * Create a new playlist associated with a certain user
+     *
+     * @param name      the name of the new playlist
+     * @param user      the user that created the playlist
+     * @return          the new playlist
+     */
+    public static Playlist create(String name, User user){
+        Playlist plist = new Playlist();
+        plist.name = name;
+        plist.owner = user;
+        plist.updated = Tools.time();
+        plist.updated_by_user = user;
+        plist.token = "";
+        plist.permissions = "read";
+        return plist;
+    }
+
+    /***********************************************************************************************
+     *
+     * Variables
+     *
+     */
 
     @Column(name = "playlist_id")
     public String id;
@@ -47,6 +82,7 @@ public class Playlist extends Model implements Parcelable{
      * The Playlist manager is then responsible for saving these references into the database
      * for later use by the function {@link #chiptuneReferences()}
      */
+    @SerializedName("tunes")
     public List<ChiptuneReference> tuneRefs;
 
     /**
@@ -56,6 +92,11 @@ public class Playlist extends Model implements Parcelable{
         super();
     }
 
+    /**
+     * Parcelable Constructor
+     *
+     * @param in        the reconstructing parcelable
+     */
     public Playlist(Parcel in){
         super();
         id = in.readString();
@@ -68,6 +109,83 @@ public class Playlist extends Model implements Parcelable{
 
         tuneRefs = new ArrayList<>();
         in.readTypedList(tuneRefs, ChiptuneReference.CREATOR);
+    }
+
+    /***********************************************************************************************
+     *
+     * Helper Methods
+     *
+     */
+
+    /**
+     * Update this playlist from a playlist sent from the API that hasn't add an iD set yet
+     *
+     * @param playlist      the playlist to update from
+     */
+    public boolean update(Playlist playlist){
+        if(playlist.getId() != null) return false;
+
+        // Update the basic values now
+        id = playlist.id;
+        name = playlist.name;
+        updated = playlist.updated;
+        token = playlist.token;
+        permissions = playlist.permissions;
+
+        // Update the complex values now
+        // 1) Find owner reference
+        User _owner = new Select()
+                .from(User.class)
+                .where("id = ?", playlist.owner.id)
+                .and("email = ?", playlist.owner.email)
+                .limit(1)
+                .executeSingle();
+
+        if(_owner != null){
+            owner = _owner;
+        }else{
+            // Create new owner
+            _owner = new User();
+            _owner.id = playlist.owner.id;
+            _owner.email = playlist.owner.email;
+            _owner.save();
+            owner = _owner;
+        }
+
+        // 2) Find updated_by_user reference
+        User _updatedByUser = new Select()
+                .from(User.class)
+                .where("id = ?", playlist.updated_by_user.id)
+                .and("email = ?", playlist.updated_by_user.email)
+                .limit(1)
+                .executeSingle();
+
+        if(_updatedByUser != null){
+            updated_by_user = _updatedByUser;
+        }else{
+            // Create new user
+            _updatedByUser = new User();
+            _updatedByUser.id = playlist.updated_by_user.id;
+            _updatedByUser.email = playlist.updated_by_user.email;
+            _updatedByUser.save();
+            updated_by_user = _updatedByUser;
+        }
+
+        // 3) Delete all the Chiptune references from the database
+        List<ChiptuneReference> references = chiptuneReferences();
+        for(ChiptuneReference reference: references){
+            reference.delete();
+        }
+
+        // now save all the ones from the updated playlist
+        tuneRefs = new ArrayList<>(playlist.tuneRefs);
+        saveChiptuneReferences();
+
+        // Save ourselves
+        save();
+
+        // Return Success
+        return true;
     }
 
     /**
@@ -148,6 +266,7 @@ public class Playlist extends Model implements Parcelable{
     }
 
     /**
+     * Add chiptune reference associated with this
      *
      * @param tune
      */
@@ -156,7 +275,12 @@ public class Playlist extends Model implements Parcelable{
         ChiptuneReference reference = new ChiptuneReference();
         reference.chiptune_id = tune.id;
         reference.playlist = this;
+        reference.sort_order = chiptuneReferences().size();
         reference.save();
+
+        // Update this playlists updated time
+        updated = Tools.time();
+        save();
     }
 
     /**
@@ -175,6 +299,11 @@ public class Playlist extends Model implements Parcelable{
 
         if(reference != null){
             reference.delete();
+            avengeSortOrder(chiptuneReferences());
+
+            // Update this playlists updated time
+            updated = Tools.time();
+            save();
             return true;
         }
 
@@ -204,24 +333,66 @@ public class Playlist extends Model implements Parcelable{
             List<ChiptuneReference> references = chiptuneReferences();
             references.remove(reference);
             references.add(index, reference);
+            avengeSortOrder(references);
 
-            ActiveAndroid.beginTransaction();
-            try {
-                for (int i = 0; i < references.size(); i++) {
-                    ChiptuneReference ref = references.get(i);
-                    ref.sort_order = i;
-                    ref.save();
-                }
-                ActiveAndroid.setTransactionSuccessful();
-            }finally{
-                ActiveAndroid.endTransaction();
-            }
-
+            // Update this playlists updated time
+            updated = Tools.time();
+            save();
             return true;
         }
 
         return false;
     }
+
+    /**
+     * Reset the 'sort_order' on all the chiptune references for this playlist
+     * in order to properly set their sort order
+     *
+     * @param references
+     */
+    private void avengeSortOrder(List<ChiptuneReference> references){
+        ActiveAndroid.beginTransaction();
+        try {
+            for (int i = 0; i < references.size(); i++) {
+                ChiptuneReference ref = references.get(i);
+                ref.sort_order = i;
+                ref.save();
+            }
+            ActiveAndroid.setTransactionSuccessful();
+        }finally{
+            ActiveAndroid.endTransaction();
+        }
+    }
+
+    /**
+     * Output this playlist to a map that can be used to update the server
+     *
+     * @return      the map object to update wiht
+     */
+    public Map<String, Object> toUpdateMap(){
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", name);
+
+        // Set the permissions on the playlist if available in the object
+        if(permissions != null && !permissions.isEmpty()){
+            map.put("permission", permissions);
+        }
+
+        List<ChiptuneReference> references = chiptuneReferences();
+        List<String> tunes = new ArrayList<>();
+        for(ChiptuneReference ref: references){
+            tunes.add(ref.chiptune_id);
+        }
+
+        map.put("tunes", tunes);
+        return map;
+    }
+
+    /***********************************************************************************************
+     *
+     * Parcelable Methods
+     *
+     */
 
     @Override
     public int describeContents() {

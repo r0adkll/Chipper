@@ -99,6 +99,9 @@ public class LoginPresenterImpl implements LoginPresenter {
      */
     private void handleSuccess(User user){
 
+        // Set this user object as the current user
+        user.isCurrentUser = true;
+
         // Save User Account via activeandroid
         if(user.save() > 0){
 
@@ -106,8 +109,7 @@ public class LoginPresenterImpl implements LoginPresenter {
             Timber.i("Great Success! %s has been logged in to chipper with a user id of %s", user.email, user.id);
 
             // Now register a device
-            mChipperService.registerDevice(ApiModule.generateAuthParam(user),
-                    user.id,
+            mChipperService.registerDevice(user.id,
                     Tools.generateUniqueDeviceId(mCtx),
                     Build.MODEL,
                     Build.VERSION.SDK_INT,

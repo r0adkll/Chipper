@@ -43,19 +43,16 @@ public class ChiptuneProvider {
     private Map<String, Chiptune> mChiptuneMap;
 
     private ChipperService mService;
-    private User mCurrentUser;
 
     /**
      * Constructor
      * @param service
-     * @param user
      */
     @Inject
-    public ChiptuneProvider(ChipperService service, @CurrentUser User user){
+    public ChiptuneProvider(ChipperService service){
         mChiptunes = new ArrayList<>();
         mChiptuneMap = new HashMap<>();
         mService = service;
-        mCurrentUser = user;
     }
 
     /**
@@ -105,39 +102,35 @@ public class ChiptuneProvider {
                 if(chiptunes != null){
                     cb.success(chiptunes, null);
                 }else{
-                    if (mCurrentUser != null) {
 
-                        // Form the request auth header
-                        String auth = ApiModule.generateAuthParam(mCurrentUser);
+                    // Make request
+                    mService.getChiptunes(new Callback<List<Chiptune>>() {
+                        @Override
+                        public void success(List<Chiptune> chiptunes, Response response) {
 
-                        // Make request
-                        mService.getChiptunes(auth, new Callback<List<Chiptune>>() {
-                            @Override
-                            public void success(List<Chiptune> chiptunes, Response response) {
-
-                                // Save all the chiptunes
-                                ActiveAndroid.beginTransaction();
-                                try{
-                                    for(Chiptune chiptune: chiptunes){
-                                        chiptune.save();
-                                    }
-                                    ActiveAndroid.setTransactionSuccessful();
-                                } finally{
-                                    ActiveAndroid.endTransaction();
+                            // Save all the chiptunes
+                            ActiveAndroid.beginTransaction();
+                            try{
+                                for(Chiptune chiptune: chiptunes){
+                                    chiptune.save();
                                 }
-
-                                Timber.i("Chiptunes loaded from API: %d", chiptunes.size());
-                                setChiptunes(chiptunes);
-                                cb.success(chiptunes, response);
+                                ActiveAndroid.setTransactionSuccessful();
+                            } finally{
+                                ActiveAndroid.endTransaction();
                             }
 
-                            @Override
-                            public void failure(RetrofitError error) {
-                                cb.failure(error);
-                            }
-                        });
+                            Timber.i("Chiptunes loaded from API: %d", chiptunes.size());
+                            setChiptunes(chiptunes);
+                            cb.success(chiptunes, response);
+                        }
 
-                    }
+                        @Override
+                        public void failure(RetrofitError error) {
+                            cb.failure(error);
+                        }
+                    });
+
+
                 }
             }
         }.execute();

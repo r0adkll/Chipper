@@ -29,7 +29,7 @@ public class PlaylistViewerActivity extends BaseActivity {
      */
 
     @Icicle
-    private Playlist mPlaylist;
+    Playlist mPlaylist;
 
     /***********************************************************************************************
      *

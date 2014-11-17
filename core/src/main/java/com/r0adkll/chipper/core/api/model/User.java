@@ -9,6 +9,8 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 /**
  * Created by r0adkll on 11/1/14.
  */
@@ -30,6 +32,9 @@ public class User extends Model implements Parcelable{
     @Column
     public String private_key;
 
+    @Column(name = "is_current_user")
+    public boolean isCurrentUser = false;
+
 
     /**
      * Default Constructor
@@ -50,6 +55,16 @@ public class User extends Model implements Parcelable{
         premium = in.readInt() == 0 ? false : true;
         public_key = in.readString();
         private_key = in.readString();
+        isCurrentUser = in.readInt() == 1 ? true : false;
+    }
+
+    /**
+     * Get a list of playlists for this user
+     *
+     * @return  return the list of playlists associated with this user
+     */
+    public List<Playlist> getPlaylists(){
+        return getMany(Playlist.class, "owner");
     }
 
     @Override
@@ -64,6 +79,7 @@ public class User extends Model implements Parcelable{
         dest.writeInt(premium ? 1 : 0);
         dest.writeString(public_key);
         dest.writeString(private_key);
+        dest.writeInt(isCurrentUser ? 1 : 0);
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {

@@ -69,8 +69,7 @@ public class PopularPresenterImpl implements PopularPresenter {
     @Override
     public void loadVotes() {
 
-        String auth = ApiModule.generateAuthParam(mCurrentUser);
-        mService.getVotes(auth, new Callback<Map<String, Integer>>() {
+        mService.getVotes(new Callback<Map<String, Integer>>() {
             @Override
             public void success(Map<String, Integer> votes, Response response) {
                 mView.setVoteData(votes);

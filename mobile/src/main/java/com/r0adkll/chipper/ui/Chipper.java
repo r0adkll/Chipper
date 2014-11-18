@@ -71,8 +71,7 @@ public class Chipper extends Activity {
             }else{
 
                 // Register Device
-                mService.registerDevice(ApiModule.generateAuthParam(mCurrentUser),
-                        mCurrentUser.id,
+                mService.registerDevice(mCurrentUser.id,
                         Tools.generateUniqueDeviceId(this),
                         String.format("%s-%s", Build.MANUFACTURER, Build.MODEL),
                         Build.VERSION.SDK_INT,

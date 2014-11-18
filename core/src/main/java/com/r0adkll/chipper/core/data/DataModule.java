@@ -35,9 +35,7 @@ import hugo.weaving.DebugLog;
  * Created by r0adkll on 11/11/14.
  */
 @Module(
-    injects = (
-        SyncCampaign.class
-    ),
+    injects = SyncCampaign.class,
     complete = false,
     library = true
 )

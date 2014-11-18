@@ -93,7 +93,6 @@
     <orderEntry type="library" exported="" name="dagger-1.2.2" level="project" />
     <orderEntry type="library" exported="" name="retrofit-1.7.1" level="project" />
     <orderEntry type="library" exported="" name="okio-1.0.0" level="project" />
-    <orderEntry type="library" exported="" name="play-services-6.1.11" level="project" />
     <orderEntry type="library" exported="" name="dagger-compiler-1.2.2" level="project" />
     <orderEntry type="library" exported="" name="slidableactivity-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="aspectjrt-1.7.4" level="project" />

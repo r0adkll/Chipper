@@ -2,6 +2,8 @@ package com.r0adkll.chipper.core.data.sync;
 
 import android.content.SyncResult;
 
+import javax.inject.Inject;
+
 /**
  * Project: Chipper
  * Package: com.r0adkll.chipper.core.data.sync

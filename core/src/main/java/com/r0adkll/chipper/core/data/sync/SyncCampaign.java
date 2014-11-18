@@ -23,7 +23,7 @@ public class SyncCampaign implements Runnable{
      * Campaign factory interface for creating dynamic sync campaign construction factories
      *
      */
-    public static interface Factory{
+    public interface Factory{
 
         /**
          * Create a campaign for a sync result
@@ -51,7 +51,6 @@ public class SyncCampaign implements Runnable{
      *
      * @param result        the sync result
      */
-    @Inject
     public SyncCampaign(SyncResult result){
         mSyncResult = result;
     }

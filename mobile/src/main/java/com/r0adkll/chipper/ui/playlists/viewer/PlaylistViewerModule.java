@@ -16,7 +16,8 @@ import dagger.Provides;
 @Module(
     injects = PlaylistViewerActivity.class,
     addsTo = UIModule.class,
-    complete = false
+    complete = false,
+    library = true
 )
 public class PlaylistViewerModule {
     private PlaylistViewerView view;

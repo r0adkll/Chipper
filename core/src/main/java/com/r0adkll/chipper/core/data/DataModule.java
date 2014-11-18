@@ -2,6 +2,7 @@ package com.r0adkll.chipper.core.data;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.SyncResult;
 import android.telephony.TelephonyManager;
 
 import com.activeandroid.query.Select;
@@ -10,6 +11,8 @@ import com.r0adkll.chipper.core.api.model.Chiptune;
 import com.r0adkll.chipper.core.api.model.Device;
 import com.r0adkll.chipper.core.api.model.Playlist;
 import com.r0adkll.chipper.core.api.model.User;
+import com.r0adkll.chipper.core.data.sync.CampaignFactoryImpl;
+import com.r0adkll.chipper.core.data.sync.SyncCampaign;
 import com.r0adkll.chipper.core.qualifiers.CurrentDevice;
 import com.r0adkll.chipper.core.qualifiers.CurrentUser;
 import com.r0adkll.chipper.core.qualifiers.DeviceId;
@@ -32,6 +35,9 @@ import hugo.weaving.DebugLog;
  * Created by r0adkll on 11/11/14.
  */
 @Module(
+    injects = (
+        SyncCampaign.class
+    ),
     complete = false,
     library = true
 )
@@ -95,6 +101,11 @@ public final class DataModule {
     PlaylistManager providePlaylistManager(ChipperService service,
                                            @CurrentUser User user){
         return new PlaylistManager(service, user);
+    }
+
+    @Provides @Singleton
+    SyncCampaign.Factory provideSyncCampaignFactory(){
+        return new CampaignFactoryImpl();
     }
 
 }

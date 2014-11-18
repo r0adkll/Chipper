@@ -1,5 +1,7 @@
 package com.r0adkll.chipper.ui.login;
 
+import android.app.Activity;
+
 /**
  * Project: Chipper
  * Package: com.r0adkll.chipper.ui.login
@@ -9,6 +11,10 @@ public interface LoginView {
 
     public void showErroMessage(String message);
 
+    public void reset();
+
     public void close();
+
+    public Activity getActivity();
 
 }

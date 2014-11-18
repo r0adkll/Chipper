@@ -156,6 +156,15 @@ public interface ChipperService {
                       Callback<List<Playlist>> cb);
 
     /**
+     * Synchronously get all the user's playlists stored on the server
+     *
+     * @param userId        the id of the user the playlists belong to
+     * @return              the list of playlists, null/empty array
+     */
+    @GET("/user/{id}/playlists")
+    List<Playlist> getPlaylistsSync(@Path("id") String userId);
+
+    /**
      * Update/Create a playlist on the server under the user's account
      *
      * @param userId        the id of the user the playlist will belong to

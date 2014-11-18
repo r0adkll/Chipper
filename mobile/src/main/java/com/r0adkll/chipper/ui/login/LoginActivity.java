@@ -1,6 +1,7 @@
 package com.r0adkll.chipper.ui.login;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.AsyncTask;
@@ -156,6 +157,16 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
     @Override
     public void close() {
         finish();
+    }
+
+    @Override
+    public void reset() {
+
+    }
+
+    @Override
+    public Activity getActivity() {
+        return this;
     }
 
     @Override

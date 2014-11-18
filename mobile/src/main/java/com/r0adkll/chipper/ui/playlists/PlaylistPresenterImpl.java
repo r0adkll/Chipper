@@ -50,7 +50,7 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
 
     @Override
     public void loadPlaylists() {
-
+        mView.setPlaylists(mUser.getPlaylists());
     }
 
     @Override

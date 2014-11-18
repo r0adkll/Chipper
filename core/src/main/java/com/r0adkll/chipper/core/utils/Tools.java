@@ -1,10 +1,16 @@
 package com.r0adkll.chipper.core.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.telephony.TelephonyManager;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
 import java.security.MessageDigest;
 import java.util.UUID;
+
+import timber.log.Timber;
 
 /**
  * Created by r0adkll on 11/1/14.

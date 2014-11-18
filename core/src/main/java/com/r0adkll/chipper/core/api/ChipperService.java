@@ -131,7 +131,7 @@ public interface ChipperService {
     void registerPushToken(@Path("id") String userId,
                            @Path("deviceId") String deviceId,
                            @Field("push_token") String pushToken,
-                           Callback cb);
+                           Callback<Device> cb);
 
     /**
      * Delete a specified device

@@ -7,10 +7,11 @@ import android.os.Bundle;
 
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
-import com.r0adkll.chipper.core.api.ApiModule;
 import com.r0adkll.chipper.core.api.ChipperService;
 import com.r0adkll.chipper.core.api.model.Device;
 import com.r0adkll.chipper.core.api.model.User;
+import com.r0adkll.chipper.core.push.PushManager;
+import com.r0adkll.chipper.core.push.PushUtils;
 import com.r0adkll.chipper.core.qualifiers.CurrentDevice;
 import com.r0adkll.chipper.core.qualifiers.CurrentUser;
 import com.r0adkll.chipper.core.utils.Tools;
@@ -43,6 +44,9 @@ public class Chipper extends Activity {
     @Inject
     ChipperService mService;
 
+    @Inject
+    PushManager mPushManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +65,11 @@ public class Chipper extends Activity {
 
             if(mCurrentDevice != null) {
 
+                // Log
                 Timber.i("Existing user found! User[%s, %s]", mCurrentUser.email, mCurrentUser.id);
+
+                // Recheck push registration
+                mPushManager.checkRegistration(this);
 
                 // Show the Starting Activity (All List)
                 Intent main = new Intent(this, ChiptunesActivity.class);
@@ -80,6 +88,9 @@ public class Chipper extends Activity {
                             @Override
                             public void success(Device device, Response response) {
                                 if(device.save() > 0){
+
+                                    // Recheck push registration
+                                    mPushManager.checkRegistration(Chipper.this);
 
                                     // Show the Starting Activity (All List)
                                     Intent main = new Intent(Chipper.this, ChiptunesActivity.class);
@@ -100,5 +111,11 @@ public class Chipper extends Activity {
 
         }
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mPushManager.handleActivityResult(this, requestCode, resultCode, data);
     }
 }

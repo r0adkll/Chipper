@@ -20,6 +20,7 @@ public class Device extends Model implements Parcelable{
     @Column public int sdk;
     @Column public boolean tablet;
     @Column public long updated;
+    @Column public String push_token;
 
     /**
      * Default constructor
@@ -36,6 +37,28 @@ public class Device extends Model implements Parcelable{
         sdk = in.readInt();
         tablet = in.readInt() == 0 ? false : true;
         updated = in.readLong();
+        push_token = in.readString();
+    }
+
+    /**
+     * Update this device with a model device Gson'd from the server
+     *
+     * @param device        the device to update with
+     */
+    public void update(Device device){
+        if(device.getId() != null) return;
+
+        // Update all it's fields
+        id = device.id;
+        device_id = device.device_id;
+        model = device.model;
+        sdk = device.sdk;
+        tablet = device.tablet;
+        updated = device.updated;
+        push_token = device.push_token;
+
+        // Save to disk
+        save();
     }
 
     @Override
@@ -51,6 +74,7 @@ public class Device extends Model implements Parcelable{
         dest.writeInt(sdk);
         dest.writeInt(tablet ? 1 : 0);
         dest.writeLong(updated);
+        dest.writeString(push_token);
     }
 
     public static final Creator<Device> CREATOR = new Creator<Device>() {

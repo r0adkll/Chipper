@@ -19,9 +19,10 @@ import dagger.Provides;
  * Created by drew.heavner on 11/18/14.
  */
 @Module(
-    injects = (
-        PushManager.class
-    ),
+    injects = {
+        PushManager.class,
+        GcmIntentService.class
+    },
     complete = false,
     library = true
 )

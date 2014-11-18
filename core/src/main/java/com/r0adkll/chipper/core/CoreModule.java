@@ -45,8 +45,24 @@ public class CoreModule {
     private static final String FLAVOR = "ijuiqkljaisudfijeknxnxnxmsnjkiufwkj";
     private static final String SECURE_PREFERENCE_NAME = "secure.prefs";
     private static final String GENERIC_PREFERENCE_NAME = "generic.prefs";
-
     private static final String PREF_APP_VERSION = "pref_app_version";
+
+
+    private final CoreApplication app;
+
+    /**
+     * Constructor
+     * @param app
+     */
+    public CoreModule(CoreApplication app) {
+        this.app = app;
+    }
+
+
+    @Provides @Singleton
+    Application provideApplication(){
+        return app;
+    }
 
     @Provides @Singleton
     OkHttpClient provideOkHttpClient(Application app) {

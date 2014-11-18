@@ -25,18 +25,5 @@ import dagger.Provides;
     }
 )
 public final class ChipperModule {
-    private final ChipperApp app;
-
-    /**
-     * Constructor
-     */
-    public ChipperModule(ChipperApp app){
-        this.app = app;
-    }
-
-    @Provides @Singleton
-    Application provideApplication(){
-        return app;
-    }
 
 }

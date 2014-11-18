@@ -6,11 +6,8 @@ import com.activeandroid.query.Select;
 import com.r0adkll.chipper.core.api.ChipperService;
 import com.r0adkll.chipper.core.api.model.Playlist;
 import com.r0adkll.chipper.core.api.model.User;
-import com.r0adkll.chipper.core.data.PlaylistManager;
 
 import java.util.List;
-
-import javax.inject.Inject;
 
 /**
  * Project: Chipper
@@ -30,7 +27,7 @@ public class SyncCampaign implements Runnable{
          * @param syncResult    the result to create a campaign for
          * @return              the sync campaign
          */
-        SyncCampaign create(SyncResult syncResult);
+        SyncCampaign create(ChipperService service, SyncResult syncResult);
 
     }
 
@@ -40,9 +37,8 @@ public class SyncCampaign implements Runnable{
      *
      */
 
-    @Inject
-    ChipperService mService;
 
+    private ChipperService mService;
     private final SyncResult mSyncResult;
     private boolean mIsCanceled = false;
 
@@ -51,7 +47,8 @@ public class SyncCampaign implements Runnable{
      *
      * @param result        the sync result
      */
-    public SyncCampaign(SyncResult result){
+    public SyncCampaign(ChipperService service, SyncResult result){
+        mService = service;
         mSyncResult = result;
     }
 

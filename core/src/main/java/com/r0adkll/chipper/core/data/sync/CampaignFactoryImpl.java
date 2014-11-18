@@ -2,7 +2,7 @@ package com.r0adkll.chipper.core.data.sync;
 
 import android.content.SyncResult;
 
-import javax.inject.Inject;
+import com.r0adkll.chipper.core.api.ChipperService;
 
 /**
  * Project: Chipper
@@ -14,7 +14,7 @@ public class CampaignFactoryImpl implements SyncCampaign.Factory {
     public CampaignFactoryImpl(){}
 
     @Override
-    public SyncCampaign create(SyncResult syncResult) {
-        return new SyncCampaign(syncResult);
+    public SyncCampaign create(ChipperService service, SyncResult syncResult) {
+        return new SyncCampaign(service, syncResult);
     }
 }

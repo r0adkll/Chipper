@@ -13,6 +13,7 @@ import com.r0adkll.chipper.core.api.model.Playlist;
 import com.r0adkll.chipper.core.api.model.User;
 import com.r0adkll.chipper.core.data.sync.CampaignFactoryImpl;
 import com.r0adkll.chipper.core.data.sync.SyncCampaign;
+import com.r0adkll.chipper.core.data.sync.SyncModule;
 import com.r0adkll.chipper.core.qualifiers.CurrentDevice;
 import com.r0adkll.chipper.core.qualifiers.CurrentUser;
 import com.r0adkll.chipper.core.qualifiers.DeviceId;
@@ -35,7 +36,9 @@ import hugo.weaving.DebugLog;
  * Created by r0adkll on 11/11/14.
  */
 @Module(
-    injects = SyncCampaign.class,
+    includes = {
+        SyncModule.class
+    },
     complete = false,
     library = true
 )
@@ -99,11 +102,6 @@ public final class DataModule {
     PlaylistManager providePlaylistManager(ChipperService service,
                                            @CurrentUser User user){
         return new PlaylistManager(service, user);
-    }
-
-    @Provides @Singleton
-    SyncCampaign.Factory provideSyncCampaignFactory(){
-        return new CampaignFactoryImpl();
     }
 
 }

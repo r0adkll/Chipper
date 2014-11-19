@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <color name="primaryDark">#99cc00</color>
+    <color name="primary">#669900</color>
+    <color name="accentColor">#9FD700</color>
+
     <color name="statusBar">#b2669900</color>
     <color name="statusBarLogin">#000</color>
 

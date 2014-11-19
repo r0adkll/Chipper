@@ -43,18 +43,31 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':core')
 
+    compile 'com.android.support:support-v4:21.+'
     compile 'com.android.support:appcompat-v7:21.+'
     compile 'com.android.support:cardview-v7:21.0.+'
     compile 'com.android.support:recyclerview-v7:21.0.+'
-
-    compile 'com.squareup.picasso:picasso:2.3.4'
-    compile 'com.timehop.stickyheadersrecyclerview:library:0.3.3@aar'
+    compile 'com.google.android.gms:play-services:6.1.11'
 
     compile 'com.r0adkll:postoffice:1.1.+'
     compile 'com.r0adkll:slidableactivity:1.0.1'
+    compile 'com.r0adkll:deadskunk:1.+'
 
     compile 'com.github.frankiesardo:icepick:2.3.6'
     provided 'com.github.frankiesardo:icepick-processor:2.3.6'
+
+    compile 'com.squareup.picasso:picasso:2.3.4'
+    compile 'com.squareup.okhttp:okhttp:2.0.0'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
+    compile 'com.squareup.retrofit:retrofit:1.7.1'
+    compile 'com.squareup.dagger:dagger:1.2.0'
+    compile 'com.squareup.dagger:dagger-compiler:1.2.2'
+    compile 'com.squareup:otto:1.+'
+
+    compile 'com.jakewharton.timber:timber:2.4.+'
+    compile 'com.jakewharton:butterknife:6.0.0'
+
+    compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
+    compile 'com.timehop.stickyheadersrecyclerview:library:0.3.3@aar'
 }

@@ -14,13 +14,20 @@
     <uses-permission android:name="com.android.vending.BILLING" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <permission android:name="com.r0adkll.chipper.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+    <uses-permission android:name="com.r0adkll.chipper.permission.C2D_MESSAGE" />
 
 
     <application
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.Chipper"
-        tools:replace="android:theme,android:label"
         android:name=".ChipperApp"
         >
 
@@ -53,6 +60,57 @@
 
         <!-- The Playlist Activity -->
         <activity android:name=".ui.playlists.PlaylistActivity"/>
+
+
+        <!--========================================================================================
+
+            Service Definitions
+
+        =========================================================================================-->
+
+        <!-- The intent service used to download chiptunes for offline use -->
+        <service android:name=".data.OfflineIntentService" />
+
+        <!-- This is the Account/Authenticator stub definition for the sync adapter -->
+        <service android:name=".data.sync.AuthenticatorService">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+
+        <!-- The Sync Service -->
+        <service android:name=".data.sync.SyncService"
+            android:exported="true"
+            android:process=":sync">
+
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
+
+        </service>
+
+        <!-- The Gcm Receiver -->
+        <receiver android:name=".push.GcmBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intetn.RECEIVE" />
+                <category android:name="com.r0adkll.chipper" />
+            </intent-filter>
+        </receiver>
+        <service android:name=".push.GcmIntentService" />
+
+        <!-- Stub Content Provider -->
+        <provider
+            android:authorities="com.r0adkll.chipper.provider"
+            android:name="com.r0adkll.chipper.data.sync.StubProvider"
+            android:exported="false"
+            android:syncable="true" />
 
         <!--========================================================================================
 

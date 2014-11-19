@@ -86,18 +86,20 @@
     <orderEntry type="library" exported="" name="okhttp-urlconnection-2.0.0" level="project" />
     <orderEntry type="library" exported="" name="cardview-v7-21.0.0" level="project" />
     <orderEntry type="library" exported="" name="fontloader-1.0.1" level="project" />
-    <orderEntry type="library" exported="" name="guava-15.0" level="project" />
     <orderEntry type="library" exported="" name="picasso-2.3.4" level="project" />
+    <orderEntry type="library" exported="" name="guava-15.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.0" level="project" />
     <orderEntry type="library" exported="" name="icepick-processor-2.3.6" level="project" />
     <orderEntry type="library" exported="" name="dagger-1.2.2" level="project" />
     <orderEntry type="library" exported="" name="retrofit-1.7.1" level="project" />
     <orderEntry type="library" exported="" name="okio-1.0.0" level="project" />
+    <orderEntry type="library" exported="" name="play-services-6.1.11" level="project" />
     <orderEntry type="library" exported="" name="dagger-compiler-1.2.2" level="project" />
     <orderEntry type="library" exported="" name="slidableactivity-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="aspectjrt-1.7.4" level="project" />
     <orderEntry type="library" exported="" name="postoffice-1.1.7" level="project" />
     <orderEntry type="library" exported="" name="hugo-annotations-1.1.0" level="project" />
+    <orderEntry type="library" exported="" name="deadskunk-1.0.1" level="project" />
     <orderEntry type="library" exported="" name="okhttp-2.0.0" level="project" />
     <orderEntry type="library" exported="" name="icepick-2.3.6" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-21.0.0" level="project" />
@@ -113,7 +115,6 @@
     <orderEntry type="library" exported="" name="butterknife-6.0.0" level="project" />
     <orderEntry type="library" exported="" name="gson-2.3" level="project" />
     <orderEntry type="library" exported="" name="javawriter-2.5.0" level="project" />
-    <orderEntry type="module" module-name="core" exported="" />
   </component>
 </module>
 

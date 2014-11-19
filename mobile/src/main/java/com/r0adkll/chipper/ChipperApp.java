@@ -5,7 +5,6 @@ import android.content.Context;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Configuration;
-import com.r0adkll.chipper.core.CoreApplication;
 import com.r0adkll.chipper.core.api.model.Chiptune;
 import com.r0adkll.chipper.core.api.model.Device;
 import com.r0adkll.chipper.core.api.model.Playlist;
@@ -28,11 +27,25 @@ import timber.log.Timber;
  * Package: com.r0adkll.chipper
  * Created by drew.heavner on 11/12/14.
  */
-public class ChipperApp extends CoreApplication {
+public class ChipperApp extends Application{
+    private ObjectGraph objectGraph;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        // Initialize ActiveAndroid
+        Configuration.Builder builder = new Configuration.Builder(this)
+                .addModelClasses(User.class, Device.class, Chiptune.class, Playlist.class);
+        ActiveAndroid.initialize(builder.create());
+
+        // Plant Timber Trees
+        if(BuildConfig.DEBUG){
+            Timber.plant(new Timber.DebugTree());
+        }else{
+            Timber.plant(new CrashlyticsTree());
+            Timber.plant(new FileTree(this, getLogFilename()));
+        }
 
         // Setup PostOffice stamp
         Stamp stamp = new Stamp.Builder(this)
@@ -42,21 +55,41 @@ public class ChipperApp extends CoreApplication {
 
         // Lick the stamp and apply it
         PostOffice.lick(stamp);
+
+        // Setup the object graph
+        buildObjectGraphAndInject();
     }
 
-    @Override
-    public Object[] getModules(Application application) {
-        return Modules.list();
+    @DebugLog
+    public void buildObjectGraphAndInject(){
+        objectGraph = ObjectGraph.create(Modules.list(this));
+        objectGraph.inject(this);
+    }
+
+    /**
+     * Create a scoped object graph
+     *
+     * @param modules       the list of modules to add to the scope
+     * @return              the scoped graph
+     */
+    public ObjectGraph createScopedGraph(Object... modules){
+        return objectGraph.plus(modules);
     }
 
     /**
      * Get the file log name
      * @return
      */
-    @Override
-    public String getLogFilename(){
+    private String getLogFilename(){
         SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
         return String.format("chipper_%s_%s.log", sdf.format(new Date()), BuildConfig.VERSION_NAME);
+    }
+
+    /**
+     * Inject an object with the object graph
+     */
+    public void inject(Object o){
+        objectGraph.inject(o);
     }
 
     /**

@@ -8,7 +8,7 @@ import android.support.v4.content.WakefulBroadcastReceiver;
 
 /**
  * Project: Chipper
- * Package: com.r0adkll.chipper.core.push
+ * Package: com.r0adkll.chipper.push
  * Created by drew.heavner on 11/18/14.
  */
 public class GcmBroadcastReceiver extends WakefulBroadcastReceiver {

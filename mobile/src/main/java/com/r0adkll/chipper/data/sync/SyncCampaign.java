@@ -9,9 +9,11 @@ import com.r0adkll.chipper.api.model.User;
 
 import java.util.List;
 
+import timber.log.Timber;
+
 /**
  * Project: Chipper
- * Package: com.r0adkll.chipper.core.data.sync
+ * Package: com.r0adkll.chipper.data.sync
  * Created by drew.heavner on 11/18/14.
  */
 public class SyncCampaign implements Runnable{
@@ -69,6 +71,8 @@ public class SyncCampaign implements Runnable{
         // If we found the existing user, run the sync
         if(user != null) {
 
+            Timber.i("Starting Sync for User [%s, %s]", user.email, user.id);
+
             // Get the local and remote playlists
             List<Playlist> remote = mService.getPlaylistsSync(user.id);
             List<Playlist> local = user.getPlaylists();
@@ -99,6 +103,7 @@ public class SyncCampaign implements Runnable{
                                 if(updatedPlaylist != null) {
                                     localPlaylist.update(updatedPlaylist);
                                     mSyncResult.stats.numUpdates++;
+                                    Timber.i("Local playlist [%s] newer than remote, uploading...", localPlaylist.name);
                                 }else{
                                     mSyncResult.stats.numSkippedEntries++;
                                 }
@@ -106,6 +111,7 @@ public class SyncCampaign implements Runnable{
                                 // Remote playlist is newer, update the local reference
                                 localPlaylist.update(remotePlaylist);
                                 mSyncResult.stats.numUpdates++;
+                                Timber.i("Remote playlist [%s] is newer than local, downloading...", remotePlaylist.name);
                             }else if(localTime == remoteTime){
                                 // These playlists are current, do nothing
                             }
@@ -123,6 +129,7 @@ public class SyncCampaign implements Runnable{
                         if(updatedPlaylist != null) {
                             localPlaylist.update(updatedPlaylist);
                             mSyncResult.stats.numUpdates++;
+                            Timber.i("Playlist [%s] not found on server, uploading...", localPlaylist.name);
                         }else{
                             mSyncResult.stats.numSkippedEntries++;
                         }
@@ -145,6 +152,7 @@ public class SyncCampaign implements Runnable{
 
                     if(!hasLocal){
                         // Add remote playlist to local
+                        Timber.i("Remote playlist found that doesn't exist locally, %s", remotePlaylist.name);
 
                         // Create a new playlist
                         Playlist newPlaylist = new Playlist();

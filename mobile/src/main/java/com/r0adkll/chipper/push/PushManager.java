@@ -31,7 +31,7 @@ import timber.log.Timber;
  * This is the push management class
  *
  * Project: Chipper
- * Package: com.r0adkll.chipper.core.push
+ * Package: com.r0adkll.chipper.push
  * Created by drew.heavner on 11/18/14.
  */
 @Singleton
@@ -210,6 +210,8 @@ public class PushManager {
                 public void success(Device updatedDevice, Response response) {
                     // Update the current device on the system
                     device.update(updatedDevice);
+
+                    Timber.i("Push Token [%s] registered to device [%s]", updatedDevice.push_token, updatedDevice.id);
                 }
 
                 @Override

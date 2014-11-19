@@ -3,7 +3,7 @@ package com.r0adkll.chipper.ui.playlists.viewer;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.r0adkll.chipper.core.api.model.Playlist;
+import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.ui.model.BaseActivity;
 
 import icepick.Icepick;

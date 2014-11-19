@@ -10,7 +10,7 @@ import retrofit.RequestInterceptor;
 
 /**
  * Project: Chipper
- * Package: com.r0adkll.chipper.core.api
+ * Package: com.r0adkll.chipper.api
  * Created by drew.heavner on 11/17/14.
  */
 @Singleton

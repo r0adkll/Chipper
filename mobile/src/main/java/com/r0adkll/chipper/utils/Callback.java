@@ -2,7 +2,7 @@ package com.r0adkll.chipper.utils;
 
 /**
  * Project: Chipper
- * Package: com.r0adkll.chipper.core.utils
+ * Package: com.r0adkll.chipper.utils
  * Created by drew.heavner on 11/12/14.
  */
 public interface Callback<T> {

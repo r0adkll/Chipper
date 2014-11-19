@@ -7,13 +7,14 @@ import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
 
+import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.api.ChipperService;
 
 import javax.inject.Inject;
 
 /**
  * Project: Chipper
- * Package: com.r0adkll.chipper.core.data.sync
+ * Package: com.r0adkll.chipper.data.sync
  * Created by drew.heavner on 11/18/14.
  */
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
@@ -32,7 +33,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      */
     public SyncAdapter(Context context) {
         super(context, true);
-//        CoreApplication.get(context).inject(this);
+        ChipperApp.get(context).inject(this);
     }
 
     @Override

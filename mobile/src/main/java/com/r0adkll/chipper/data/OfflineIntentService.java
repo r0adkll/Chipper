@@ -5,8 +5,9 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 
+import com.r0adkll.chipper.ChipperApp;
+import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
-import com.r0adkll.chipper.core.R;
 import com.r0adkll.chipper.data.events.OfflineRequestCompletedEvent;
 import com.r0adkll.chipper.data.model.OfflineRequest;
 import com.r0adkll.deadskunk.utils.ProgressInputStream;
@@ -60,6 +61,7 @@ public class OfflineIntentService extends IntentService {
      */
     public OfflineIntentService() {
         super(SERVICE_NAME);
+        ChipperApp.get(this).inject(this);
 
         // Get the notification manager compat
         mNotifMan = NotificationManagerCompat.from(this);

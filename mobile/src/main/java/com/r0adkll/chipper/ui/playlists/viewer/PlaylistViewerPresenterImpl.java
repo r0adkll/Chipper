@@ -1,7 +1,7 @@
 package com.r0adkll.chipper.ui.playlists.viewer;
 
-import com.r0adkll.chipper.core.api.ChipperService;
-import com.r0adkll.chipper.core.api.model.User;
+import com.r0adkll.chipper.api.ChipperService;
+import com.r0adkll.chipper.api.model.User;
 
 /**
  * Created by r0adkll on 11/16/14.

@@ -1,9 +1,9 @@
 package com.r0adkll.chipper.ui.all;
 
-import com.r0adkll.chipper.core.api.ChipperService;
-import com.r0adkll.chipper.core.api.model.User;
-import com.r0adkll.chipper.core.data.ChiptuneProvider;
-import com.r0adkll.chipper.core.qualifiers.CurrentUser;
+import com.r0adkll.chipper.api.ChipperService;
+import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.data.ChiptuneProvider;
+import com.r0adkll.chipper.qualifiers.CurrentUser;
 import com.r0adkll.chipper.ui.UIModule;
 
 import javax.inject.Singleton;

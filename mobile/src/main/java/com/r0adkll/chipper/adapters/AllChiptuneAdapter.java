@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.r0adkll.chipper.R;
-import com.r0adkll.chipper.core.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.Chiptune;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 
 import java.util.ArrayList;

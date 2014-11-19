@@ -2,7 +2,7 @@ package com.r0adkll.chipper.ui.login;
 
 import android.app.Application;
 
-import com.r0adkll.chipper.core.api.ChipperService;
+import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.ui.UIModule;
 
 import javax.inject.Singleton;

@@ -1,9 +1,10 @@
 package com.r0adkll.chipper.ui.playlists;
 
-import com.r0adkll.chipper.core.api.ChipperService;
-import com.r0adkll.chipper.core.api.model.User;
-import com.r0adkll.chipper.core.data.PlaylistManager;
-import com.r0adkll.chipper.core.qualifiers.CurrentUser;
+import com.r0adkll.chipper.adapters.PlaylistAdapter;
+import com.r0adkll.chipper.api.ChipperService;
+import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.data.PlaylistManager;
+import com.r0adkll.chipper.qualifiers.CurrentUser;
 import com.r0adkll.chipper.ui.UIModule;
 
 import javax.inject.Singleton;
@@ -38,6 +39,5 @@ public class PlaylistModule {
                                        @CurrentUser User user){
         return new PlaylistPresenterImpl(view, service, manager, user);
     }
-
 
 }

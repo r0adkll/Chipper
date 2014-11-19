@@ -8,7 +8,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Project: Chipper
- * Package: com.r0adkll.chipper.core.qualifiers
+ * Package: com.r0adkll.chipper.qualifiers
  * Created by drew.heavner on 11/18/14.
  */
 @Qualifier

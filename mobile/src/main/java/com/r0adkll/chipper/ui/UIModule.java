@@ -2,8 +2,8 @@ package com.r0adkll.chipper.ui;
 
 import android.content.SharedPreferences;
 
-import com.r0adkll.chipper.core.prefs.BooleanPreference;
-import com.r0adkll.chipper.core.qualifiers.GenericPrefs;
+import com.r0adkll.chipper.prefs.BooleanPreference;
+import com.r0adkll.chipper.qualifiers.GenericPrefs;
 import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
 
 import javax.inject.Singleton;

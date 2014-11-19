@@ -9,7 +9,7 @@ import android.view.View;
 
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.adapters.PopularChiptuneAdapter;
-import com.r0adkll.chipper.core.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
 import com.r0adkll.chipper.ui.widget.DividerDecoration;
 import com.r0adkll.postoffice.PostOffice;

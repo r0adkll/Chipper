@@ -2,7 +2,7 @@ package com.r0adkll.chipper.api.model;
 
 /**
  * Project: Chipper
- * Package: com.r0adkll.chipper.core.api.model
+ * Package: com.r0adkll.chipper.api.model
  * Created by drew.heavner on 11/12/14.
  */
 public class ChipperError {

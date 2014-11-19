@@ -8,7 +8,7 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
-import com.r0adkll.chipper.core.R;
+import com.r0adkll.chipper.R;
 import com.r0adkll.deadskunk.utils.FileUtils;
 
 import java.io.BufferedWriter;

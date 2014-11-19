@@ -6,7 +6,7 @@ import android.os.IBinder;
 
 /**
  * Project: Chipper
- * Package: com.r0adkll.chipper.core.data.sync
+ * Package: com.r0adkll.chipper.data.sync
  * Created by drew.heavner on 11/18/14.
  */
 public class AuthenticatorService extends Service {

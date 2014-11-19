@@ -10,12 +10,12 @@ import android.os.Build;
 import android.os.Bundle;
 
 import com.activeandroid.query.Select;
-import com.r0adkll.chipper.core.api.ApiModule;
-import com.r0adkll.chipper.core.api.ChipperService;
-import com.r0adkll.chipper.core.api.model.ChipperError;
-import com.r0adkll.chipper.core.api.model.Device;
-import com.r0adkll.chipper.core.api.model.User;
-import com.r0adkll.chipper.core.utils.Tools;
+import com.r0adkll.chipper.api.ApiModule;
+import com.r0adkll.chipper.api.ChipperService;
+import com.r0adkll.chipper.api.model.ChipperError;
+import com.r0adkll.chipper.api.model.Device;
+import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.utils.Tools;
 import com.r0adkll.chipper.ui.all.ChiptunesActivity;
 import com.r0adkll.deadskunk.utils.Utils;
 
@@ -169,11 +169,7 @@ public class LoginPresenterImpl implements LoginPresenter {
         // Get account manager instance
         AccountManager accountManager = AccountManager.get(activity);
 
-        // Bundle user data to use later
-        Bundle userData = new Bundle();
-        userData.putParcelable("user", user);
-
-        if(accountManager.addAccountExplicitly(newAcct, null, userData)){
+        if(accountManager.addAccountExplicitly(newAcct, null, null)){
 
             // Added was a success
             Timber.i("Account Created: [%s][%s]", newAcct.name, newAcct.type);

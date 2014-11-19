@@ -2,7 +2,7 @@ package com.r0adkll.chipper.ui.popular;
 
 import android.app.Activity;
 
-import com.r0adkll.chipper.core.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.Chiptune;
 
 import java.util.List;
 import java.util.Map;

@@ -9,7 +9,7 @@ import android.net.Uri;
  * Stub Content Provider
  *
  * Project: Chipper
- * Package: com.r0adkll.chipper.core.data.sync
+ * Package: com.r0adkll.chipper.data.sync
  * Created by drew.heavner on 11/18/14.
  */
 public class StubProvider extends ContentProvider {

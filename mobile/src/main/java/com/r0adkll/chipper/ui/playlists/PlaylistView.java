@@ -2,7 +2,7 @@ package com.r0adkll.chipper.ui.playlists;
 
 import android.app.Activity;
 
-import com.r0adkll.chipper.core.api.model.Playlist;
+import com.r0adkll.chipper.api.model.Playlist;
 
 import java.util.List;
 

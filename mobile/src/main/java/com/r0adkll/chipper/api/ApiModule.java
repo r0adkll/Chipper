@@ -19,8 +19,6 @@ import retrofit.client.Client;
 import retrofit.client.OkClient;
 import retrofit.converter.GsonConverter;
 
-//import org.apache.commons.codec.digest.DigestUtils;
-
 /**
  * This module defines all the injectable components that will be used
  * for interfacing with the new Chipper JAVA api.

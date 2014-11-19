@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
-import com.r0adkll.chipper.core.prefs.BooleanPreference;
+import com.r0adkll.chipper.prefs.BooleanPreference;
 import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
 import com.r0adkll.chipper.ui.all.ChiptunesActivity;
 import com.r0adkll.chipper.ui.popular.PopularActivity;

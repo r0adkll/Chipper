@@ -7,15 +7,15 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.api.model.User;
-import com.r0adkll.chipper.core.CoreApplication;
 import com.r0adkll.chipper.qualifiers.CurrentUser;
 
 import javax.inject.Inject;
 
 /**
  * Project: Chipper
- * Package: com.r0adkll.chipper.core.push
+ * Package: com.r0adkll.chipper.push
  * Created by drew.heavner on 11/18/14.
  */
 public class GcmIntentService extends IntentService{
@@ -33,7 +33,7 @@ public class GcmIntentService extends IntentService{
      */
     public GcmIntentService() {
         super("GcmIntentService");
-        CoreApplication.get(this).inject(this);
+        ChipperApp.get(this).inject(this);
     }
 
     @Override

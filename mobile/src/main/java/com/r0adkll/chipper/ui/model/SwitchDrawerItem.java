@@ -8,7 +8,7 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.r0adkll.chipper.R;
-import com.r0adkll.chipper.core.prefs.BooleanPreference;
+import com.r0adkll.chipper.prefs.BooleanPreference;
 
 import butterknife.ButterKnife;
 

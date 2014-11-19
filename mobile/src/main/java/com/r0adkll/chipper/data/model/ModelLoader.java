@@ -62,8 +62,7 @@ public class ModelLoader<T extends Model> extends AsyncTaskLoader<List<T>>
 	 * @param updateOnRelationshipChanges
 	 *            if true, loader will updated when tables related to the one detected are changed
 	 */
-	public ModelLoader(Context context, Class<T> clazz, boolean updateOnRelationshipChanges)
-	{
+	public ModelLoader(Context context, Class<T> clazz, boolean updateOnRelationshipChanges){
 		this(context, clazz, null, updateOnRelationshipChanges);
 	}
 
@@ -185,10 +184,8 @@ public class ModelLoader<T extends Model> extends AsyncTaskLoader<List<T>>
 		}
 
 		// Start watching for changes in the job data.
-		if (mContentObserver == null)
-		{
-			mContentObserver = new ContentObserver(new Handler(getContext().getMainLooper()))
-			{
+		if (mContentObserver == null){
+			mContentObserver = new ContentObserver(new Handler(getContext().getMainLooper())){
 
 				@Override
 				public void onChange(boolean selfChange)

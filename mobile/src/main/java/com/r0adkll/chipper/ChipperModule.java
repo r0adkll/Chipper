@@ -7,8 +7,8 @@ import android.preference.PreferenceManager;
 import com.google.gson.Gson;
 import com.r0adkll.chipper.api.ApiModule;
 import com.r0adkll.chipper.data.DataModule;
-import com.r0adkll.chipper.data.OfflineIntentService;
 import com.r0adkll.chipper.prefs.IntPreference;
+import com.r0adkll.chipper.push.PushModule;
 import com.r0adkll.chipper.qualifiers.AppVersion;
 import com.r0adkll.chipper.qualifiers.DefaultPrefs;
 import com.r0adkll.chipper.qualifiers.GenericPrefs;
@@ -34,12 +34,13 @@ import static android.content.Context.MODE_PRIVATE;
     includes = {
         ApiModule.class,
         DataModule.class,
+        PushModule.class,
         UIModule.class
     },
     injects = {
-        ChipperApp.class,
-        OfflineIntentService.class
-    }
+        ChipperApp.class
+    },
+    library = true
 )
 public final class ChipperModule {
     private static final String SAUCE = "sE2s3KWwQGEf3cqXUyZmdd1vOmsMoirDwFxhfMOrUac=";

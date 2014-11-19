@@ -5,7 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.r0adkll.chipper.R;
-import com.r0adkll.chipper.core.utils.UIUtils;
+import com.r0adkll.chipper.utils.UIUtils;
 
 /**
  * Created by r0adkll on 11/13/14.

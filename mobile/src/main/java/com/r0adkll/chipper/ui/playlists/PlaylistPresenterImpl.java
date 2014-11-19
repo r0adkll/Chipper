@@ -2,11 +2,15 @@ package com.r0adkll.chipper.ui.playlists;
 
 import android.content.Intent;
 
-import com.r0adkll.chipper.core.api.ChipperService;
-import com.r0adkll.chipper.core.api.model.Playlist;
-import com.r0adkll.chipper.core.api.model.User;
-import com.r0adkll.chipper.core.data.PlaylistManager;
-import com.r0adkll.chipper.core.data.model.OfflineRequest;
+import com.activeandroid.Cache;
+import com.activeandroid.query.From;
+import com.activeandroid.query.Select;
+import com.r0adkll.chipper.api.ChipperService;
+import com.r0adkll.chipper.api.model.Playlist;
+import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.data.PlaylistManager;
+import com.r0adkll.chipper.data.model.ModelLoader;
+import com.r0adkll.chipper.data.model.OfflineRequest;
 
 /**
  * Created by r0adkll on 11/16/14.
@@ -54,6 +58,11 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
     }
 
     @Override
+    public void loadSharedPlaylists() {
+
+    }
+
+    @Override
     public void addNewPlaylist(String name) {
         // Use the playlist manager to create a new playlist
         mManager.createPlaylist(name);
@@ -81,5 +90,11 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
     @Override
     public void onPlaylistSelected(Playlist playlist, int position) {
 
+    }
+
+    @Override
+    public ModelLoader<Playlist> getLoader() {
+        From query = new Select().from(Playlist.class).where(Cache.getTableName(Playlist.class) + ".owner=?", mUser.getId());
+        return new ModelLoader<>(mView.getActivity(), Playlist.class, query, false);
     }
 }

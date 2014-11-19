@@ -5,12 +5,12 @@ import android.content.Context;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Configuration;
-import com.r0adkll.chipper.core.api.model.Chiptune;
-import com.r0adkll.chipper.core.api.model.Device;
-import com.r0adkll.chipper.core.api.model.Playlist;
-import com.r0adkll.chipper.core.api.model.User;
-import com.r0adkll.chipper.core.utils.CrashlyticsTree;
-import com.r0adkll.chipper.core.utils.FileTree;
+import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.Device;
+import com.r0adkll.chipper.api.model.Playlist;
+import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.utils.CrashlyticsTree;
+import com.r0adkll.chipper.utils.FileTree;
 import com.r0adkll.postoffice.PostOffice;
 import com.r0adkll.postoffice.model.Design;
 import com.r0adkll.postoffice.model.Stamp;

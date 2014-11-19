@@ -7,14 +7,14 @@ import android.os.Bundle;
 
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
-import com.r0adkll.chipper.core.api.ChipperService;
-import com.r0adkll.chipper.core.api.model.Device;
-import com.r0adkll.chipper.core.api.model.User;
-import com.r0adkll.chipper.core.push.PushManager;
-import com.r0adkll.chipper.core.push.PushUtils;
-import com.r0adkll.chipper.core.qualifiers.CurrentDevice;
-import com.r0adkll.chipper.core.qualifiers.CurrentUser;
-import com.r0adkll.chipper.core.utils.Tools;
+import com.r0adkll.chipper.api.ChipperService;
+import com.r0adkll.chipper.api.model.Device;
+import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.push.PushManager;
+import com.r0adkll.chipper.push.PushUtils;
+import com.r0adkll.chipper.qualifiers.CurrentDevice;
+import com.r0adkll.chipper.qualifiers.CurrentUser;
+import com.r0adkll.chipper.utils.Tools;
 import com.r0adkll.chipper.ui.all.ChiptunesActivity;
 import com.r0adkll.chipper.ui.login.LoginActivity;
 import com.r0adkll.deadskunk.utils.Utils;
@@ -63,10 +63,12 @@ public class Chipper extends Activity {
 
         }else{
 
+            // Log
+            Timber.i("Existing user found! User[%s, %s]", mCurrentUser.email, mCurrentUser.id);
+
             if(mCurrentDevice != null) {
 
-                // Log
-                Timber.i("Existing user found! User[%s, %s]", mCurrentUser.email, mCurrentUser.id);
+                Timber.i("Existing device found! Device[%s, %s]", mCurrentDevice.device_id, mCurrentDevice.id);
 
                 // Recheck push registration
                 mPushManager.checkRegistration(this);
@@ -78,6 +80,8 @@ public class Chipper extends Activity {
 
             }else{
 
+                Timber.i("User found, but device was not. Registering new device");
+
                 // Register Device
                 mService.registerDevice(mCurrentUser.id,
                         Tools.generateUniqueDeviceId(this),
@@ -88,6 +92,8 @@ public class Chipper extends Activity {
                             @Override
                             public void success(Device device, Response response) {
                                 if(device.save() > 0){
+
+                                    Timber.i("New Device registered [%s]", device.id);
 
                                     // Recheck push registration
                                     mPushManager.checkRegistration(Chipper.this);

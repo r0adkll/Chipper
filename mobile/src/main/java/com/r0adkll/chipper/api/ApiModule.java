@@ -67,9 +67,8 @@ public final class ApiModule {
 
         // Add auth params
         try {
-
-            auth.put("public_key", user.public_key);
             auth.put("user_id", user.id);
+            auth.put("public_key", user.public_key);
             auth.put("timestamp", System.currentTimeMillis()/1000L);
 
             String compose = auth.toString().concat(user.private_key);

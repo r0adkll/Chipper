@@ -61,7 +61,10 @@
         <!-- The Playlist Activity -->
         <activity android:name=".ui.playlists.PlaylistActivity"/>
 
+        <!-- The Playlist Viewing Activity -->
         <activity android:name=".ui.playlists.viewer.PlaylistViewerActivity"/>
+
+
 
         <!--========================================================================================
 

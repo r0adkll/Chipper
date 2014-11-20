@@ -14,6 +14,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.ftinc.fontloader.FontLoader;
+import com.ftinc.fontloader.Types;
 import com.r0adkll.chipper.R;
 
 /**
@@ -120,6 +122,7 @@ public class EmptyView extends RelativeLayout {
         mMessage.setTextColor(mAccentColor);
         mMessage.setGravity(Gravity.CENTER);
         mMessage.setText(mEmptyMessage);
+        FontLoader.applyTypeface(mMessage, Types.ROBOTO_MEDIUM);
 
         // Add to the layout
         container.addView(mIcon, iconParams);

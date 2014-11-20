@@ -70,4 +70,5 @@ dependencies {
 
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'com.timehop.stickyheadersrecyclerview:library:0.3.3@aar'
+    compile 'com.fortysevendeg:swipelistview:1.0.0'
 }

@@ -11,4 +11,10 @@
         <attr name="desaturateOnPress" format="boolean" />
     </declare-styleable>
 
+    <declare-styleable name="EmptyView">
+        <attr name="accentColor" format="reference|color" />
+        <attr name="emptyMessage" format="reference|string" />
+        <attr name="emptyIcon" format="reference" />
+    </declare-styleable>
+
 </resources>

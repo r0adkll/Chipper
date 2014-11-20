@@ -28,5 +28,6 @@
     <dimen name="fab_shadow_radius">62dp</dimen>
     <dimen name="fab_elevation">8dp</dimen>
     <dimen name="fab_button_height">56dp</dimen>
+    <dimen name="fab_icon_height">24dp</dimen>
 
 </resources>

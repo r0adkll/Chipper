@@ -1,5 +1,7 @@
 package com.r0adkll.chipper.data;
 
+import android.content.ContentResolver;
+
 import com.activeandroid.query.Select;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Playlist;
@@ -82,36 +84,6 @@ public class PlaylistManager  {
             // Delete locally
             playlist.delete();
         }
-
-    }
-
-    /**
-     * Update a playlist after it's content has been changed with the server if possible, this is
-     * after local changes have been applied.
-     *
-     * @param playlist      the playlist to update with the server (that has since changed)
-     */
-    public void updatePlaylist(final Playlist playlist){
-
-        // Force a sync to the server
-
-
-        // Make an API call to update this playlist with the server
-//        mService.updatePlaylist(mCurrentUser.id, playlist.id, playlist.toUpdateMap(), new Callback<Playlist>() {
-//            @Override
-//            public void success(Playlist newPlaylist, Response response) {
-//
-//                // We have an updated playlist response from the server, update the local reference
-//                playlist.update(newPlaylist);
-//
-//            }
-//
-//            @Override
-//            public void failure(RetrofitError error) {
-//                // Silently fail
-//                Timber.w(error.getCause(), "Unable to update the playlist on the server, please try again later");
-//            }
-//        });
 
     }
 }

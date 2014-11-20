@@ -2,11 +2,14 @@ package com.r0adkll.chipper.ui.model;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 
 import com.r0adkll.chipper.ChipperApp;
+import com.r0adkll.chipper.R;
 
 import java.util.List;
 
+import butterknife.ButterKnife;
 import dagger.ObjectGraph;
 
 /**
@@ -19,6 +22,7 @@ import dagger.ObjectGraph;
  */
 public abstract class BaseActivity extends ActionBarActivity {
 
+    protected Toolbar actionBarToolbar;
     private ObjectGraph activityGraph;
 
     @Override
@@ -29,9 +33,31 @@ public abstract class BaseActivity extends ActionBarActivity {
     }
 
     @Override
+    public void setContentView(int layoutResID) {
+        super.setContentView(layoutResID);
+        getActionBarToolbar();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         activityGraph = null;
+    }
+
+
+    /**
+     * Get the toolbar actionbar
+     *
+     * @return      get teh action bar
+     */
+    protected Toolbar getActionBarToolbar() {
+        if (actionBarToolbar == null) {
+            actionBarToolbar = ButterKnife.findById(this, R.id.toolbar_actionbar);
+            if (actionBarToolbar != null) {
+                setSupportActionBar(actionBarToolbar);
+            }
+        }
+        return actionBarToolbar;
     }
 
     protected abstract Object[] getModules();

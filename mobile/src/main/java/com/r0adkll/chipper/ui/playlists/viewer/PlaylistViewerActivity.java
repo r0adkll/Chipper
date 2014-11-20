@@ -1,18 +1,53 @@
 package com.r0adkll.chipper.ui.playlists.viewer;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Outline;
+import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewOutlineProvider;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 
+import com.activeandroid.Model;
+import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.adapters.OnItemClickListener;
+import com.r0adkll.chipper.adapters.PlaylistChiptuneAdapter;
+import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.ChiptuneReference;
 import com.r0adkll.chipper.api.model.Playlist;
+import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.ui.model.BaseActivity;
+import com.r0adkll.chipper.ui.widget.DividerDecoration;
+import com.r0adkll.chipper.ui.widget.EmptyView;
+import com.r0adkll.deadskunk.utils.Utils;
+import com.r0adkll.postoffice.PostOffice;
 
+import java.util.List;
+
+import javax.inject.Inject;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 import icepick.Icepick;
 import icepick.Icicle;
 
 /**
  * Created by r0adkll on 11/16/14.
  */
-public class PlaylistViewerActivity extends BaseActivity {
+public class PlaylistViewerActivity extends BaseActivity implements PlaylistViewerView, LoaderManager.LoaderCallbacks<List<ChiptuneReference>>,OnItemClickListener<ChiptuneReference> {
 
     /***********************************************************************************************
      *
@@ -20,7 +55,7 @@ public class PlaylistViewerActivity extends BaseActivity {
      *
      */
 
-    public static final String EXTRA_PLAYLIST = "extra_playlist";
+    public static final String EXTRA_PLAYLIST_ID = "extra_playlist_id";
 
     /***********************************************************************************************
      *
@@ -28,8 +63,19 @@ public class PlaylistViewerActivity extends BaseActivity {
      *
      */
 
+    @InjectView(R.id.recycle_view)          RecyclerView mRecyclerView;
+    @InjectView(R.id.empty_layout)          EmptyView mEmptyView;
+    @InjectView(R.id.fab_play)      FrameLayout mFabPlay;
+
+    @Inject ChiptuneProvider chiptuneProvider;
+    @Inject PlaylistViewerPresenter presenter;
+    @Inject PlaylistChiptuneAdapter adapter;
+
     @Icicle
-    Playlist mPlaylist;
+    long mPlaylistId = -1;
+
+    // The local playlist reference
+    private Playlist mPlaylist;
 
     /***********************************************************************************************
      *
@@ -43,18 +89,31 @@ public class PlaylistViewerActivity extends BaseActivity {
         Icepick.restoreInstanceState(this, savedInstanceState);
 
         // Set the content view of this activity
-        setContentView(0);
+        setContentView(R.layout.activity_playlist_viewer);
+        ButterKnife.inject(this);
 
         // Load sent playlist to view
         Intent intent = getIntent();
         if(intent != null && mPlaylist == null){
-            mPlaylist = intent.getParcelableExtra(EXTRA_PLAYLIST);
+            mPlaylistId = intent.getLongExtra(EXTRA_PLAYLIST_ID, -1);
         }
+
+        // Check the playlist id
+        mPlaylist = Model.load(Playlist.class, mPlaylistId);
 
         // Check to see if we found a playlist, if not kill this activity
         if(mPlaylist == null) finish();
 
+        // Set Title
+        getSupportActionBar().setTitle(mPlaylist.name);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         // Now present the layout
+        setupFab();
+        setupRecyclerView();
+
+        // Setup the loader
+        getSupportLoaderManager().initLoader(0, null, this);
 
     }
 
@@ -65,8 +124,152 @@ public class PlaylistViewerActivity extends BaseActivity {
     }
 
     @Override
-    protected Object[] getModules() {
-        return new Object[0];
+    public boolean onCreateOptionsMenu(Menu menu) {
+        return super.onCreateOptionsMenu(menu);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                finish();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /***********************************************************************************************
+     *
+     *  Helper Methods
+     *
+     */
+
+    private void setupRecyclerView(){
+
+        mRecyclerView.setAdapter(adapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        mRecyclerView.addItemDecoration(new DividerDecoration(this));
+        adapter.setOnItemClickListener(this);
+
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void setupFab(){
+        // Setup the FAB
+        if(!Utils.isLollipop()) {
+            ImageView shadow = ButterKnife.findById(mFabPlay, R.id.shadow);
+            int dimen = getResources().getDimensionPixelSize(R.dimen.fab_shadow_radius);
+            Bitmap blur = Bitmap.createBitmap(dimen, dimen, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(blur);
+            Paint p = new Paint();
+            p.setColor(Color.BLACK);
+            canvas.drawCircle(dimen / 2f, dimen / 2f, dimen / 2f - Utils.dpToPx(this, 6), p);
+            shadow.setImageBitmap(Utils.blurImage(this, blur, 16));
+            mFabPlay.setOnClickListener(mFABClickListener);
+        }else{
+
+            ViewOutlineProvider vop = new ViewOutlineProvider() {
+                @Override
+                public void getOutline(View view, Outline outline) {
+                    int size = (int) Utils.dpToPx(PlaylistViewerActivity.this, 56);
+                    outline.setOval(0, 0, size, size);
+                }
+            };
+
+            //Button btn = ButterKnife.findById(mFabAdd, R.id.button);
+            mFabPlay.setOutlineProvider(vop);
+            mFabPlay.setClipToOutline(true);
+            mFabPlay.setOnClickListener(mFABClickListener);
+        }
+    }
+
+
+    /**
+     * The floating action button click listener
+     */
+    private View.OnClickListener mFABClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            presenter.onPlaySelected(mPlaylist);
+        }
+    };
+
+
+    @Override
+    public void onItemClick(View v, ChiptuneReference item, int position) {
+        Chiptune chiptune = chiptuneProvider.getChiptune(item.chiptune_id);
+        presenter.onChiptuneSelected(chiptune);
+
+    }
+
+    /***********************************************************************************************
+     *
+     * Loader Callbacks
+     *
+     */
+
+    @Override
+    public Loader<List<ChiptuneReference>> onCreateLoader(int i, Bundle bundle) {
+        return presenter.getLoader(mPlaylist);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<ChiptuneReference>> objectLoader, List<ChiptuneReference> chiptunes) {
+        if(!chiptunes.isEmpty()){
+            mEmptyView.setVisibility(View.GONE);
+        }else{
+            mEmptyView.setVisibility(View.VISIBLE);
+        }
+
+        adapter.clear();
+        adapter.addAll(chiptunes);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<ChiptuneReference>> objectLoader) {
+        mEmptyView.setVisibility(View.GONE);
+        adapter.clear();
+    }
+
+
+    /***********************************************************************************************
+     *
+     *  View Methods
+     *
+     */
+
+    @Override
+    public void showProgress() {
+
+    }
+
+    @Override
+    public void hideProgress() {
+
+    }
+
+    @Override
+    public void showErrorMessage(String msg) {
+        PostOffice.newMail(this)
+                .setMessage(msg)
+                .show(getFragmentManager());
+    }
+
+    @Override
+    public Activity getActivity() {
+        return this;
+    }
+
+    /***********************************************************************************************
+     *
+     * Base Methods
+     *
+     */
+
+    @Override
+    protected Object[] getModules() {
+        return new Object[]{
+            new PlaylistViewerModule(this)
+        };
+    }
 }

@@ -26,6 +26,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.adapters.OnItemClickListener;
 import com.r0adkll.chipper.adapters.PlaylistAdapter;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.Playlist;
@@ -46,7 +47,7 @@ import timber.log.Timber;
 /**
  * Created by r0adkll on 11/16/14.
  */
-public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView, LoaderManager.LoaderCallbacks<List<Playlist>>,PlaylistAdapter.OnItemClickListener {
+public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView, LoaderManager.LoaderCallbacks<List<Playlist>>, OnItemClickListener<Playlist> {
 
     /***********************************************************************************************
      *
@@ -77,8 +78,6 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
         getSupportActionBar().setTitle(R.string.navdrawer_item_playlists);
 
         // Setup the FAB
-
-
         setupFab();
 
         // Setup the recycler view
@@ -121,7 +120,6 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
             mFabAdd.setOnClickListener(mFABClickListener);
         }else{
 
-            //mFabAdd.setElevation(Utils.dpToPx(this, 8));
             ViewOutlineProvider vop = new ViewOutlineProvider() {
                 @Override
                 public void getOutline(View view, Outline outline) {
@@ -133,20 +131,6 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
             //Button btn = ButterKnife.findById(mFabAdd, R.id.button);
             mFabAdd.setOutlineProvider(vop);
             mFabAdd.setClipToOutline(true);
-
-//            mFabAdd.setOnTouchListener(new View.OnTouchListener() {
-//                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-//                @Override
-//                public boolean onTouch(View v, MotionEvent event) {
-//
-//                    Button button = ButterKnife.findById(mFabAdd, R.id.button);
-//                    RippleDrawable rippleDrawable = (RippleDrawable) button.getBackground();
-//                    rippleDrawable.setHotspot(event.getX(), event.getY());
-//
-//                    return false;
-//                }
-//            });
-
             mFabAdd.setOnClickListener(mFABClickListener);
         }
     }
@@ -166,7 +150,6 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
             // Prompt user for new playlist
             PostOffice.newMail(PlaylistActivity.this)
                     .setTitle("New playlist")
-                    .setMessage("Enter the name of the playlist you want to create.")
                     .setThemeColorFromResource(R.color.primary)
                     .setStyle(new EditTextStyle.Builder(PlaylistActivity.this)
                                     .setHint("Playlist name")
@@ -204,6 +187,8 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
 
     @Override
     public void setSharedPlaylists(List<Playlist> sharedPlaylists) {
+
+
 
     }
 
@@ -266,8 +251,6 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
     @Override
     public void onLoadFinished(Loader<List<Playlist>> playlistLoader, List<Playlist> playlists) {
 
-        Timber.i("Loader Finished: [%d] - %s", playlists.size(), playlistLoader.toString());
-
         // Update the adapter and notify of a data set change
         adapter.clear();
         adapter.addAll(playlists);
@@ -277,7 +260,6 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
     @Override
     public void onLoaderReset(Loader<List<Playlist>> playlistLoader) {
 
-        Timber.i("Loader Reset: %s", playlistLoader.toString());
         // Clear adapter and notify of change
         adapter.clear();
     }

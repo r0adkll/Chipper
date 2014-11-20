@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.adapters.OnItemClickListener;
 import com.r0adkll.chipper.adapters.PopularChiptuneAdapter;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
@@ -24,7 +25,7 @@ import butterknife.InjectView;
 /**
  * Created by r0adkll on 11/15/14.
  */
-public class PopularActivity extends BaseDrawerActivity implements PopularView, PopularChiptuneAdapter.OnItemClickListener, SwipeRefreshLayout.OnRefreshListener {
+public class PopularActivity extends BaseDrawerActivity implements PopularView, OnItemClickListener<Chiptune>, SwipeRefreshLayout.OnRefreshListener {
 
     /***********************************************************************************************
      *

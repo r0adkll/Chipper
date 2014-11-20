@@ -10,6 +10,7 @@ import android.view.View;
 
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.adapters.AllChiptuneAdapter;
+import com.r0adkll.chipper.adapters.OnItemClickListener;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
 import com.r0adkll.chipper.ui.model.RecyclerItemClickListener;
@@ -27,7 +28,8 @@ import butterknife.InjectView;
 /**
  * Created by r0adkll on 11/12/14.
  */
-public class ChiptunesActivity extends BaseDrawerActivity implements ChiptunesView, AllChiptuneAdapter.OnItemClickListener {
+public class ChiptunesActivity extends BaseDrawerActivity
+        implements ChiptunesView, OnItemClickListener<Chiptune> {
 
     /***********************************************************************************************
      *

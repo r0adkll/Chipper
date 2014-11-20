@@ -32,7 +32,7 @@
         android:layout_width="@dimen/fab_icon_height"
         android:layout_height="@dimen/fab_icon_height"
         android:layout_gravity="center"
-        android:src="@drawable/ic_action_playlist_add"
+        android:src="@drawable/ic_action_play"
         />
 
 </FrameLayout>

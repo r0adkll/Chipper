@@ -34,7 +34,6 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
 
     private List<List<Chiptune>> mHeaders = new ArrayList<>();
     private List<String> mTitles = new ArrayList<>();
-    private OnItemClickListener mItemClickListener;
 
     /**
      * Constructor
@@ -43,14 +42,6 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
     public AllChiptuneAdapter(){
         super();
         registerAdapterDataObserver(mChiptunesObserver);
-    }
-
-    /**
-     * Set the item click listener for this adapter
-     * @param listener
-     */
-    public void setOnItemClickListener(OnItemClickListener listener){
-        mItemClickListener = listener;
     }
 
     /***********************************************************************************************
@@ -72,16 +63,13 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
         Chiptune data = getItem(position);
 
         holder.title.setText(data.title);
-        holder.description.setText(String.format("%d:%02d",
-                TimeUnit.MILLISECONDS.toMinutes(data.length),
-                TimeUnit.MILLISECONDS.toSeconds(data.length) -
-                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(data.length))));
+        holder.description.setText(data.getFormattedLength());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int i = holder.getPosition();
-                if(mItemClickListener != null) mItemClickListener.onItemClick(v, getItem(i), i);
+                onItemClick(v, i);
             }
         });
 
@@ -200,10 +188,6 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
             super(itemView);
             ButterKnife.inject(this, itemView);
         }
-    }
-
-    public static interface OnItemClickListener{
-        public void onItemClick(View v, Chiptune item, int position);
     }
 
 }

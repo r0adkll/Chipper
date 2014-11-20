@@ -16,7 +16,7 @@ public class ChiptuneReference extends Model implements Parcelable {
 
     @Column
     @SerializedName("id")
-    String chiptune_id;
+    public String chiptune_id;
 
     @Column
     public Playlist playlist;

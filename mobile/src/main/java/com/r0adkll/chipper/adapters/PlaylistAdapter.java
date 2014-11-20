@@ -28,7 +28,6 @@ public class PlaylistAdapter extends RecyclerArrayAdapter<Playlist, PlaylistAdap
     ChiptuneProvider mChiptuneProvider;
 
     private final SimpleDateFormat mDateFormat = new SimpleDateFormat("M/d/yy 'at' HH:mm a");
-    private OnItemClickListener mItemClickListener;
 
     /**
      * Constructor
@@ -36,14 +35,6 @@ public class PlaylistAdapter extends RecyclerArrayAdapter<Playlist, PlaylistAdap
     @Inject
     public PlaylistAdapter(){
         super();
-    }
-
-    /**
-     * Set the item click listener for this adapter
-     * @param listener
-     */
-    public void setOnItemClickListener(OnItemClickListener listener){
-        mItemClickListener = listener;
     }
 
     @Override
@@ -69,7 +60,7 @@ public class PlaylistAdapter extends RecyclerArrayAdapter<Playlist, PlaylistAdap
             @Override
             public void onClick(View v) {
                 int i = holder.getPosition();
-                if(mItemClickListener != null) mItemClickListener.onItemClick(v, getItem(i), i);
+                onItemClick(v, i);
             }
         });
     }
@@ -84,10 +75,6 @@ public class PlaylistAdapter extends RecyclerArrayAdapter<Playlist, PlaylistAdap
             super(itemView);
             ButterKnife.inject(this, itemView);
         }
-    }
-
-    public static interface OnItemClickListener{
-        public void onItemClick(View v, Playlist item, int position);
     }
 
 }

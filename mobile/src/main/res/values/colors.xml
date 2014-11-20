@@ -29,4 +29,6 @@
     <color name="body_text_secondary_light">@color/black35</color>
 
     <color name="black12">#1f000000</color>
+    <color name="empty_layout_default">#C1C1C1</color>
+
 </resources>

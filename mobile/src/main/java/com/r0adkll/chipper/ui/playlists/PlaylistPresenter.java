@@ -8,8 +8,6 @@ import com.r0adkll.chipper.data.model.ModelLoader;
  */
 public interface PlaylistPresenter {
 
-    public void loadPlaylists();
-
     public void loadSharedPlaylists();
 
     public void addNewPlaylist(String name);

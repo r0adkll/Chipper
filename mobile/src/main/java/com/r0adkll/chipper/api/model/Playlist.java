@@ -99,10 +99,10 @@ public class Playlist extends Model implements Parcelable{
     public Playlist(Parcel in){
         super();
         id = in.readString();
-        owner = in.readParcelable(null);
+        owner = in.readParcelable(User.class.getClassLoader());
         name = in.readString();
         updated = in.readLong();
-        updated_by_user = in.readParcelable(null);
+        updated_by_user = in.readParcelable(User.class.getClassLoader());
         token = in.readString();
         permissions = in.readString();
 

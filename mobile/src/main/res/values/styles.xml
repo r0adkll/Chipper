@@ -38,6 +38,11 @@
         <item name="android:textColor">#fff</item>
     </style>
 
+    <style name="TextAppearance.Chipper.ExtendedActionBar.Title" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">#fff</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
     <style name="Widget.Chipper.HeaderBar" parent="">
         <item name="android:background">@drawable/actionbar_background</item>
         <item name="android:elevation" tools:ignore="NewApi">@dimen/headerbar_elevation</item>

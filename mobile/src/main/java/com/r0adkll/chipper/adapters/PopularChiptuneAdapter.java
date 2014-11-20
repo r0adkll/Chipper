@@ -30,22 +30,12 @@ public class PopularChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, Popul
 
     private Map<String, Integer> voteData;
 
-    private OnItemClickListener mClickListener;
-
     /**
      * Constructor
      */
     public PopularChiptuneAdapter(){
         super();
         voteData = new HashMap<>();
-    }
-
-    /**
-     * Set the item click listener
-     * @param listener      the click listener
-     */
-    public void setOnItemClickListener(OnItemClickListener listener){
-        mClickListener = listener;
     }
 
     /**
@@ -83,11 +73,7 @@ public class PopularChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, Popul
         Chiptune tune = getItem(i);
 
         // Compute time
-        String time = String.format("%d:%02d",
-                TimeUnit.MILLISECONDS.toMinutes(tune.length),
-                TimeUnit.MILLISECONDS.toSeconds(tune.length) -
-                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(tune.length)));
-        holder.length.setText(time);
+        holder.length.setText(tune.getFormattedLength());
 
         // Get vote data value
         int voteValue = getVoteValue(voteData, tune.id);
@@ -102,7 +88,7 @@ public class PopularChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, Popul
             @Override
             public void onClick(View v) {
                 int i = holder.getPosition();
-                if(mClickListener != null) mClickListener.onItemClick(v, getItem(i), i);
+                onItemClick(v, i);
             }
         });
 
@@ -180,10 +166,6 @@ public class PopularChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, Popul
 
             return 0;
         }
-    }
-
-    public static interface OnItemClickListener{
-        public void onItemClick(View v, Chiptune item, int position);
     }
 
 }

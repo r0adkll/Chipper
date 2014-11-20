@@ -7,6 +7,8 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by r0adkll on 11/9/14.
  */
@@ -44,6 +46,18 @@ public class Chiptune extends Model implements Parcelable{
         artist = in.readString();
         streamUrl = in.readString();
         length = in.readLong();
+    }
+
+    /**
+     * Get a formated string representation of this chiptunes play length
+     *
+     * @return      the formatted length, i.e. 1:23, or 0:23
+     */
+    public String getFormattedLength(){
+        return String.format("%d:%02d",
+                TimeUnit.MILLISECONDS.toMinutes(length),
+                TimeUnit.MILLISECONDS.toSeconds(length) -
+                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(length)));
     }
 
     @Override

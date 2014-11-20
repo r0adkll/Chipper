@@ -19,6 +19,7 @@ import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.prefs.BooleanPreference;
 import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
 import com.r0adkll.chipper.ui.all.ChiptunesActivity;
+import com.r0adkll.chipper.ui.playlists.PlaylistActivity;
 import com.r0adkll.chipper.ui.popular.PopularActivity;
 import com.r0adkll.chipper.ui.widget.ScrimInsetsScrollView;
 
@@ -412,9 +413,9 @@ public abstract class BaseDrawerActivity extends ActionBarActivity {
 //                finish();
                 break;
             case NAVDRAWER_ITEM_PLAYLISTS:
-//                intent = new Intent(this, ExpertsDirectoryActivity.class);
-//                startActivity(intent);
-//                finish();
+                intent = new Intent(this, PlaylistActivity.class);
+                startActivity(intent);
+                finish();
                 break;
             case NAVDRAWER_ITEM_PARTIES:
 //                intent = new Intent(this, PeopleIveMetActivity.class);

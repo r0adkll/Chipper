@@ -4,6 +4,8 @@
     <color name="primaryDark">#99cc00</color>
     <color name="primary">#669900</color>
     <color name="accentColor">#9FD700</color>
+    <color name="fab">@color/button_material_dark</color>
+    <color name="fabPressed">#2F2F2F</color>
 
     <color name="statusBar">#b2669900</color>
     <color name="statusBarLogin">#000</color>

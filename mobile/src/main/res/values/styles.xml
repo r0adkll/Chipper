@@ -36,7 +36,6 @@
 
     <style name="TextAppearance.Chipper.ActionBar.Title" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
         <item name="android:textColor">#fff</item>
-        <item name="android:textSize">18sp</item>
     </style>
 
     <style name="Widget.Chipper.HeaderBar" parent="">

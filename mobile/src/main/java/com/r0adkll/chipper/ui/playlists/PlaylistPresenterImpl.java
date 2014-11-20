@@ -54,7 +54,7 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
 
     @Override
     public void loadPlaylists() {
-        mView.setPlaylists(mUser.getPlaylists());
+        //mView.setPlaylists(mUser.getPlaylists());
     }
 
     @Override
@@ -94,7 +94,7 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
 
     @Override
     public ModelLoader<Playlist> getLoader() {
-        From query = new Select().from(Playlist.class).where(Cache.getTableName(Playlist.class) + ".owner=?", mUser.getId());
-        return new ModelLoader<>(mView.getActivity(), Playlist.class, query, false);
+        From query = new Select().from(Playlist.class).where("owner=?", mUser.getId());
+        return new ModelLoader<>(mView.getActivity(), Playlist.class, query, true);
     }
 }

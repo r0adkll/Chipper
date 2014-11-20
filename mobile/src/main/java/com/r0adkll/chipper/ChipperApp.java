@@ -6,9 +6,11 @@ import android.content.Context;
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Configuration;
 import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.ChiptuneReference;
 import com.r0adkll.chipper.api.model.Device;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.api.model.Vote;
 import com.r0adkll.chipper.utils.CrashlyticsTree;
 import com.r0adkll.chipper.utils.FileTree;
 import com.r0adkll.postoffice.PostOffice;
@@ -36,7 +38,14 @@ public class ChipperApp extends Application{
 
         // Initialize ActiveAndroid
         Configuration.Builder builder = new Configuration.Builder(this)
-                .addModelClasses(User.class, Device.class, Chiptune.class, Playlist.class);
+                .addModelClasses(
+                        User.class,
+                        Device.class,
+                        Chiptune.class,
+                        Playlist.class,
+                        ChiptuneReference.class,
+                        Vote.class
+                );
         ActiveAndroid.initialize(builder.create());
 
         // Plant Timber Trees

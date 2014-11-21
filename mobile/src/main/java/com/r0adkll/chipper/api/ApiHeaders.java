@@ -1,6 +1,7 @@
 package com.r0adkll.chipper.api;
 
 import com.activeandroid.query.Select;
+import com.google.gson.Gson;
 import com.r0adkll.chipper.api.model.User;
 
 import javax.inject.Inject;
@@ -18,6 +19,9 @@ public final class ApiHeaders implements RequestInterceptor{
     private static final String AUTHORIZATION_HEADER = "auth";
 
     @Inject
+    Gson gson;
+
+    @Inject
     public ApiHeaders(){}
 
     @Override
@@ -29,7 +33,7 @@ public final class ApiHeaders implements RequestInterceptor{
                 .executeSingle();
 
         if(currentUser != null){
-            request.addHeader(AUTHORIZATION_HEADER, ApiModule.generateAuthParam(currentUser));
+            request.addHeader(AUTHORIZATION_HEADER, ApiModule.generateAuthParam(gson, currentUser));
         }
     }
 }

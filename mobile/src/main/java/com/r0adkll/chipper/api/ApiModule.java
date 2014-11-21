@@ -8,6 +8,8 @@ import com.squareup.okhttp.OkHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.LinkedHashMap;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -62,24 +64,23 @@ public final class ApiModule {
      * Generate the auth params and keystore hash
      * @return
      */
-    public static String generateAuthParam(User user){
-        JSONObject auth = new JSONObject();
+    public static String generateAuthParam(Gson gson, User user){
+        LinkedHashMap<String, Object> auth = new LinkedHashMap<>();
 
         // Add auth params
         try {
             auth.put("user_id", user.id);
             auth.put("public_key", user.public_key);
-            auth.put("timestamp", System.currentTimeMillis()/1000L);
+            auth.put("timestamp", Tools.time());
 
-            String compose = auth.toString().concat(user.private_key);
+            String stage1Raw = gson.toJson(auth);
+            String compose = stage1Raw.concat(user.private_key);
 
             // Now generate the hash
             String hash = Tools.sha256(compose);
             auth.put("hash", hash);
 
-            return auth.toString();
-        } catch (JSONException e) {
-            e.printStackTrace();
+            return gson.toJson(auth);
         } catch (NullPointerException e){
             e.printStackTrace();
         }

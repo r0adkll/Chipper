@@ -6,6 +6,7 @@ import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Select;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,18 +39,19 @@ public class ChiptuneProvider {
      */
     private List<Chiptune> mChiptunes;
     private Map<String, Chiptune> mChiptuneMap;
-
     private ChipperService mService;
+    private User mCurrentUser;
 
     /**
      * Constructor
      * @param service
      */
     @Inject
-    public ChiptuneProvider(ChipperService service){
+    public ChiptuneProvider(ChipperService service, User currentUser){
         mChiptunes = new ArrayList<>();
         mChiptuneMap = new HashMap<>();
         mService = service;
+        mCurrentUser = currentUser;
     }
 
     /**
@@ -101,7 +103,7 @@ public class ChiptuneProvider {
                 }else{
 
                     // Make request
-                    mService.getChiptunes(new Callback<List<Chiptune>>() {
+                    mService.getChiptunes(mCurrentUser.id, new Callback<List<Chiptune>>() {
                         @Override
                         public void success(List<Chiptune> chiptunes, Response response) {
 

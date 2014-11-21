@@ -25,9 +25,17 @@ public class User extends Model implements Parcelable{
     @Column
     public boolean premium;
 
+    /**
+     * Do note that this is only valid for registering a new device, after the device is created
+     * these tokens are invalidated
+     */
     @Column
     public String public_key;
 
+    /**
+     * Do note that this is only valid for registering a new device, after the device is created
+     * these tokens are invalidated
+     */
     @Column
     public String private_key;
 
@@ -55,6 +63,15 @@ public class User extends Model implements Parcelable{
         public_key = in.readString();
         private_key = in.readString();
         isCurrentUser = in.readInt() == 1 ? true : false;
+    }
+
+    /**
+     * Clear the session keypair and save this
+     */
+    public void clearSession(){
+        public_key = "";
+        private_key = "";
+        save();
     }
 
     /**

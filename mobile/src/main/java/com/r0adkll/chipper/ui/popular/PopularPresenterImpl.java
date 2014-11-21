@@ -69,7 +69,7 @@ public class PopularPresenterImpl implements PopularPresenter {
     @Override
     public void loadVotes() {
 
-        mService.getVotes(new Callback<Map<String, Integer>>() {
+        mService.getVotes(mCurrentUser.id, new Callback<Map<String, Integer>>() {
             @Override
             public void success(Map<String, Integer> votes, Response response) {
                 mView.setVoteData(votes);

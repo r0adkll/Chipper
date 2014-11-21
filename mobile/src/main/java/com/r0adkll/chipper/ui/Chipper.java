@@ -83,7 +83,7 @@ public class Chipper extends Activity {
                 Timber.i("User found, but device was not. Registering new device");
 
                 // Register Device
-                mService.registerDevice(mCurrentUser.id,
+                mService.registerDevice(
                         Tools.generateUniqueDeviceId(this),
                         String.format("%s-%s", Build.MANUFACTURER, Build.MODEL),
                         Build.VERSION.SDK_INT,

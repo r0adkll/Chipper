@@ -91,8 +91,8 @@ public final class DataModule {
 
     @DebugLog
     @Provides @Singleton
-    ChiptuneProvider provideChiptuneProvider(ChipperService service){
-        return new ChiptuneProvider(service);
+    ChiptuneProvider provideChiptuneProvider(ChipperService service, @CurrentUser User currentUser){
+        return new ChiptuneProvider(service, currentUser);
     }
 
     @Provides @Singleton

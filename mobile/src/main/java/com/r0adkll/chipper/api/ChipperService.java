@@ -64,6 +64,23 @@ public interface ChipperService {
                 Callback<User> cb);
 
     /**
+     * Register a new device, or update an existing one with a matching device_id
+     *
+     * @param deviceId      the unique id of the device
+     * @param model         the model of the device ({@link android.os.Build#MANUFACTURER} + {@link android.os.Build#PRODUCT})
+     * @param sdk           the sdk int version of this device
+     * @param tablet        whether this device is a tablet or not
+     * @param cb            the callback
+     */
+    @FormUrlEncoded
+    @POST("/user/devices")
+    void registerDevice(@Field("device_id") String deviceId,
+                        @Field("model") String model,
+                        @Field("sdk") int sdk,
+                        @Field("tablet") boolean tablet,
+                        Callback<Device> cb);
+
+    /**
      * Verify a PlayStore purchase against the server
      * so we can give this account premium if possible.
      *
@@ -85,25 +102,6 @@ public interface ChipperService {
     @GET("/user/{id}/devices")
     void getUsersDevices(@Path("id") String userId,
                          Callback<List<Device>> cb);
-
-    /**
-     * Register a new device, or update an existing one with a matching device_id
-     *
-     * @param userId        the id of the user
-     * @param deviceId      the unique id of the device
-     * @param model         the model of the device ({@link android.os.Build#MANUFACTURER} + {@link android.os.Build#PRODUCT})
-     * @param sdk           the sdk int version of this device
-     * @param tablet        whether this device is a tablet or not
-     * @param cb            the callback
-     */
-    @FormUrlEncoded
-    @POST("/user/{id}/devices")
-    void registerDevice(@Path("id") String userId,
-                        @Field("device_id") String deviceId,
-                        @Field("model") String model,
-                        @Field("sdk") int sdk,
-                        @Field("tablet") boolean tablet,
-                        Callback<Device> cb);
 
     /**
      * Get a single device
@@ -344,8 +342,9 @@ public interface ChipperService {
      *
      * @param cb        the callback
      */
-    @GET("/playlists/featured")
-    void getFeaturedPlaylist(Callback<Playlist> cb);
+    @GET("/{id}/featured")
+    void getFeaturedPlaylist(@Path("id") String userId,
+                             Callback<Playlist> cb);
 
     /**
      * Get a map of all the collective vote values of all
@@ -353,8 +352,9 @@ public interface ChipperService {
      *
      * @param cb    the callback
      */
-    @GET("/votes")
-    void getVotes(Callback<Map<String, Integer>> cb);
+    @GET("/{id}/votes")
+    void getVotes(@Path("id") String userId,
+                  Callback<Map<String, Integer>> cb);
 
     /**
      * Get the master list of chiptunes that give the name, title, stream url
@@ -362,7 +362,8 @@ public interface ChipperService {
      *
      * @param cb        the callback
      */
-    @GET("/chiptunes")
-    void getChiptunes(Callback<List<Chiptune>> cb);
+    @GET("/{id}/chiptunes")
+    void getChiptunes(@Path("id") String userId,
+                      Callback<List<Chiptune>> cb);
 
 }

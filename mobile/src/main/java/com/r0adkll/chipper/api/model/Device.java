@@ -21,6 +21,8 @@ public class Device extends Model implements Parcelable{
     @Column public boolean tablet;
     @Column public long updated;
     @Column public String push_token;
+    @Column public String private_key;
+    @Column public String public_key;
 
     /**
      * Default constructor
@@ -38,6 +40,8 @@ public class Device extends Model implements Parcelable{
         tablet = in.readInt() == 0 ? false : true;
         updated = in.readLong();
         push_token = in.readString();
+        private_key = in.readString();
+        public_key = in.readString();
     }
 
     /**
@@ -57,6 +61,8 @@ public class Device extends Model implements Parcelable{
         updated = device.updated;
         push_token = device.push_token;
 
+        // DON'T UPDATE THE KEYPAIR HERE, THAT IS ONLY SET FROM THE INITIAL RESPONSE.
+
         // Save to disk
         save();
     }
@@ -75,6 +81,8 @@ public class Device extends Model implements Parcelable{
         dest.writeInt(tablet ? 1 : 0);
         dest.writeLong(updated);
         dest.writeString(push_token);
+        dest.writeString(private_key);
+        dest.writeString(public_key);
     }
 
     public static final Creator<Device> CREATOR = new Creator<Device>() {

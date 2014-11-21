@@ -118,7 +118,7 @@ public class LoginPresenterImpl implements LoginPresenter {
                 Timber.i("Great Success! %s has been logged in to chipper with a user id of %s", user.email, user.id);
 
                 // Now register a device
-                mChipperService.registerDevice(user.id,
+                mChipperService.registerDevice(
                         Tools.generateUniqueDeviceId(mCtx),
                         Build.MODEL,
                         Build.VERSION.SDK_INT,

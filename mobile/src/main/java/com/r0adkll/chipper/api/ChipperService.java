@@ -342,9 +342,8 @@ public interface ChipperService {
      *
      * @param cb        the callback
      */
-    @GET("/{id}/featured")
-    void getFeaturedPlaylist(@Path("id") String userId,
-                             Callback<Playlist> cb);
+    @GET("/general/featured")
+    void getFeaturedPlaylist(Callback<Playlist> cb);
 
     /**
      * Get a map of all the collective vote values of all
@@ -352,9 +351,8 @@ public interface ChipperService {
      *
      * @param cb    the callback
      */
-    @GET("/{id}/votes")
-    void getVotes(@Path("id") String userId,
-                  Callback<Map<String, Integer>> cb);
+    @GET("/general/votes")
+    void getVotes(Callback<Map<String, Integer>> cb);
 
     /**
      * Get the master list of chiptunes that give the name, title, stream url
@@ -362,8 +360,7 @@ public interface ChipperService {
      *
      * @param cb        the callback
      */
-    @GET("/{id}/chiptunes")
-    void getChiptunes(@Path("id") String userId,
-                      Callback<List<Chiptune>> cb);
+    @GET("/general/chiptunes")
+    void getChiptunes(Callback<List<Chiptune>> cb);
 
 }

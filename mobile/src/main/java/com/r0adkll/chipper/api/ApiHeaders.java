@@ -50,7 +50,7 @@ public final class ApiHeaders implements RequestInterceptor{
         if(currentUser != null && currentDevice == null){
             request.addHeader(AUTHORIZATION_HEADER, ApiModule.generateUserAuthParam(gson, currentUser));
         }else if(currentUser != null && currentDevice != null){
-            request.addHeader(AUTHORIZATION_HEADER, ApiModule.generateDeviceAuthParam(gson, currentDevice));
+            request.addHeader(AUTHORIZATION_HEADER, ApiModule.generateDeviceAuthParam(gson, currentUser, currentDevice));
         }
     }
 }

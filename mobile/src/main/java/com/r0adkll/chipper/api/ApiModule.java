@@ -93,11 +93,12 @@ public final class ApiModule {
      * Generate the auth params and keystore hash
      * @return
      */
-    public static String generateDeviceAuthParam(Gson gson, Device device){
+    public static String generateDeviceAuthParam(Gson gson, User user, Device device){
         LinkedHashMap<String, Object> auth = new LinkedHashMap<>();
 
         // Add auth params
         try {
+            auth.put("user_id", user.id);
             auth.put("device_id", device.id);
             auth.put("public_key", device.public_key);
             auth.put("timestamp", Tools.time());

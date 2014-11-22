@@ -103,7 +103,7 @@ public class ChiptuneProvider {
                 }else{
 
                     // Make request
-                    mService.getChiptunes(mCurrentUser.id, new Callback<List<Chiptune>>() {
+                    mService.getChiptunes(new Callback<List<Chiptune>>() {
                         @Override
                         public void success(List<Chiptune> chiptunes, Response response) {
 

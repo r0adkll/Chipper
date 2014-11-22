@@ -1,35 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:gravity="start|center_vertical"
-    android:paddingLeft="@dimen/activity_padding"
-    android:paddingRight="@dimen/activity_padding"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
-    tools:background="@color/white"
-    android:background="?android:selectableItemBackground">
+    android:layout_height="72dp">
 
-    <TextView
-        android:id="@+id/title"
+    <LinearLayout
+        android:id="@+id/back"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="72dp"
+        android:orientation="horizontal"
+        android:paddingLeft="24dp"
+        android:background="@color/leave_behind_background"
+        >
 
-        android:singleLine="true"
-        android:ellipsize="end"
-        android:textSize="16sp"
-        android:textColor="@color/body_text_primary_light"
-        tools:text="@string/placeholder_lorem_ipsum"
-        />
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="@dimen/activity_padding"
 
-    <TextView
-        android:id="@+id/description"
+            android:src="@drawable/ic_action_play"
+            />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="@dimen/activity_padding"
+
+            android:src="@drawable/ic_action_cloud_download"
+            />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="@dimen/activity_padding"
+
+            android:src="@drawable/ic_action_playlist_add"
+            />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="@dimen/activity_padding"
+
+            android:src="@drawable/ic_action_search"
+            />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="@dimen/activity_padding"
+
+            android:src="@drawable/ic_action_cloud_download"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/front"
+        android:orientation="vertical"
+        android:gravity="start|center_vertical"
+        android:paddingLeft="@dimen/activity_padding"
+        android:paddingRight="@dimen/activity_padding"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="72dp"
+        android:background="@drawable/list_item_background">
 
-        android:textSize="14sp"
-        android:textColor="@color/body_text_secondary_light"
-        tools:text="@string/placeholder_lorem_ipsum"
-        />
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
 
-</LinearLayout>
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textSize="16sp"
+            android:textColor="@color/body_text_primary_light"
+            tools:text="@string/placeholder_lorem_ipsum"
+            />
+
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:textSize="14sp"
+            android:textColor="@color/body_text_secondary_light"
+            tools:text="@string/placeholder_lorem_ipsum"
+            />
+
+    </LinearLayout>
+
+</FrameLayout>

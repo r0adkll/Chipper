@@ -65,13 +65,13 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
         holder.title.setText(data.title);
         holder.description.setText(data.getFormattedLength());
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int i = holder.getPosition();
-                onItemClick(v, i);
-            }
-        });
+//        holder.itemView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                int i = holder.getPosition();
+//                onItemClick(v, i);
+//            }
+//        });
 
     }
 

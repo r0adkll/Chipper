@@ -30,5 +30,6 @@
 
     <color name="black12">#1f000000</color>
     <color name="empty_layout_default">#C1C1C1</color>
+    <color name="leave_behind_background">#DDDDDD</color>
 
 </resources>

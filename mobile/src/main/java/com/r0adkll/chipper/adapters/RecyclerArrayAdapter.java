@@ -121,6 +121,10 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
         notifyDataSetChanged();
     }
 
+    public void remove(int index){
+        items.remove(index);
+    }
+
     /**
      * Sort the items in this adapter by a given
      * {@link java.util.Comparator}

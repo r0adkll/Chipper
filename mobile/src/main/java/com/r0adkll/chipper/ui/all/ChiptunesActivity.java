@@ -1,12 +1,15 @@
 package com.r0adkll.chipper.ui.all;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.adapters.AllChiptuneAdapter;
@@ -15,6 +18,7 @@ import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
 import com.r0adkll.chipper.ui.model.RecyclerItemClickListener;
 import com.r0adkll.chipper.ui.widget.StickyRecyclerHeadersElevationDecoration;
+import com.r0adkll.chipper.utils.SwipeDismissRecyclerViewTouchListener;
 import com.r0adkll.postoffice.PostOffice;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
@@ -24,6 +28,7 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import hugo.weaving.DebugLog;
 
 /**
  * Created by r0adkll on 11/12/14.
@@ -66,7 +71,36 @@ public class ChiptunesActivity extends BaseDrawerActivity
         mChiptuneRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         StickyRecyclerHeadersElevationDecoration headersDecor = new StickyRecyclerHeadersElevationDecoration(mAdapter);
         mChiptuneRecycler.addItemDecoration(headersDecor);
-        mAdapter.setOnItemClickListener(this);
+//        mAdapter.setOnItemClickListener(this);
+
+        SwipeDismissRecyclerViewTouchListener touchListener =
+                new SwipeDismissRecyclerViewTouchListener(
+                        mChiptuneRecycler,
+                        new SwipeDismissRecyclerViewTouchListener.DismissCallbacks() {
+                            @Override
+                            public boolean canDismiss(int position) {
+                                return true;
+                            }
+
+                            @Override
+                            public void onDismiss(RecyclerView recyclerView, int[] reverseSortedPositions) {
+                                for (int position : reverseSortedPositions) {
+//                                    mLayoutManager.removeView(mLayoutManager.getChildAt(position));
+                                    mAdapter.remove(position);
+                                    mAdapter.notifyItemRemoved(position);
+                                }
+                                mAdapter.notifyDataSetChanged();
+                            }
+                        });
+
+        mChiptuneRecycler.setOnTouchListener(touchListener);
+        mChiptuneRecycler.setOnScrollListener(touchListener.makeScrollListener());
+        mChiptuneRecycler.addOnItemTouchListener(new RecyclerItemClickListener(this, new OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                Toast.makeText(ChiptunesActivity.this, "Clicked " + position, Toast.LENGTH_SHORT).show();
+            }
+        }));
 
         //  Load all chiptunes
         presenter.loadAllChiptunes();
@@ -141,4 +175,36 @@ public class ChiptunesActivity extends BaseDrawerActivity
                 .show(getSupportFragmentManager());
     }
 
+    public interface OnItemClickListener {
+        public void onItemClick(View view, int position);
+    }
+
+    public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
+        private OnItemClickListener mListener;
+
+        GestureDetector mGestureDetector;
+
+        public RecyclerItemClickListener(Context context, OnItemClickListener listener) {
+            mListener = listener;
+            mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+                @Override
+                public boolean onSingleTapUp(MotionEvent e) {
+                    return true;
+                }
+            });
+        }
+
+        @Override
+        public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent e) {
+            View childView = view.findChildViewUnder(e.getX(), e.getY());
+            if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
+                mListener.onItemClick(childView, view.getChildPosition(childView));
+            }
+            return false;
+        }
+
+        @Override
+        public void onTouchEvent(RecyclerView view, MotionEvent motionEvent) {
+        }
+    }
 }

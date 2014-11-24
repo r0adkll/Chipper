@@ -1,6 +1,7 @@
 package com.r0adkll.chipper;
 
 import android.app.Application;
+import android.app.Service;
 import android.content.Context;
 
 import com.activeandroid.ActiveAndroid;
@@ -60,6 +61,8 @@ public class ChipperApp extends Application{
         Stamp stamp = new Stamp.Builder(this)
                 .setDesign(Design.MATERIAL_LIGHT)
                 .setThemeColorResource(R.color.primary)
+                .setCancelable(true)
+                .setCanceledOnTouchOutside(true)
                 .build();
 
         // Lick the stamp and apply it
@@ -109,6 +112,17 @@ public class ChipperApp extends Application{
      */
     public static ChipperApp get(Context ctx){
         return (ChipperApp) ctx.getApplicationContext();
+    }
+
+    /**
+     * Get a reference to this application with a service
+     * object
+     *
+     * @param ctx
+     * @return
+     */
+    public static ChipperApp get(Service ctx){
+        return (ChipperApp) ctx.getApplication();
     }
 
 }

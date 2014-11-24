@@ -61,6 +61,11 @@ public class OfflineIntentService extends IntentService {
      */
     public OfflineIntentService() {
         super(SERVICE_NAME);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
         ChipperApp.get(this).inject(this);
 
         // Get the notification manager compat
@@ -68,6 +73,7 @@ public class OfflineIntentService extends IntentService {
 
         // Create the reference to the cache dir
         mCacheDir = new File(getFilesDir(), CACHE_DIRECTORY_NAME);
+        mCacheDir.mkdir();
     }
 
     @Override
@@ -79,6 +85,9 @@ public class OfflineIntentService extends IntentService {
             Timber.e("Please submit a valid OfflineRequest to the offline service");
             return;
         }
+
+        // Show Initial notification
+        showStartingNotification(request.getChiptunes().size());
 
         // Iterate through all of the chiptunes in the request and download them
         int N = request.getChiptunes().size();
@@ -109,6 +118,8 @@ public class OfflineIntentService extends IntentService {
                 if (output.delete()) {
                     output.createNewFile();
                 }
+            }else{
+                output.createNewFile();
             }
 
             // Check for write capabilities
@@ -116,7 +127,7 @@ public class OfflineIntentService extends IntentService {
 
             // Using OkHttp, attempt to download the chiptune and save it's output file to the disk
             Request request = new Request.Builder()
-                    .url(chiptune.streamUrl)
+                    .url(chiptune.stream_url)
                     .get()
                     .build();
 
@@ -153,6 +164,27 @@ public class OfflineIntentService extends IntentService {
 
     }
 
+    private void showStartingNotification(int numDownload){
+
+        String title = "Downloading...";
+        String text = String.format("Starting download for %d chiptunes", numDownload);
+        String ticker = String.format("Now downloading %d chiptunes for offline playback.", numDownload);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setSmallIcon(R.drawable.ic_stat_chipper)
+                .setColor(getResources().getColor(R.color.primary))
+                .setTicker(ticker)
+                .setOngoing(true)
+                .setProgress(0, 0, true)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setLocalOnly(true);
+
+        mNotifMan.notify(NOTIFICATION_ID, builder.build());
+
+    }
+
     /**
      * Update the system notification with the current progress of the download
      *
@@ -166,15 +198,13 @@ public class OfflineIntentService extends IntentService {
         // Prepare the notification
         String title = String.format("Downloading %s", currentChiptune.title);
         String text = String.format("%d out of %d songs. (%d%% Complete)", index, total, (int)progress);
-        String ticker = String.format("Now downloading %d chiptunes for offline playback.", total);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentTitle(title)
                 .setContentText(text)
                 .setSmallIcon(R.drawable.ic_stat_chipper)
                 .setOngoing(true)
-                .setProgress(100, (int)(progress * 100f), false)
-                .setTicker(ticker)
+                .setProgress(100, (int) (progress * 100f), false)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setColor(getResources().getColor(R.color.primary))
                 .setLocalOnly(true);

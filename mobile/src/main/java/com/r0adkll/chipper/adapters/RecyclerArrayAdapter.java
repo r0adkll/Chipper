@@ -21,6 +21,7 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
      *
      */
 
+    private OnItemOptionSelectedListener<M> itemOptionSelectedListener;
     private OnItemClickListener<M> itemClickListener;
     private ArrayList<M> items = new ArrayList<M>();
 
@@ -44,6 +45,10 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
         this.itemClickListener = itemClickListener;
     }
 
+    public void setOnItemOptionSelectedListener(OnItemOptionSelectedListener<M> itemOptionSelectedListener){
+        this.itemOptionSelectedListener = itemOptionSelectedListener;
+    }
+
     /**
      * Call this to trigger the user set item click listener
      *
@@ -52,6 +57,10 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
      */
     protected void onItemClick(View view, int position){
         if(itemClickListener != null) itemClickListener.onItemClick(view, getItem(position), position);
+    }
+
+    protected void onItemOptionSelected(View view, int position){
+        if(itemOptionSelectedListener != null) itemOptionSelectedListener.onSelected(view, getItem(position));
     }
 
     /***********************************************************************************************
@@ -155,4 +164,10 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
     public int getItemCount() {
         return items.size();
     }
+
+
+    public static interface OnItemOptionSelectedListener<M>{
+        public void onSelected(View view, M item);
+    }
+
 }

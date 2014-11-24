@@ -4,7 +4,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
@@ -17,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import timber.log.Timber;
 
 /**
  * Project: Chipper
@@ -65,7 +68,8 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
         holder.title.setText(data.title);
         holder.description.setText(data.getFormattedLength());
 
-//        holder.itemView.setOnClickListener(new View.OnClickListener() {
+//        View front = holder.itemView.findViewById(R.id.front);
+//        front.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
 //                int i = holder.getPosition();
@@ -73,7 +77,28 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
 //            }
 //        });
 
+        holder.optFav.setOnClickListener(new OptionClickListener(position));
+        holder.optUpvote.setOnClickListener(new OptionClickListener(position));
+        holder.optDownvote.setOnClickListener(new OptionClickListener(position));
+        holder.optAdd.setOnClickListener(new OptionClickListener(position));
+        holder.optOffline.setOnClickListener(new OptionClickListener(position));
+
+
     }
+
+    private class OptionClickListener implements View.OnClickListener {
+
+        private int mPosition = 0;
+
+        public OptionClickListener(int position){
+            mPosition = position;
+        }
+
+        @Override
+        public void onClick(View v) {
+            onItemOptionSelected(v, mPosition);
+        }
+    };
 
     /***********************************************************************************************
      *
@@ -170,6 +195,12 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
 
         @InjectView(R.id.title)         TextView title;
         @InjectView(R.id.description)   TextView description;
+        @InjectView(R.id.opt_favorite)  ImageView optFav;
+        @InjectView(R.id.opt_upvote)    ImageView optUpvote;
+        @InjectView(R.id.opt_downvote)  ImageView optDownvote;
+        @InjectView(R.id.opt_add)       ImageView optAdd;
+        @InjectView(R.id.opt_offline)   ImageView optOffline;
+
 
         public ChiptuneViewHolder(View itemView) {
             super(itemView);

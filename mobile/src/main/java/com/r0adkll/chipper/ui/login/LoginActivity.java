@@ -92,12 +92,6 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
         mSignIn.setOnClickListener(this);
         mTempAccount.setOnClickListener(this);
 
-        // By default disable the signin button
-        //mSignIn.setEnabled(false);
-
-        // Start attempt to connect to play services
-        mAPIClient.connect();
-
     }
 
     @Override
@@ -181,6 +175,7 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
     public void onClick(View v) {
         if(v.getId() == R.id.sign_in_button) {
             if (!mAPIClient.isConnecting() && !mAPIClient.isConnected()) {
+                mSignIn.setEnabled(false);
                 mSignInClicked = true;
                 resolveSignInError();
             } else if (mAPIClient.isConnected()) {

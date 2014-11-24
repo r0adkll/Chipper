@@ -10,7 +10,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 21
         versionCode 1
-        versionName "1.0"
+        versionName "2.0.0"
     }
 
     signingConfigs {
@@ -70,4 +70,5 @@ dependencies {
 
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'com.timehop.stickyheadersrecyclerview:library:0.3.3@aar'
+    compile 'com.fortysevendeg:swipelistview:1.0.0'
 }

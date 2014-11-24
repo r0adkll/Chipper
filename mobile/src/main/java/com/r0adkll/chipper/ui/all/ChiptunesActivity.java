@@ -11,15 +11,21 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
+import com.fortysevendeg.swipelistview.SwipeListView;
+import com.fortysevendeg.swipelistview.SwipeListViewListener;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.adapters.AllChiptuneAdapter;
 import com.r0adkll.chipper.adapters.OnItemClickListener;
+import com.r0adkll.chipper.adapters.RecyclerArrayAdapter;
 import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
 import com.r0adkll.chipper.ui.model.RecyclerItemClickListener;
 import com.r0adkll.chipper.ui.widget.StickyRecyclerHeadersElevationDecoration;
 import com.r0adkll.chipper.utils.SwipeDismissRecyclerViewTouchListener;
 import com.r0adkll.postoffice.PostOffice;
+import com.r0adkll.postoffice.styles.ListStyle;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
 import java.util.List;
@@ -34,7 +40,7 @@ import hugo.weaving.DebugLog;
  * Created by r0adkll on 11/12/14.
  */
 public class ChiptunesActivity extends BaseDrawerActivity
-        implements ChiptunesView, OnItemClickListener<Chiptune> {
+        implements ChiptunesView, OnItemClickListener<Chiptune>,RecyclerArrayAdapter.OnItemOptionSelectedListener<Chiptune> {
 
     /***********************************************************************************************
      *
@@ -43,7 +49,7 @@ public class ChiptunesActivity extends BaseDrawerActivity
      */
 
     @InjectView(R.id.chiptune_recycler)
-    RecyclerView mChiptuneRecycler;
+    SwipeListView mChiptuneRecycler;
 
     @Inject
     ChiptunesPresenter presenter;
@@ -71,36 +77,14 @@ public class ChiptunesActivity extends BaseDrawerActivity
         mChiptuneRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         StickyRecyclerHeadersElevationDecoration headersDecor = new StickyRecyclerHeadersElevationDecoration(mAdapter);
         mChiptuneRecycler.addItemDecoration(headersDecor);
-//        mAdapter.setOnItemClickListener(this);
+        mAdapter.setOnItemOptionSelectedListener(this);
 
-        SwipeDismissRecyclerViewTouchListener touchListener =
-                new SwipeDismissRecyclerViewTouchListener(
-                        mChiptuneRecycler,
-                        new SwipeDismissRecyclerViewTouchListener.DismissCallbacks() {
-                            @Override
-                            public boolean canDismiss(int position) {
-                                return true;
-                            }
-
-                            @Override
-                            public void onDismiss(RecyclerView recyclerView, int[] reverseSortedPositions) {
-                                for (int position : reverseSortedPositions) {
-//                                    mLayoutManager.removeView(mLayoutManager.getChildAt(position));
-                                    mAdapter.remove(position);
-                                    mAdapter.notifyItemRemoved(position);
-                                }
-                                mAdapter.notifyDataSetChanged();
-                            }
-                        });
-
-        mChiptuneRecycler.setOnTouchListener(touchListener);
-        mChiptuneRecycler.setOnScrollListener(touchListener.makeScrollListener());
-        mChiptuneRecycler.addOnItemTouchListener(new RecyclerItemClickListener(this, new OnItemClickListener() {
+        mChiptuneRecycler.setSwipeListViewListener(new BaseSwipeListViewListener(){
             @Override
-            public void onItemClick(View view, int position) {
-                Toast.makeText(ChiptunesActivity.this, "Clicked " + position, Toast.LENGTH_SHORT).show();
+            public void onClickFrontView(int position) {
+                presenter.onChiptuneSelected(mAdapter.getItem(position));
             }
-        }));
+        });
 
         //  Load all chiptunes
         presenter.loadAllChiptunes();
@@ -116,6 +100,34 @@ public class ChiptunesActivity extends BaseDrawerActivity
     public void onItemClick(View view, Chiptune item,  int position) {
         presenter.onChiptuneSelected(item);
     }
+
+    @Override
+    public void onSelected(View view, Chiptune item) {
+        switch (view.getId()){
+            case R.id.opt_favorite:
+                presenter.favoriteChiptunes(item);
+                break;
+            case R.id.opt_upvote:
+                presenter.upvoteChiptune(item);
+                break;
+            case R.id.opt_downvote:
+                presenter.downvoteChiptune(item);
+                break;
+            case R.id.opt_add:
+
+                // Show dialog that contains all the available playlists
+                // and let the user select one that they wish to add this chiptune
+                // to.
+
+
+
+                break;
+            case R.id.opt_offline:
+                presenter.offlineChiptunes(item);
+                break;
+        }
+    }
+
 
     /***********************************************************************************************
      *
@@ -175,36 +187,4 @@ public class ChiptunesActivity extends BaseDrawerActivity
                 .show(getSupportFragmentManager());
     }
 
-    public interface OnItemClickListener {
-        public void onItemClick(View view, int position);
-    }
-
-    public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
-        private OnItemClickListener mListener;
-
-        GestureDetector mGestureDetector;
-
-        public RecyclerItemClickListener(Context context, OnItemClickListener listener) {
-            mListener = listener;
-            mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
-                @Override
-                public boolean onSingleTapUp(MotionEvent e) {
-                    return true;
-                }
-            });
-        }
-
-        @Override
-        public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent e) {
-            View childView = view.findChildViewUnder(e.getX(), e.getY());
-            if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
-                mListener.onItemClick(childView, view.getChildPosition(childView));
-            }
-            return false;
-        }
-
-        @Override
-        public void onTouchEvent(RecyclerView view, MotionEvent motionEvent) {
-        }
-    }
 }

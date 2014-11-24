@@ -1,5 +1,7 @@
 package com.r0adkll.chipper.ui.all;
 
+import android.view.View;
+
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.Playlist;
 

@@ -25,7 +25,7 @@ public class Chiptune extends Model implements Parcelable{
     public String id;
     @Column public String title;
     @Column public String artist;
-    @Column public String streamUrl;
+    @Column public String stream_url;
     @Column public long length;
 
     /**
@@ -44,7 +44,7 @@ public class Chiptune extends Model implements Parcelable{
         id = in.readString();
         title = in.readString();
         artist = in.readString();
-        streamUrl = in.readString();
+        stream_url = in.readString();
         length = in.readLong();
     }
 
@@ -70,7 +70,7 @@ public class Chiptune extends Model implements Parcelable{
         dest.writeString(id);
         dest.writeString(title);
         dest.writeString(artist);
-        dest.writeString(streamUrl);
+        dest.writeString(stream_url);
         dest.writeLong(length);
     }
 

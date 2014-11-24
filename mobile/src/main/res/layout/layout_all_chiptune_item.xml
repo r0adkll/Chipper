@@ -10,46 +10,51 @@
         android:layout_height="72dp"
         android:orientation="horizontal"
         android:paddingLeft="24dp"
-        android:background="@color/leave_behind_background"
+        android:background="@drawable/background_item"
         >
 
         <ImageView
+            android:id="@+id/opt_favorite"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:padding="@dimen/activity_padding"
 
-            android:src="@drawable/ic_action_play"
+            android:src="@drawable/ic_action_favorite"
             />
 
         <ImageView
+            android:id="@+id/opt_upvote"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:padding="@dimen/activity_padding"
 
-            android:src="@drawable/ic_action_cloud_download"
+            android:src="@drawable/ic_action_thumb_up"
             />
 
         <ImageView
+            android:id="@+id/opt_downvote"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:padding="@dimen/activity_padding"
 
-            android:src="@drawable/ic_action_playlist_add"
+            android:src="@drawable/ic_action_thumb_down"
             />
 
         <ImageView
+            android:id="@+id/opt_add"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:padding="@dimen/activity_padding"
 
-            android:src="@drawable/ic_action_search"
+            android:src="@drawable/ic_action_add"
             />
 
         <ImageView
+            android:id="@+id/opt_offline"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -68,7 +73,9 @@
         android:paddingRight="@dimen/activity_padding"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:background="@drawable/list_item_background">
+        android:background="@drawable/list_item_background"
+        tools:visibility="gone"
+        >
 
         <TextView
             android:id="@+id/title"

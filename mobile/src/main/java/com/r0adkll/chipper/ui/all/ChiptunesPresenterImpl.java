@@ -1,6 +1,7 @@
 package com.r0adkll.chipper.ui.all;
 
 import android.content.Intent;
+import android.widget.Toast;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.Select;
@@ -78,19 +79,21 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
         Timber.i("Chiptune selected[%s]: %s-%s", chiptune.id, chiptune.artist, chiptune.title);
     }
 
+
+
     @Override
     public void upvoteChiptune(Chiptune chiptune) {
-
+        Toast.makeText(mView.getActivity(), "Upvote: " + chiptune.title, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void downvoteChiptune(Chiptune chiptune) {
-
+        Toast.makeText(mView.getActivity(), "Downvote: " + chiptune.title, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void favoriteChiptunes(Chiptune... chiptunes) {
-
+        Toast.makeText(mView.getActivity(), "Favoring " + chiptunes.length + " chiptunes", Toast.LENGTH_SHORT).show();
     }
 
     @Override

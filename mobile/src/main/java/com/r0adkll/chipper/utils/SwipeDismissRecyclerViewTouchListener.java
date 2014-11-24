@@ -22,6 +22,7 @@ import android.animation.ValueAnimator;
 import android.graphics.Rect;
 import android.os.SystemClock;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseBooleanArray;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -32,10 +33,13 @@ import android.widget.AbsListView;
 import android.widget.ListView;
 
 import com.r0adkll.chipper.R;
+import com.r0adkll.deadskunk.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import timber.log.Timber;
 
 /**
  * A {@link android.view.View.OnTouchListener} that makes the list items in a {@link android.widget.ListView}
@@ -100,6 +104,8 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
     private View mDownView;
     private boolean mPaused;
 
+    private SparseBooleanArray mOpenMap = new SparseBooleanArray();
+
     /**
      * The callback interface used by {@link com.r0adkll.chipper.utils.SwipeDismissRecyclerViewTouchListener} to inform its client
      * about a successful dismissal of one or more list item positions.
@@ -149,6 +155,32 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
     }
 
     /**
+     * Find any open items and close them
+     */
+    public void findAndCloseOpenItems(){
+        int N = mRecyclerView.getChildCount();
+        for(int i=0; i<N; i++){
+            View child = mRecyclerView.getChildAt(i);
+            View front = child.findViewById(R.id.front);
+            final View back = child.findViewById(R.id.back);
+            if(front.getTranslationX() != 0){
+                // Get the view at this position
+                front.animate()
+                        .translationX(0)
+                        .setDuration(mAnimationTime)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                back.setVisibility(View.GONE);
+                            }
+                        });
+
+
+            }
+        }
+    }
+
+    /**
      * Returns an {@link android.widget.AbsListView.OnScrollListener} to be added to the {@link
      * android.widget.ListView} using {@link android.widget.ListView#setOnScrollListener(android.widget.AbsListView.OnScrollListener)}.
      * If a scroll listener is already assigned, the caller should still pass scroll changes through
@@ -161,11 +193,17 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
         return new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                setEnabled(newState != AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL);
+                setEnabled(newState != RecyclerView.SCROLL_STATE_DRAGGING);
+
+                if(newState != RecyclerView.SCROLL_STATE_IDLE){
+                    findAndCloseOpenItems();
+                }
+
             }
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                // Find if there are any existing views slide open, then close them
             }
         };
     }
@@ -186,18 +224,34 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
 
                 // Find the child view that was touched (perform a hit test)
                 Rect rect = new Rect();
+                Rect frontRect = new Rect();
                 int childCount = mRecyclerView.getChildCount();
                 int[] listViewCoords = new int[2];
                 mRecyclerView.getLocationOnScreen(listViewCoords);
                 int x = (int) motionEvent.getRawX() - listViewCoords[0];
                 int y = (int) motionEvent.getRawY() - listViewCoords[1];
                 View child;
+                View front;
                 for (int i = 0; i < childCount; i++) {
+
                     child = mRecyclerView.getChildAt(i);
+                    front = child.findViewById(R.id.front);
                     child.getHitRect(rect);
+                    front.getHitRect(frontRect);
+
                     if (rect.contains(x, y)) {
-                        mDownView = child;
-                        break;
+
+                        // Check front rect
+                        int fx = x - rect.left;
+                        int fy = y - rect.top;
+
+                        if(frontRect.contains(fx, fy)) {
+                            mDownView = child;
+                            break;
+                        }else{
+                            return false;
+                        }
+
                     }
                 }
 
@@ -205,9 +259,12 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
                     mDownX = motionEvent.getRawX();
                     mDownY = motionEvent.getRawY();
                     mDownPosition = mRecyclerView.getChildPosition(mDownView);
+                    findAndCloseOpenItems();
                     if (mCallbacks.canDismiss(mDownPosition)) {
                         mVelocityTracker = VelocityTracker.obtain();
                         mVelocityTracker.addMovement(motionEvent);
+                        View back = mDownView.findViewById(R.id.back);
+                        back.setVisibility(View.VISIBLE);
                     } else {
                         mDownView = null;
                     }
@@ -221,12 +278,17 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
                 }
 
                 if (mDownView != null && mSwiping) {
-                    // cancel
+                    final View back = mDownView.findViewById(R.id.back);
                     mDownView.animate()
                             .translationX(0)
                             .alpha(1)
                             .setDuration(mAnimationTime)
-                            .setListener(null);
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    back.setVisibility(View.VISIBLE);
+                                }
+                            });
                 }
                 mVelocityTracker.recycle();
                 mVelocityTracker = null;
@@ -251,6 +313,7 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
                 float absVelocityY = Math.abs(mVelocityTracker.getYVelocity());
                 boolean dismiss = false;
                 boolean dismissRight = false;
+
                 if (Math.abs(deltaX) > mViewWidth / 2 && mSwiping) {
                     dismiss = true;
                     dismissRight = deltaX > 0;
@@ -260,31 +323,38 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
                     dismiss = (velocityX < 0) == (deltaX < 0);
                     dismissRight = mVelocityTracker.getXVelocity() > 0;
                 }
+
                 if (dismiss && mDownPosition != ListView.INVALID_POSITION) {
                     // dismiss
                     final View downView = mDownView; // mDownView gets null'd before animation ends
                     final int downPosition = mDownPosition;
                     ++mDismissAnimationRefCount;
+
+                    float padding = Utils.dpToPx(mDownView.getContext(), 25);
+
                     View front = mDownView.findViewById(R.id.front);
                     front.animate()
-                            .translationX(dismissRight ? mViewWidth : -mViewWidth)
-                            .alpha(0)
+                            .translationX(dismissRight ? 0 : -(mViewWidth - padding))
+                            .setDuration(mAnimationTime)
+                            .setListener(null);
+
+                } else {
+
+                    // cancel
+                    View front = mDownView.findViewById(R.id.front);
+                    final View back = mDownView.findViewById(R.id.back);
+                    front.animate()
+                            .translationX(0)
                             .setDuration(mAnimationTime)
                             .setListener(new AnimatorListenerAdapter() {
                                 @Override
                                 public void onAnimationEnd(Animator animation) {
-                                    performDismiss(downView, downPosition);
+                                    back.setVisibility(View.GONE);
                                 }
                             });
-                } else {
-                    // cancel
-                    View front = mDownView.findViewById(R.id.front);
-                    front.animate()
-                            .translationX(0)
-                            .alpha(1)
-                            .setDuration(mAnimationTime)
-                            .setListener(null);
+
                 }
+
                 mVelocityTracker.recycle();
                 mVelocityTracker = null;
                 mDownX = 0;
@@ -313,15 +383,19 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
                     cancelEvent.setAction(MotionEvent.ACTION_CANCEL |
                             (motionEvent.getActionIndex()
                                     << MotionEvent.ACTION_POINTER_INDEX_SHIFT));
+
                     mRecyclerView.onTouchEvent(cancelEvent);
                     cancelEvent.recycle();
                 }
 
                 if (mSwiping) {
+
                     View front = mDownView.findViewById(R.id.front);
-                    front.setTranslationX(deltaX - mSwipingSlop);
-//                    front.setAlpha(Math.max(0f, Math.min(1f,
-//                            1f - 2f * Math.abs(deltaX) / mViewWidth)));
+                    float transX = (deltaX - mSwipingSlop);
+
+                    if(transX < 0)
+                        front.setTranslationX(deltaX - mSwipingSlop);
+
                     return true;
                 }
                 break;
@@ -370,8 +444,8 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
                         dismissPositions[i] = mPendingDismisses.get(i).position;
                     }
                     mCallbacks.onDismiss(mRecyclerView, dismissPositions);
-                    
-                    // Reset mDownPosition to avoid MotionEvent.ACTION_UP trying to start a dismiss 
+
+                    // Reset mDownPosition to avoid MotionEvent.ACTION_UP trying to start a dismiss
                     // animation with a stale position
                     mDownPosition = ListView.INVALID_POSITION;
 

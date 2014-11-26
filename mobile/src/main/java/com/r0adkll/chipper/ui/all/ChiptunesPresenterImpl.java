@@ -12,6 +12,7 @@ import com.r0adkll.chipper.api.model.ChipperError;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.data.OfflineIntentService;
 import com.r0adkll.chipper.data.model.OfflineRequest;
@@ -103,15 +104,7 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
 
     @Override
     public void offlineChiptunes(Chiptune... chiptunes) {
-
-        OfflineRequest request = new OfflineRequest.Builder()
-                .addChiptunes(Arrays.asList(chiptunes))
-                .build();
-
-        Intent offlineRequest = new Intent(mView.getActivity(), OfflineIntentService.class);
-        offlineRequest.putExtra(OfflineIntentService.EXTRA_OFFLINE_REQUEST, request);
-        mView.getActivity().startService(offlineRequest);
-
+        CashMachine.offline(mView.getActivity(), chiptunes);
     }
 
     /**

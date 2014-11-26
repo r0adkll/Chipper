@@ -3,10 +3,12 @@ package com.r0adkll.chipper;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationManagerCompat;
 
 import com.google.gson.Gson;
 import com.r0adkll.chipper.api.ApiModule;
 import com.r0adkll.chipper.data.DataModule;
+import com.r0adkll.chipper.playback.PlaybackModule;
 import com.r0adkll.chipper.prefs.IntPreference;
 import com.r0adkll.chipper.push.PushModule;
 import com.r0adkll.chipper.qualifiers.AppVersion;
@@ -35,7 +37,8 @@ import static android.content.Context.MODE_PRIVATE;
         ApiModule.class,
         DataModule.class,
         PushModule.class,
-        UIModule.class
+        UIModule.class,
+        PlaybackModule.class
     },
     injects = {
         ChipperApp.class
@@ -97,5 +100,18 @@ public final class ChipperModule {
     Bus provideOttoBus(){
         return new Bus(ThreadEnforcer.ANY);
     }
+
+    /***********************************************************************************************
+     *
+     * System Service Provides
+     *
+     */
+
+    @Provides
+    NotificationManagerCompat provideNotificationManager(Application app){
+        return NotificationManagerCompat.from(app);
+    }
+
+
 
 }

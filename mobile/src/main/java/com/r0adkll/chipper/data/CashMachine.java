@@ -10,6 +10,7 @@ import com.r0adkll.chipper.data.model.OfflineRequest;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Arrays;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -63,7 +64,7 @@ public class CashMachine {
      *
      * @param chiptune      the chiptune to offline
      */
-    public void offline(Context ctx, Chiptune chiptune){
+    public static void offline(Context ctx, Chiptune chiptune){
 
         // Create OfflineRequest
         OfflineRequest request = new OfflineRequest.Builder()
@@ -77,11 +78,29 @@ public class CashMachine {
     }
 
     /**
+     * Cache a chiptune for offline playback
+     *
+     * @param chiptunes      the chiptunes to offline
+     */
+    public static void offline(Context ctx, Chiptune... chiptunes){
+
+        // Create OfflineRequest
+        OfflineRequest request = new OfflineRequest.Builder()
+                .addChiptunes(Arrays.asList(chiptunes))
+                .build();
+
+        Intent offlineIntent = new Intent(ctx, OfflineIntentService.class);
+        offlineIntent.putExtra(OfflineIntentService.EXTRA_OFFLINE_REQUEST, request);
+        ctx.startService(offlineIntent);
+
+    }
+
+    /**
      * Cache an entire playlist for offline playback
      *
      * @param playlist      the playlist to offline
      */
-    public void offline(Context ctx, Playlist playlist){
+    public static void offline(Context ctx, Playlist playlist){
 
         // Create OfflineRequest
         OfflineRequest request = new OfflineRequest.Builder()
@@ -112,6 +131,23 @@ public class CashMachine {
         return false;
     }
 
+    /**
+     * Return the offline file for the given chiptune if it exists
+     *
+     * @param chiptune      the chiptune to check and see if it's offlined or not
+     * @return              the offline file, or null if none is found
+     */
+    public File getOfflineFile(Chiptune chiptune){
+        // Scan for it's existence in the offline directory
+        File[] files = mCacheDir.listFiles(new ChiptuneFilenameFilter(chiptune));
+        if(files != null){
+            if(files.length > 0){
+                return files[0];
+            }
+        }
+
+        return null;
+    }
 
     /***********************************************************************************************
      *

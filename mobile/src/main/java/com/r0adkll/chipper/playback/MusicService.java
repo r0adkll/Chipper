@@ -1,28 +1,41 @@
 package com.r0adkll.chipper.playback;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.session.MediaSessionManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.ResultReceiver;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
+import android.view.KeyEvent;
 
 import com.r0adkll.chipper.ChipperApp;
+import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.data.PlaylistManager;
+import com.r0adkll.chipper.playback.model.PlaybackState;
+import com.r0adkll.chipper.playback.model.SessionState;
+import com.r0adkll.chipper.prefs.BooleanPreference;
+import com.r0adkll.chipper.prefs.IntPreference;
 import com.squareup.otto.Bus;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 /**
  * Created by r0adkll on 11/25/14.
  */
-public class MusicService extends Service implements AudioPlayer.PlayerCallbacks{
+public class MusicService extends Service implements AudioPlayer.PlayerCallbacks {
 
     /***********************************************************************************************
      *
@@ -30,6 +43,17 @@ public class MusicService extends Service implements AudioPlayer.PlayerCallbacks
      *
      */
 
+    public static final String MEDIA_SESSION_TAG = "Chipper Session";
+
+    public static final String INTENT_ACTION_PLAY = "com.r0adkll.chipper.intent.PLAY";
+    public static final String INTENT_ACTION_PAUSE = "com.r0adkll.chipper.intent.PAUSE";
+    public static final String INTENT_ACTION_PLAYPAUSE = "com.r0adkll.chipper.intent.PLAYPAUSE";
+    public static final String INTENT_ACTION_SHUFFLEPLAY = "com.r0adkll.chipper.action.WIDGET_SHUFFLE_PLAY";
+    public static final String INTENT_ACTION_NEXT = "com.r0adkll.chipper.intent.NEXT";
+    public static final String INTENT_ACTION_PREV = "com.r0adkll.chipper.intent.PREV";
+    public static final String INTENT_ACTION_EXIT = "com.r0adkll.chipper.intent.EXIT";
+    public static final String INTENT_ACTION_UPVOTE = "com.r0adkll.chipper.intent.UPVOTE";
+    public static final String INTENT_ACTION_DOWNVOTE = "com.r0adkll.chipper.intent.DOWNVOTE";
 
 
     /***********************************************************************************************
@@ -38,13 +62,18 @@ public class MusicService extends Service implements AudioPlayer.PlayerCallbacks
      *
      */
 
+    @Inject AudioManager mAudioManager;
     @Inject NotificationManagerCompat mNotificationManager;
     @Inject PlaylistManager mPlaylistManager;
     @Inject ChiptuneProvider mProvider;
     @Inject CashMachine mATM;
     @Inject Bus mBus;
+
+    @Inject BooleanPreference mShufflePref;
+    @Inject IntPreference mRepeatPref;
     @Inject AudioPlayer mPlayer;
 
+    private SessionState mCurrentState;
     private MediaSessionCompat mCurrentSession;
 
     /***********************************************************************************************
@@ -64,6 +93,16 @@ public class MusicService extends Service implements AudioPlayer.PlayerCallbacks
         // Setup the Player Callbacks
         mPlayer.setPlayerCallbacks(this);
 
+        // Register Receivers
+        registerReceiver(mNoisyAudioStreamReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
+
+        // Initialize the Session State
+        mCurrentState = new SessionState(mShufflePref, mRepeatPref);
+
+        // Initialize the Media Session
+        mCurrentSession = new MediaSessionCompat(this, MEDIA_SESSION_TAG);
+        mCurrentSession.setCallback(mMediaSessionCallbacks);
+        mCurrentSession.setActive(true);
     }
 
     @Override
@@ -85,6 +124,19 @@ public class MusicService extends Service implements AudioPlayer.PlayerCallbacks
         // Un-register from the otto bus
         mBus.unregister(this);
 
+        // Unregister Receivers
+        unregisterReceiver(mNoisyAudioStreamReceiver);
+
+        // Relinquish playback resources
+        stop();
+
+        // Abandon Focus
+        mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
+
+        // Release the Session
+        if(mCurrentSession != null){
+            mCurrentSession.release();
+        }
 
     }
 
@@ -95,14 +147,53 @@ public class MusicService extends Service implements AudioPlayer.PlayerCallbacks
      */
 
     private void play(){
+        // Start playback
+        mPlayer.play();
+
+        // Set the playback state
+        mCurrentSession.setPlaybackState(buildPlaybackState(PlaybackStateCompat.STATE_PLAYING));
+
+        // Update Notification
+
+        // Dispatch Otto Event
 
     }
 
     private void pause(){
+        // Pause Playback
+        mPlayer.pause();
+
+        // Set the playback state
+        mCurrentSession.setPlaybackState(buildPlaybackState(PlaybackStateCompat.STATE_PAUSED));
+
+        // Update Notification
+
+
+        // Dispatch Otto event
 
     }
 
+    private void playPause(){
+        if(mCurrentState.isValid()){
+            if(mPlayer.isPlaying()){
+                pause();
+            }else{
+                play();
+            }
+        }else{
+            // Play a Random Chiptune
+            coldStartRandomPlayback();
+        }
+    }
+
     private void stop(){
+        mPlayer.stop();
+        mPlayer.release();
+        mCurrentSession.setPlaybackState(buildPlaybackState(PlaybackStateCompat.STATE_STOPPED));
+
+        // Update Notification
+
+        // Dispatch Otto Event
 
     }
 
@@ -133,7 +224,78 @@ public class MusicService extends Service implements AudioPlayer.PlayerCallbacks
      *
      */
 
+    /**
+     * Build the MediaSession playback state after a state change in the service
+     *
+     * @param playBackState     the state to update with
+     * @return                  the state
+     */
+    private PlaybackStateCompat buildPlaybackState(int playBackState){
 
+        // Determine appropriate playback rate
+        int playbackRate = 0;
+        if(playBackState == PlaybackStateCompat.STATE_PLAYING) {
+            playbackRate = 1;
+        }
+
+        // Build the playback state
+        PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder();
+        stateBuilder.setState(playBackState, mPlayer.getCurrentPosition(), playbackRate);
+
+        // Set the Playback available actions
+        stateBuilder.setActions(
+            PlaybackStateCompat.ACTION_PLAY |
+            PlaybackStateCompat.ACTION_PAUSE |
+            PlaybackStateCompat.ACTION_PLAY_PAUSE |
+            PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
+            PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+            PlaybackStateCompat.ACTION_SEEK_TO |
+            PlaybackStateCompat.ACTION_SET_RATING |
+            PlaybackStateCompat.ACTION_STOP
+        );
+
+        return stateBuilder.build();
+    }
+
+    private MediaMetadataCompat buildMetaData(){
+        Chiptune chiptune = mCurrentState.getCurrentChiptune();
+
+        // Create the builder
+        MediaMetadataCompat.Builder metaBuilder = new MediaMetadataCompat.Builder();
+
+        if(chiptune != null){
+
+            metaBuilder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, chiptune.artist)
+                       .putString(MediaMetadataCompat.METADATA_KEY_TITLE, chiptune.title)
+                       .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, chiptune.length)
+                       .putRating(MediaMetadataCompat.METADATA_KEY_RATING, );
+
+        }
+
+        return metaBuilder.build();
+    }
+
+    /**
+     * This is called when the current SessionState doesn't have a defined
+     * chiptune or playlist and the user issues a play command to Chipper (via UI or widget, etc)
+     * so we need to grab a random Chiptune from the list of all available chiptunes and set the
+     * playlist as the master list (i.e. ALL THE CHIPTUNES) and start playback
+     */
+    private void coldStartRandomPlayback(){
+
+
+
+    }
+
+    /**
+     * Shut down the this service
+     */
+    private void shutdown(){
+
+        stopSelf();
+
+
+    }
 
     /***********************************************************************************************
      *
@@ -141,20 +303,51 @@ public class MusicService extends Service implements AudioPlayer.PlayerCallbacks
      *
      */
 
+
+
+
     /***********************************************************************************************
      *
      * MediaSession Callbacks
      *
      */
 
+    /**
+     * Media Session Callbacks that listen to controller commands to control the music playback
+     *
+     */
     private MediaSessionCompat.Callback mMediaSessionCallbacks = new MediaSessionCompat.Callback() {
         @Override
         public void onCommand(String command, Bundle extras, ResultReceiver cb) {
-
+            // Handle custom command
         }
 
         @Override
         public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
+            if(mediaButtonEvent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)){
+                KeyEvent event = mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+                switch (event.getAction()){
+                    case KeyEvent.KEYCODE_MEDIA_PLAY:
+                        play();
+                        return true;
+                    case KeyEvent.KEYCODE_MEDIA_PAUSE:
+                        pause();
+                        return true;
+                    case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+
+                        return true;
+                    case KeyEvent.KEYCODE_MEDIA_NEXT:
+                        next();
+                        return true;
+                    case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+                        previous();
+                        return true;
+                    case KeyEvent.KEYCODE_MEDIA_STOP:
+                        stop();
+                        return true;
+                }
+
+            }
 
             return false;
         }
@@ -221,32 +414,68 @@ public class MusicService extends Service implements AudioPlayer.PlayerCallbacks
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
+        Timber.e("MediaPlayer Error [what: %d][extra: %d]", what, extra);
         return false;
     }
 
     @Override
     public boolean onInfo(MediaPlayer mp, int what, int extra) {
+        Timber.i("MediaPlayer Info [what: %d][extra: %d]", what, extra);
         return false;
     }
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+        Timber.d("MediaPlayer Prepared"); // Add current session data to this output
 
     }
 
     @Override
     public void onCompletion(MediaPlayer mp) {
+        Timber.d("MediaPlayer Completion"); // Add current session data to this output
 
     }
 
     @Override
     public void onSeekComplete(MediaPlayer mp) {
+        Timber.d("MediaPlayer Seek Complete [%d - %d]", mp.getCurrentPosition(), mp.getDuration());
 
     }
 
     @Override
     public void onBufferingUpdate(MediaPlayer mp, int percent) {
 
+
     }
 
+    /***********************************************************************************************
+     *
+     * Receivers
+     *
+     */
+
+    /**
+     * This receiver catches the intent when a user unplugs a headset, or disconnects
+     * from bluetooth
+     */
+    public BroadcastReceiver mNoisyAudioStreamReceiver = new BroadcastReceiver(){
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+                Timber.d("Becoming Noisy, pausing...");
+                pause();
+            }
+        }
+    };
+
+    /**
+     * The AudioManager focus change listener to listen for focus changes in the OS system
+     */
+    private AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener =
+            new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+
+        }
+    };
 }

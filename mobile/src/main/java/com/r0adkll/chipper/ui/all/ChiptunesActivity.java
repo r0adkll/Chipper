@@ -2,6 +2,8 @@ package com.r0adkll.chipper.ui.all;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 
@@ -109,7 +111,6 @@ public class ChiptunesActivity extends BaseDrawerActivity
         }
     }
 
-
     /***********************************************************************************************
      *
      * Base Methods
@@ -132,6 +133,7 @@ public class ChiptunesActivity extends BaseDrawerActivity
             new ChiptunesModule(this)
         };
     }
+
 
 
     /***********************************************************************************************
@@ -167,5 +169,4 @@ public class ChiptunesActivity extends BaseDrawerActivity
                 .setMessage(msg)
                 .show(getSupportFragmentManager());
     }
-
 }

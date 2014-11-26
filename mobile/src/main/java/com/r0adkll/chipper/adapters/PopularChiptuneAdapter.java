@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.r0adkll.chipper.R;
@@ -83,16 +84,27 @@ public class PopularChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, Popul
         holder.title.setText(tune.title);
         holder.artist.setText(tune.artist);
 
-        // Set click listener
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int i = holder.getPosition();
-                onItemClick(v, i);
-            }
-        });
+        holder.optFav.setOnClickListener(new OptionClickListener(i));
+        holder.optUpvote.setOnClickListener(new OptionClickListener(i));
+        holder.optDownvote.setOnClickListener(new OptionClickListener(i));
+        holder.optAdd.setOnClickListener(new OptionClickListener(i));
+        holder.optOffline.setOnClickListener(new OptionClickListener(i));
 
     }
+
+    private class OptionClickListener implements View.OnClickListener {
+
+        private int mPosition = 0;
+
+        public OptionClickListener(int position){
+            mPosition = position;
+        }
+
+        @Override
+        public void onClick(View v) {
+            onItemOptionSelected(v, mPosition);
+        }
+    };
 
     /***********************************************************************************************
      *
@@ -131,6 +143,11 @@ public class PopularChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, Popul
         @InjectView(R.id.artist)    TextView artist;
         @InjectView(R.id.vote)      TextView vote;
         @InjectView(R.id.length)    TextView length;
+        @InjectView(R.id.opt_favorite)  ImageView optFav;
+        @InjectView(R.id.opt_upvote)    ImageView optUpvote;
+        @InjectView(R.id.opt_downvote)  ImageView optDownvote;
+        @InjectView(R.id.opt_add)       ImageView optAdd;
+        @InjectView(R.id.opt_offline)   ImageView optOffline;
 
         public PopularViewHolder(View itemView) {
             super(itemView);

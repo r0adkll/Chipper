@@ -68,15 +68,6 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
         holder.title.setText(data.title);
         holder.description.setText(data.getFormattedLength());
 
-//        View front = holder.itemView.findViewById(R.id.front);
-//        front.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                int i = holder.getPosition();
-//                onItemClick(v, i);
-//            }
-//        });
-
         holder.optFav.setOnClickListener(new OptionClickListener(position));
         holder.optUpvote.setOnClickListener(new OptionClickListener(position));
         holder.optDownvote.setOnClickListener(new OptionClickListener(position));
@@ -200,7 +191,6 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
         @InjectView(R.id.opt_downvote)  ImageView optDownvote;
         @InjectView(R.id.opt_add)       ImageView optAdd;
         @InjectView(R.id.opt_offline)   ImageView optOffline;
-
 
         public ChiptuneViewHolder(View itemView) {
             super(itemView);

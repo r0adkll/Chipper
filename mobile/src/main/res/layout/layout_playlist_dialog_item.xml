@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    >
+
+    <include layout="@layout/layout_playlist_item_avatar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/material_spacing"
+        android:layout_marginRight="@dimen/activity_padding"
+        android:layout_marginTop="@dimen/half_padding"
+        android:layout_marginBottom="@dimen/half_padding"
+        />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="start|center_vertical">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/song_count"
+            android:singleLine="true"
+            android:ellipsize="end"
+
+            tools:text="@string/placeholder_lorem_ipsum"
+            android:textSize="16sp"
+            />
+
+        <TextView
+            android:id="@+id/song_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/activity_padding"
+            android:layout_marginLeft="@dimen/activity_padding"
+
+            tools:text="0 Songs"
+            android:textSize="16sp"
+            android:fontFamily="@string/font_fontFamily_medium"
+            android:textStyle="@integer/font_textStyle_medium"
+            android:textColor="@color/primary"
+            />
+
+    </RelativeLayout>
+
+
+</LinearLayout>

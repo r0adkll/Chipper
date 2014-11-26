@@ -1,32 +1,20 @@
 package com.r0adkll.chipper.ui.all;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
 import com.fortysevendeg.swipelistview.SwipeListView;
-import com.fortysevendeg.swipelistview.SwipeListViewListener;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.adapters.AllChiptuneAdapter;
 import com.r0adkll.chipper.adapters.OnItemClickListener;
 import com.r0adkll.chipper.adapters.RecyclerArrayAdapter;
 import com.r0adkll.chipper.api.model.Chiptune;
-import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
-import com.r0adkll.chipper.ui.model.RecyclerItemClickListener;
 import com.r0adkll.chipper.ui.widget.StickyRecyclerHeadersElevationDecoration;
-import com.r0adkll.chipper.utils.SwipeDismissRecyclerViewTouchListener;
 import com.r0adkll.postoffice.PostOffice;
-import com.r0adkll.postoffice.styles.ListStyle;
-import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 
 import java.util.List;
 
@@ -34,7 +22,6 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import hugo.weaving.DebugLog;
 
 /**
  * Created by r0adkll on 11/12/14.
@@ -54,7 +41,8 @@ public class ChiptunesActivity extends BaseDrawerActivity
     @Inject
     ChiptunesPresenter presenter;
 
-    private AllChiptuneAdapter mAdapter;
+    @Inject
+    AllChiptuneAdapter mAdapter;
 
 
     /***********************************************************************************************
@@ -72,7 +60,6 @@ public class ChiptunesActivity extends BaseDrawerActivity
         getSupportActionBar().setTitle(R.string.navdrawer_item_chiptunes);
 
         // Setup the adapter with the recycler view
-        mAdapter = new AllChiptuneAdapter();
         mChiptuneRecycler.setAdapter(mAdapter);
         mChiptuneRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         StickyRecyclerHeadersElevationDecoration headersDecor = new StickyRecyclerHeadersElevationDecoration(mAdapter);
@@ -114,13 +101,7 @@ public class ChiptunesActivity extends BaseDrawerActivity
                 presenter.downvoteChiptune(item);
                 break;
             case R.id.opt_add:
-
-                // Show dialog that contains all the available playlists
-                // and let the user select one that they wish to add this chiptune
-                // to.
-
-
-
+                presenter.addChiptunesToPlaylist(item);
                 break;
             case R.id.opt_offline:
                 presenter.offlineChiptunes(item);

@@ -33,18 +33,35 @@
             android:layout_height="match_parent">
 
 
-            <android.support.v4.widget.SwipeRefreshLayout
+            <com.r0adkll.chipper.ui.widget.TightSwipeRefreshLayout
                 android:id="@+id/swipe_refresh_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <android.support.v7.widget.RecyclerView
+                <!--<android.support.v7.widget.RecyclerView-->
+                    <!--android:id="@+id/recycle_view"-->
+                    <!--android:scrollbars="vertical"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="match_parent"/>-->
+                <com.fortysevendeg.swipelistview.SwipeListView
+                    xmlns:swipe="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/recycle_view"
-                    android:scrollbars="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent"
 
-            </android.support.v4.widget.SwipeRefreshLayout>
+                    swipe:swipeFrontView="@+id/front"
+                    swipe:swipeBackView="@+id/back"
+
+                    swipe:swipeOffsetLeft="25dp"
+
+                    swipe:swipeDrawableChecked="@drawable/choice_selected"
+
+                    swipe:swipeCloseAllItemsWhenMoveList="true"
+                    swipe:swipeMode="left"
+                    swipe:onlyOneOpenedWhenSwipe="true"
+                    />
+
+            </com.r0adkll.chipper.ui.widget.TightSwipeRefreshLayout>
 
         </FrameLayout>
 

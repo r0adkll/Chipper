@@ -2,22 +2,27 @@ package com.r0adkll.chipper.ui.login;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Bundle;
 
 import com.activeandroid.query.Select;
-import com.r0adkll.chipper.api.ApiModule;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.ChipperError;
 import com.r0adkll.chipper.api.model.Device;
+import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.utils.Tools;
 import com.r0adkll.chipper.ui.all.ChiptunesActivity;
 import com.r0adkll.deadskunk.utils.Utils;
+
+import java.io.IOException;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -103,7 +108,7 @@ public class LoginPresenterImpl implements LoginPresenter {
      *
      * @param user      the user retreived from the server
      */
-    private void handleSuccess(User user){
+    private void handleSuccess(final User user){
 
         // Set this user object as the current user
         user.isCurrentUser = true;
@@ -111,9 +116,24 @@ public class LoginPresenterImpl implements LoginPresenter {
         // Save User Account via activeandroid
         if(user.save() > 0){
 
-            // Now create a sync account
-            if(createSyncAccount(mView.getActivity(), user)) {
+            // Associate Pre-Configured Favorites playlist to this user
+            Playlist favorites = new Select()
+                    .from(Playlist.class)
+                    .where("name=?", "Favorites")
+                    .limit(1)
+                    .executeSingle();
 
+            // If we found the favorites, update it
+            if(favorites != null){
+                favorites.owner = user;
+                favorites.updated_by_user = user;
+                favorites.updated = Tools.time();
+                favorites.save();
+                Timber.i("Successfully linked pre-configured 'Favorites' to the new user");
+            }
+
+            // Now create a sync account
+            if (createSyncAccount(mView.getActivity(), user)) {
                 // Great Success! Forward on to the next activity
                 Timber.i("Great Success! %s has been logged in to chipper with a user id of %s", user.email, user.id);
 
@@ -141,11 +161,11 @@ public class LoginPresenterImpl implements LoginPresenter {
                                 handleRetrofitError(error);
                             }
                         });
-
-            }else{
+            } else {
                 user.delete();
                 mView.reset();
                 mView.showErroMessage("Unable to create an Account, please try again");
+
             }
 
         }else{
@@ -164,24 +184,34 @@ public class LoginPresenterImpl implements LoginPresenter {
     public boolean createSyncAccount(Activity activity, User user){
 
         // Create new account
-        Account newAcct = new Account(user.email, ACCOUNT_TYPE);
+        final Account newAcct = new Account(user.email, ACCOUNT_TYPE);
 
         // Get account manager instance
-        AccountManager accountManager = AccountManager.get(activity);
+        final AccountManager accountManager = AccountManager.get(activity);
 
-        if(accountManager.addAccountExplicitly(newAcct, null, null)){
-
-            // Added was a success
-            Timber.i("Account Created: [%s][%s]", newAcct.name, newAcct.type);
-            return true;
-
-        }else{
-
-            Timber.e("Unable to create SyncAccount");
-            return false;
-
+        // Find existing accounts
+        boolean hasExistingAcct = false;
+        Account[] accts = accountManager.getAccountsByType(ACCOUNT_TYPE);
+        if(accts.length > 0){
+            for(Account acct: accts){
+                if(acct.name.equals(user.email)){
+                    // Found Account!
+                    hasExistingAcct = true;
+                }
+            }
         }
 
+        if(!hasExistingAcct) {
+            if (accountManager.addAccountExplicitly(newAcct, null, null)) {
+                Timber.i("Account Created: [%s][%s]", newAcct.name, newAcct.type);
+                return true;
+            } else {
+                Timber.e("Unable to create SyncAccount");
+                return false;
+            }
+        }else{
+            return true;
+        }
     }
 
     /**
@@ -211,6 +241,10 @@ public class LoginPresenterImpl implements LoginPresenter {
         }catch (Exception e){
             mView.showErroMessage(error.getMessage());
         }
+    }
+
+    public static interface AccountCreateCallback {
+        public void onCreate(boolean result);
     }
 
 }

@@ -7,12 +7,16 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
+import com.fortysevendeg.swipelistview.SwipeListView;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.adapters.OnItemClickListener;
 import com.r0adkll.chipper.adapters.PopularChiptuneAdapter;
+import com.r0adkll.chipper.adapters.RecyclerArrayAdapter;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
 import com.r0adkll.chipper.ui.widget.DividerDecoration;
+import com.r0adkll.chipper.ui.widget.TightSwipeRefreshLayout;
 import com.r0adkll.postoffice.PostOffice;
 
 import java.util.List;
@@ -25,7 +29,7 @@ import butterknife.InjectView;
 /**
  * Created by r0adkll on 11/15/14.
  */
-public class PopularActivity extends BaseDrawerActivity implements PopularView, OnItemClickListener<Chiptune>, SwipeRefreshLayout.OnRefreshListener {
+public class PopularActivity extends BaseDrawerActivity implements PopularView, OnItemClickListener<Chiptune>, SwipeRefreshLayout.OnRefreshListener, RecyclerArrayAdapter.OnItemOptionSelectedListener<Chiptune> {
 
     /***********************************************************************************************
      *
@@ -34,10 +38,10 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView, 
      */
 
     @InjectView(R.id.swipe_refresh_layout)
-    SwipeRefreshLayout mSwipeLayout;
+    TightSwipeRefreshLayout mSwipeLayout;
 
     @InjectView(R.id.recycle_view)
-    RecyclerView mRecyclerView;
+    SwipeListView mRecyclerView;
 
     @Inject
     PopularPresenter presenter;
@@ -66,7 +70,13 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView, 
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mRecyclerView.addItemDecoration(new DividerDecoration(this));
-        adapter.setOnItemClickListener(this);
+        adapter.setOnItemOptionSelectedListener(this);
+        mRecyclerView.setSwipeListViewListener(new BaseSwipeListViewListener(){
+            @Override
+            public void onClickFrontView(int position) {
+                presenter.onChiptuneSelected(adapter.getItem(position));
+            }
+        });
 
         // Load all chiptunes and vote data
         presenter.loadAllChiptunes();
@@ -89,6 +99,28 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView, 
     @Override
     public void onRefresh() {
         presenter.loadVotes();
+    }
+
+    @Override
+    public void onSelected(View view, Chiptune item) {
+        switch (view.getId()){
+            case R.id.opt_favorite:
+                presenter.favoriteChiptunes(item);
+                break;
+            case R.id.opt_upvote:
+                presenter.upvoteChiptune(item);
+                break;
+            case R.id.opt_downvote:
+                presenter.downvoteChiptune(item);
+                break;
+            case R.id.opt_add:
+                // TODO: Show dialog with the list of current playlists, so the user can choose one to add to
+
+                break;
+            case R.id.opt_offline:
+                presenter.offlineChiptunes(item);
+                break;
+        }
     }
 
     /***********************************************************************************************

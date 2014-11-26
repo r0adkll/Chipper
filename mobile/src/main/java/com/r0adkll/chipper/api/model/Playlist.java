@@ -228,6 +228,15 @@ public class Playlist extends Model implements Parcelable{
     }
 
     /**
+     * Get the number of chiptunes in this playlist
+     *
+     * @return      the # of chiptunes in this playlist
+     */
+    public int getCount(){
+        return chiptuneReferences().size();
+    }
+
+    /**
      * Get all the chiptunes straight from the database
      * @return
      */
@@ -278,6 +287,31 @@ public class Playlist extends Model implements Parcelable{
         reference.save();
 
         // Update this playlists updated time
+        updated = Tools.time();
+        save();
+    }
+
+    /**
+     * Add a collection of chiptunes to this playlist
+     * @param tunes
+     */
+    public void add(Chiptune... tunes){
+
+        ActiveAndroid.beginTransaction();
+        try{
+            for(Chiptune tune: tunes){
+                ChiptuneReference reference = new ChiptuneReference();
+                reference.chiptune_id = tune.id;
+                reference.playlist = this;
+                reference.sort_order = chiptuneReferences().size();
+                reference.save();
+            }
+            ActiveAndroid.setTransactionSuccessful();
+        }finally {
+            ActiveAndroid.endTransaction();
+        }
+
+        // Save and update this playlist
         updated = Tools.time();
         save();
     }

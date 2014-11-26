@@ -20,7 +20,7 @@ public interface ChiptunesPresenter {
 
     public void favoriteChiptunes(Chiptune... chiptunes);
 
-    public void addChiptunesToPlaylist(Playlist playlist, Chiptune... chiptunes);
+    public void addChiptunesToPlaylist(Chiptune... chiptunes);
 
     public void offlineChiptunes(Chiptune... chiptunes);
 

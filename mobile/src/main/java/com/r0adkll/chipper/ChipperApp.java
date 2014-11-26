@@ -47,6 +47,8 @@ public class ChipperApp extends Application{
                         ChiptuneReference.class,
                         Vote.class
                 );
+
+        // Initialize the Database ORM
         ActiveAndroid.initialize(builder.create());
 
         // Plant Timber Trees

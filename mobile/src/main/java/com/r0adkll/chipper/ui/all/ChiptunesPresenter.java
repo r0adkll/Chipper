@@ -1,27 +1,12 @@
 package com.r0adkll.chipper.ui.all;
 
-import android.view.View;
-
-import com.r0adkll.chipper.api.model.Chiptune;
-import com.r0adkll.chipper.api.model.Playlist;
+import com.r0adkll.chipper.ui.model.IActionPresenter;
 
 /**
  * Created by r0adkll on 11/13/14.
  */
-public interface ChiptunesPresenter {
+public interface ChiptunesPresenter extends IActionPresenter {
 
     public void loadAllChiptunes();
-
-    public void onChiptuneSelected(Chiptune chiptune);
-
-    public void upvoteChiptune(Chiptune chiptune);
-
-    public void downvoteChiptune(Chiptune chiptune);
-
-    public void favoriteChiptunes(Chiptune... chiptunes);
-
-    public void addChiptunesToPlaylist(Chiptune... chiptunes);
-
-    public void offlineChiptunes(Chiptune... chiptunes);
 
 }

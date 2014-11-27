@@ -1,5 +1,7 @@
 package com.r0adkll.chipper.api;
 
+import android.app.Application;
+
 import com.google.gson.Gson;
 import com.r0adkll.chipper.api.model.Device;
 import com.r0adkll.chipper.api.model.User;
@@ -47,11 +49,17 @@ public final class ApiModule {
     }
 
     @Provides @Singleton
-    RestAdapter provideRestAdapter(Endpoint endpoint, Client client, ApiHeaders headers) {
+    ChipperErrorHandler provideErrorHandler(Application app){
+        return new ChipperErrorHandler(app);
+    }
+
+    @Provides @Singleton
+    RestAdapter provideRestAdapter(Endpoint endpoint, Client client, ApiHeaders headers, ChipperErrorHandler errorHandler) {
         return new RestAdapter.Builder()
                 .setClient(client)
                 .setEndpoint(endpoint)
                 .setRequestInterceptor(headers)
+                .setErrorHandler(errorHandler)
                 .setConverter(new GsonConverter(new Gson()))
                 .build();
     }

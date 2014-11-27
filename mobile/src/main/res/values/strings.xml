@@ -19,4 +19,9 @@
     <string name="playlist_viewer_message">You don\'t have any\nchiptunes in this playlist.</string>
     <string name="add_playlist_dialog_item">add playlist</string>
 
+    <string name="error_network">A network error has occured, please check your connection.</string>
+    <string name="error_no_response">There was no response from the server.</string>
+    <string name="error_network_http_error">There was an issue in communicating with the server.</string>
+    <string name="error_unknown">An unknown error has occurred.</string>
+
 </resources>

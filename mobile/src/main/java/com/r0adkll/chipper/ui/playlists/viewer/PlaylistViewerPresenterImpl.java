@@ -9,8 +9,12 @@ import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.ChiptuneReference;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.data.CashMachine;
+import com.r0adkll.chipper.data.PlaylistManager;
+import com.r0adkll.chipper.data.VoteManager;
 import com.r0adkll.chipper.data.model.ModelLoader;
 import com.r0adkll.chipper.data.model.OfflineRequest;
+import com.r0adkll.chipper.utils.CallbackHandler;
 
 import java.util.Arrays;
 
@@ -21,6 +25,8 @@ public class PlaylistViewerPresenterImpl implements PlaylistViewerPresenter {
 
     private PlaylistViewerView mView;
     private ChipperService mService;
+    private VoteManager mVoteManager;
+    private PlaylistManager mPlaylistManager;
     private User mUser;
 
     /**
@@ -30,10 +36,16 @@ public class PlaylistViewerPresenterImpl implements PlaylistViewerPresenter {
      * @param service
      * @param user
      */
-    public PlaylistViewerPresenterImpl(PlaylistViewerView view, ChipperService service, User user) {
+    public PlaylistViewerPresenterImpl(PlaylistViewerView view,
+                                       ChipperService service,
+                                       PlaylistManager playlistManager,
+                                       VoteManager voteManager,
+                                       User user) {
         mView = view;
         mService = service;
         mUser = user;
+        mPlaylistManager = playlistManager;
+        mVoteManager = voteManager;
     }
 
     @Override
@@ -48,46 +60,62 @@ public class PlaylistViewerPresenterImpl implements PlaylistViewerPresenter {
 
     @Override
     public void upvoteChiptune(Chiptune chiptune) {
+        mVoteManager.upvote(chiptune, new CallbackHandler() {
+            @Override
+            public void onHandle(Object value) {
 
+            }
+
+            @Override
+            public void onFailure(String msg) {
+
+            }
+        });
     }
 
     @Override
     public void downvoteChiptune(Chiptune chiptune) {
+        mVoteManager.downvote(chiptune, new CallbackHandler() {
+            @Override
+            public void onHandle(Object value) {
 
+            }
+
+            @Override
+            public void onFailure(String msg) {
+
+            }
+        });
     }
 
     @Override
     public void favoriteChiptunes(Chiptune... chiptunes) {
-
+        mPlaylistManager.addToFavorites(chiptunes);
     }
 
     @Override
-    public void addChiptunesToPlaylist(Playlist playlist, Chiptune... chiptunes) {
+    public void addChiptunesToPlaylist(Chiptune... chiptunes) {
+        mPlaylistManager.addToPlaylist(mView.getActivity(), new CallbackHandler() {
+            @Override
+            public void onHandle(Object value) {
 
+            }
+
+            @Override
+            public void onFailure(String msg) {
+
+            }
+        }, chiptunes);
     }
 
     @Override
     public void offlineChiptunes(Chiptune... chiptunes) {
-        // Create an offline task
-        OfflineRequest request = new OfflineRequest.Builder()
-                .addChiptunes(Arrays.asList(chiptunes))
-                .build();
-
-        // Send offline request
-        Intent offlineIntent = OfflineRequest.createOfflineRequestIntent(mView.getActivity(), request);
-        mView.getActivity().startService(offlineIntent);
+        CashMachine.offline(mView.getActivity(), chiptunes);
     }
 
     @Override
     public void offlinePlaylist(Playlist playlist) {
-        // Create an offline task
-        OfflineRequest request = new OfflineRequest.Builder()
-                .addPlaylist(playlist)
-                .build();
-
-        // Send offline request
-        Intent offlineIntent = OfflineRequest.createOfflineRequestIntent(mView.getActivity(), request);
-        mView.getActivity().startService(offlineIntent);
+        CashMachine.offline(mView.getActivity(), playlist);
     }
 
     @Override

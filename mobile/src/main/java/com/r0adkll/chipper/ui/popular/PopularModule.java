@@ -4,6 +4,8 @@ import com.r0adkll.chipper.adapters.PopularChiptuneAdapter;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.data.ChiptuneProvider;
+import com.r0adkll.chipper.data.PlaylistManager;
+import com.r0adkll.chipper.data.VoteManager;
 import com.r0adkll.chipper.qualifiers.CurrentUser;
 import com.r0adkll.chipper.ui.UIModule;
 
@@ -36,8 +38,11 @@ public class PopularModule {
     PopularPresenter providePresenter(PopularView view,
                                       ChiptuneProvider provider,
                                       ChipperService service,
+                                      VoteManager voteManager,
+                                      PlaylistManager playlistManager,
                                       @CurrentUser User user){
-        return new PopularPresenterImpl(view, provider, service, user);
+
+        return new PopularPresenterImpl(view, provider, service, playlistManager, voteManager, user);
     }
 
     @Provides

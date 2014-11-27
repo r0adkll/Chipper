@@ -14,7 +14,7 @@ import com.google.gson.annotations.SerializedName;
 @Table(name = "playlist_chiptunes")
 public class ChiptuneReference extends Model implements Parcelable {
 
-    @Column
+    @Column(index = true)
     @SerializedName("id")
     public String chiptune_id;
 

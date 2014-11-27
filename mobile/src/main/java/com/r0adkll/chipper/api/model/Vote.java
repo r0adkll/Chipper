@@ -7,16 +7,21 @@ import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
+import java.util.Map;
+
 /**
  * Created by r0adkll on 11/15/14.
  */
 @Table(name = "Votes")
 public class Vote extends Model implements Parcelable{
 
+    public static final String TYPE_UP = "up";
+    public static final String TYPE_DOWN = "down";
+
     @Column(name = "vote_id")
     public String id;
 
-    @Column
+    @Column(index = true)
     public String tune_id;
 
     @Column
@@ -32,9 +37,17 @@ public class Vote extends Model implements Parcelable{
      * Parcel Constructor
      */
     public Vote(Parcel in){
+        super();
         id = in.readString();
         tune_id = in.readString();
         value = in.readInt();
+    }
+
+    public Vote(Map<String, Object> map){
+        super();
+        id = (String) map.get("id");
+        tune_id = (String) map.get("tune_id");
+        value = (int) map.get("value");
     }
 
     /***********************************************************************************************

@@ -21,7 +21,7 @@ public class Chiptune extends Model implements Parcelable{
      *
      */
 
-    @Column(name = "chiptune_id")
+    @Column(name = "chiptune_id", index = true)
     public String id;
     @Column public String title;
     @Column public String artist;

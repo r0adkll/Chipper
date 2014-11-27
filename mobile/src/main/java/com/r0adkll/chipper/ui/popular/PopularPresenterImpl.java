@@ -1,19 +1,15 @@
 package com.r0adkll.chipper.ui.popular;
 
-import android.content.Intent;
-
-import com.r0adkll.chipper.api.ApiModule;
 import com.r0adkll.chipper.api.ChipperService;
-import com.r0adkll.chipper.api.model.ChipperError;
 import com.r0adkll.chipper.api.model.Chiptune;
-import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
-import com.r0adkll.chipper.data.OfflineIntentService;
-import com.r0adkll.chipper.data.model.OfflineRequest;
+import com.r0adkll.chipper.data.PlaylistManager;
+import com.r0adkll.chipper.data.VoteManager;
+import com.r0adkll.chipper.utils.CallbackHandler;
 import com.r0adkll.chipper.utils.ChiptuneComparator;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +28,8 @@ public class PopularPresenterImpl implements PopularPresenter {
     private PopularView mView;
     private ChipperService mService;
     private ChiptuneProvider mProvider;
+    private VoteManager mVoteManager;
+    private PlaylistManager mPlaylistManager;
 
     /**
      * Constructor
@@ -41,11 +39,15 @@ public class PopularPresenterImpl implements PopularPresenter {
     public PopularPresenterImpl(PopularView view,
                                 ChiptuneProvider provider,
                                 ChipperService service,
+                                PlaylistManager playlistManager,
+                                VoteManager voteManager,
                                 User user){
         mView = view;
         mService = service;
         mCurrentUser = user;
         mProvider = provider;
+        mVoteManager = voteManager;
+        mPlaylistManager = playlistManager;
     }
 
 
@@ -69,16 +71,17 @@ public class PopularPresenterImpl implements PopularPresenter {
     @Override
     public void loadVotes() {
 
-        mService.getVotes(new Callback<Map<String, Integer>>() {
+        mVoteManager.syncTotalVotes(new CallbackHandler<Map<String, Integer>>() {
             @Override
-            public void success(Map<String, Integer> votes, Response response) {
+            public void onHandle(Map<String, Integer> votes) {
                 mView.setVoteData(votes);
                 mView.hideProgress();
             }
 
             @Override
-            public void failure(RetrofitError error) {
-                handleRetrofitError(error);
+            public void onFailure(String msg) {
+                mView.showErrorMessage(msg);
+                mView.hideProgress();
             }
         });
 
@@ -86,43 +89,77 @@ public class PopularPresenterImpl implements PopularPresenter {
 
     @Override
     public void onChiptuneSelected(Chiptune chiptune) {
+        // Send to session to be played
 
     }
 
     @Override
     public void upvoteChiptune(Chiptune chiptune) {
+        final String title = chiptune.title;
+        mVoteManager.upvote(chiptune, new CallbackHandler() {
+            @Override
+            public void onHandle(Object value) {
+                // Update UI
 
+            }
+
+            @Override
+            public void onFailure(String msg) {
+                Timber.e("Unable to upvote %s : %s", title, msg);
+            }
+        });
     }
 
     @Override
     public void downvoteChiptune(Chiptune chiptune) {
+        final String title = chiptune.title;
+        mVoteManager.downvote(chiptune, new CallbackHandler() {
+            @Override
+            public void onHandle(Object value) {
+                // Update UI
 
+            }
+
+            @Override
+            public void onFailure(String msg) {
+                Timber.e("Unable to downvote %s : %s", title, msg);
+            }
+        });
     }
 
     @Override
     public void favoriteChiptunes(Chiptune... chiptunes) {
-
+        mPlaylistManager.addToFavorites(chiptunes);
     }
 
     @Override
-    public void addChiptunesToPlaylist(Playlist playlist, Chiptune... chiptunes) {
+    public void addChiptunesToPlaylist(final Chiptune... chiptunes) {
+        mPlaylistManager.addToPlaylist(mView.getActivity(), new CallbackHandler() {
+            @Override
+            public void onHandle(Object value) {
+                // Success fully added, Update UI
 
+            }
+
+            @Override
+            public void onFailure(String msg) {
+                if(msg != null) {
+                    Timber.w("Unable to add chiptunes to playlist: %s", msg);
+                }
+            }
+        }, chiptunes);
     }
 
     @Override
     public void offlineChiptunes(Chiptune... chiptunes) {
-
-        OfflineRequest request = new OfflineRequest.Builder()
-                .addChiptunes(Arrays.asList(chiptunes))
-                .build();
-
-        Intent offlineRequest = new Intent(mView.getActivity(), OfflineIntentService.class);
-        offlineRequest.putExtra(OfflineIntentService.EXTRA_OFFLINE_REQUEST, request);
-        mView.getActivity().startService(offlineRequest);
-
+        CashMachine.offline(mView.getActivity(), chiptunes);
     }
 
-
+    /**
+     * Apply a set of chiptunes to the UI
+     *
+     * @param chiptunes
+     */
     private void setChiptunes(List<Chiptune> chiptunes){
 
         // 1. Sort
@@ -138,14 +175,7 @@ public class PopularPresenterImpl implements PopularPresenter {
      * @param error
      */
     private void handleRetrofitError(RetrofitError error){
-        ChipperError cer = (ChipperError) error.getBodyAs(ChipperError.class);
-        if(cer != null){
-            Timber.e("Retrofit Error[%s] - %s", error.getMessage(), cer.technical);
-            mView.showErrorMessage(cer.readable);
-        }else{
-            Timber.e("Retrofit Error: %s", error.getKind().toString());
-            mView.showErrorMessage(error.getLocalizedMessage());
-        }
+        mView.showErrorMessage(error.getLocalizedMessage());
         mView.hideProgress();
     }
 }

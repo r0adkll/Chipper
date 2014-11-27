@@ -18,7 +18,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
 import com.r0adkll.chipper.R;
-import com.r0adkll.chipper.utils.Callback;
+import com.r0adkll.chipper.utils.CallbackHandler;
 import com.r0adkll.chipper.ui.model.BaseActivity;
 import com.r0adkll.postoffice.PostOffice;
 
@@ -125,7 +125,7 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
             }
 
             // Try to get the access token again
-            getAuthToken(new Callback<String>() {
+            getAuthToken(new CallbackHandler<String>() {
                 @Override
                 public void onHandle(String authToken) {
                     // Now attempt to log into server
@@ -182,7 +182,7 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
                 mSignIn.setEnabled(false);
 
                 // Attempt to get token and register user
-                getAuthToken(new Callback<String>() {
+                getAuthToken(new CallbackHandler<String>() {
                     @Override
                     public void onHandle(String authToken) {
                         String email = Plus.AccountApi.getAccountName(mAPIClient);
@@ -226,7 +226,7 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
      *
      * @return  the access token, or null;
      */
-    private void getAuthToken(final Callback<String> cb){
+    private void getAuthToken(final CallbackHandler<String> cb){
 
         new AsyncTask<Void, Void, String>(){
             @Override
@@ -283,7 +283,7 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
             mSignIn.setEnabled(false);
 
             // Attempt to get token and register user
-            getAuthToken(new Callback<String>() {
+            getAuthToken(new CallbackHandler<String>() {
                 @Override
                 public void onHandle(String authToken) {
                     String email = Plus.AccountApi.getAccountName(mAPIClient);

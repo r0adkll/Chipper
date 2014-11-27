@@ -1,29 +1,14 @@
 package com.r0adkll.chipper.ui.popular;
 
-import com.r0adkll.chipper.api.model.Chiptune;
-import com.r0adkll.chipper.api.model.Playlist;
+import com.r0adkll.chipper.ui.model.IActionPresenter;
 
 /**
  * Created by r0adkll on 11/15/14.
  */
-public interface PopularPresenter {
+public interface PopularPresenter extends IActionPresenter{
 
     public void loadAllChiptunes();
 
     public void loadVotes();
-
-    public void onChiptuneSelected(Chiptune chiptune);
-
-    public void upvoteChiptune(Chiptune chiptune);
-
-    public void downvoteChiptune(Chiptune chiptune);
-
-    public void favoriteChiptunes(Chiptune... chiptunes);
-
-    public void addChiptunesToPlaylist(Playlist playlist, Chiptune... chiptunes);
-
-    public void offlineChiptunes(Chiptune... chiptunes);
-
-
 
 }

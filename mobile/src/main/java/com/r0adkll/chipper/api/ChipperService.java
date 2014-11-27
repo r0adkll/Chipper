@@ -322,8 +322,8 @@ public interface ChipperService {
     @POST("/user/{id}/vote/{type}/{tuneId}")
     void vote(@Path("id") String userId,
               @Path("type") String voteType,
-              @Path("tuneId") int tuneId,
-              Callback cb);
+              @Path("tuneId") String tuneId,
+              Callback<Map<String, Object>> cb);
 
     /**
      * Batch vote on several chiptunes at once

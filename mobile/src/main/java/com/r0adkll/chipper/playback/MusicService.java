@@ -268,7 +268,7 @@ public class MusicService extends Service implements AudioPlayer.PlayerCallbacks
             metaBuilder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, chiptune.artist)
                        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, chiptune.title)
                        .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, chiptune.length)
-                       .putRating(MediaMetadataCompat.METADATA_KEY_RATING, );
+                       .putRating(MediaMetadataCompat.METADATA_KEY_RATING, null);
 
         }
 

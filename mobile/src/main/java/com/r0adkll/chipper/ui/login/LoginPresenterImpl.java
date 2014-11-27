@@ -229,22 +229,7 @@ public class LoginPresenterImpl implements LoginPresenter {
      * @param error
      */
     private void handleRetrofitError(RetrofitError error){
-        try {
-            ChipperError cer = (ChipperError) error.getBodyAs(ChipperError.class);
-            if (cer != null) {
-                Timber.e("Retrofit Error[%s] - %s", error.getMessage(), cer.technical);
-                mView.showErroMessage(cer.readable);
-            } else {
-                Timber.e("Retrofit Error: %s", error.getKind().toString());
-                mView.showErroMessage(error.getLocalizedMessage());
-            }
-        }catch (Exception e){
-            mView.showErroMessage(error.getMessage());
-        }
-    }
-
-    public static interface AccountCreateCallback {
-        public void onCreate(boolean result);
+        mView.showErroMessage(error.getLocalizedMessage());
     }
 
 }

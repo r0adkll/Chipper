@@ -4,13 +4,11 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.Paint;
-import android.graphics.drawable.RippleDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -18,17 +16,14 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewOutlineProvider;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.r0adkll.chipper.R;
-import com.r0adkll.chipper.adapters.OnItemClickListener;
-import com.r0adkll.chipper.adapters.PlaylistAdapter;
-import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
+import com.r0adkll.chipper.ui.adapters.PlaylistAdapter;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
 import com.r0adkll.chipper.ui.widget.DividerDecoration;
@@ -42,7 +37,6 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import timber.log.Timber;
 
 /**
  * Created by r0adkll on 11/16/14.

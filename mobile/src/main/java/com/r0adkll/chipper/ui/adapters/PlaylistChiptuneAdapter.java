@@ -1,4 +1,4 @@
-package com.r0adkll.chipper.adapters;
+package com.r0adkll.chipper.ui.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,7 +19,7 @@ import butterknife.InjectView;
 
 /**
  * Project: Chipper
- * Package: com.r0adkll.chipper.adapters
+ * Package: com.r0adkll.chipper.ui.adapters
  * Created by drew.heavner on 11/20/14.
  */
 public class PlaylistChiptuneAdapter extends RecyclerArrayAdapter<ChiptuneReference, PlaylistChiptuneAdapter.PlaylistChiptuneViewHolder> {

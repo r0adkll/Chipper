@@ -1,4 +1,4 @@
-package com.r0adkll.chipper.adapters;
+package com.r0adkll.chipper.ui.adapters;
 
 import android.view.View;
 

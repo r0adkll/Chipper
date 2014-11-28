@@ -1,6 +1,6 @@
 package com.r0adkll.chipper.ui.all;
 
-import com.r0adkll.chipper.adapters.AllChiptuneAdapter;
+import com.r0adkll.chipper.ui.adapters.AllChiptuneAdapter;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.data.ChiptuneProvider;
@@ -45,8 +45,8 @@ public class ChiptunesModule {
     }
 
     @Provides @Singleton
-    AllChiptuneAdapter provideAdapter(){
-        return new AllChiptuneAdapter();
+    AllChiptuneAdapter provideAdapter(VoteManager voteManager){
+        return new AllChiptuneAdapter(voteManager);
     }
 
 }

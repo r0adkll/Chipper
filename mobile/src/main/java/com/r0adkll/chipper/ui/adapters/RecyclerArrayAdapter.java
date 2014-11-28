@@ -1,9 +1,7 @@
-package com.r0adkll.chipper.adapters;
+package com.r0adkll.chipper.ui.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-
-import com.google.common.collect.Collections2;
 
 import java.util.ArrayList;
 import java.util.Arrays;

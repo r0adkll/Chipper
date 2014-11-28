@@ -4,15 +4,14 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
 import com.fortysevendeg.swipelistview.SwipeListView;
 import com.r0adkll.chipper.R;
-import com.r0adkll.chipper.adapters.OnItemClickListener;
-import com.r0adkll.chipper.adapters.PopularChiptuneAdapter;
-import com.r0adkll.chipper.adapters.RecyclerArrayAdapter;
+import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
+import com.r0adkll.chipper.ui.adapters.PopularChiptuneAdapter;
+import com.r0adkll.chipper.ui.adapters.RecyclerArrayAdapter;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
 import com.r0adkll.chipper.ui.widget.DividerDecoration;

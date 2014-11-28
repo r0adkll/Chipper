@@ -163,7 +163,6 @@ public class VoteManager {
      * @param chiptuneId        the id of the chiptune to get teh rating value for
      * @return                  the user's vote value on that chiptune, 0 if no voting data found
      */
-    @DebugLog
     public int getUserVoteValue(String chiptuneId){
         Vote vote = new Select()
                 .from(Vote.class)
@@ -190,6 +189,9 @@ public class VoteManager {
             public void success(List<Vote> votes, Response response) {
                 // Store Votes
                 saveVoteData(votes);
+
+                // TODO: Signal UI
+
             }
 
             @Override

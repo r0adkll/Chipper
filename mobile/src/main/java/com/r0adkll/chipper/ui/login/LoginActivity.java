@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -16,8 +18,13 @@ import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
+import com.google.android.gms.plus.model.people.Person;
+import com.google.android.gms.plus.model.people.PersonBuffer;
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.qualifiers.GenericPrefs;
 import com.r0adkll.chipper.utils.CallbackHandler;
 import com.r0adkll.chipper.ui.model.BaseActivity;
 import com.r0adkll.postoffice.PostOffice;
@@ -60,7 +67,6 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
      */
 
     @Inject LoginPresenter presenter;
-
     @InjectView(R.id.sign_in_button)        SignInButton mSignIn;
     @InjectView(R.id.skip_with_temp_acct)   TextView mTempAccount;
 
@@ -91,6 +97,7 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
         // Set the click listener for the sign in button
         mSignIn.setOnClickListener(this);
         mTempAccount.setOnClickListener(this);
+        mSignIn.setSize(SignInButton.SIZE_WIDE);
 
     }
 
@@ -128,8 +135,10 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
             getAuthToken(new CallbackHandler<String>() {
                 @Override
                 public void onHandle(String authToken) {
+                    String accountName = Plus.AccountApi.getAccountName(mAPIClient);
+
                     // Now attempt to log into server
-                    presenter.authorizeUserAccount(Plus.AccountApi.getAccountName(mAPIClient), authToken);
+                    presenter.authorizeUserAccount(accountName, authToken);
                 }
 
                 @Override

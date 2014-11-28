@@ -89,7 +89,6 @@ public final class DataModule {
                 .executeSingle();
     }
 
-    @DebugLog
     @Provides @Singleton
     ChiptuneProvider provideChiptuneProvider(ChipperService service, @CurrentUser User currentUser){
         return new ChiptuneProvider(service, currentUser);

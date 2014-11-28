@@ -1,6 +1,6 @@
 package com.r0adkll.chipper.ui.playlists;
 
-import com.r0adkll.chipper.adapters.PlaylistAdapter;
+import com.r0adkll.chipper.ui.adapters.PlaylistAdapter;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.data.PlaylistManager;

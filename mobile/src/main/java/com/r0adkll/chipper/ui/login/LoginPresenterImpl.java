@@ -10,14 +10,18 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 
 import com.activeandroid.query.Select;
+import com.r0adkll.chipper.account.GoogleAccountManager;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.ChipperError;
 import com.r0adkll.chipper.api.model.Device;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.prefs.StringPreference;
+import com.r0adkll.chipper.qualifiers.GenericPrefs;
 import com.r0adkll.chipper.utils.Tools;
 import com.r0adkll.chipper.ui.all.ChiptunesActivity;
 import com.r0adkll.deadskunk.utils.Utils;
@@ -40,15 +44,17 @@ public class LoginPresenterImpl implements LoginPresenter {
 
     private LoginView mView;
     private ChipperService mChipperService;
-    private Context mCtx;
+    private SharedPreferences mPrefs;
+    private StringPreference mPrefAccountName;
 
     /**
      * Constructor
      */
-    public LoginPresenterImpl(LoginView view, ChipperService chipperService, Application app){
+    public LoginPresenterImpl(LoginView view, ChipperService chipperService, SharedPreferences prefs){
         mView = view;
         mChipperService = chipperService;
-        mCtx = app;
+        mPrefs = prefs;
+        mPrefAccountName = new StringPreference(mPrefs, GoogleAccountManager.PREF_ACCOUNT_NAME);
     }
 
     @Override
@@ -86,12 +92,13 @@ public class LoginPresenterImpl implements LoginPresenter {
     }
 
     @Override
-    public void authorizeUserAccount(String email, String accessToken) {
+    public void authorizeUserAccount(final String email, String accessToken) {
 
         mChipperService.auth(email, accessToken, new Callback<User>() {
             @Override
             public void success(User user, Response response) {
                 handleSuccess(user);
+                mPrefAccountName.set(email);
             }
 
             @Override
@@ -139,10 +146,10 @@ public class LoginPresenterImpl implements LoginPresenter {
 
                 // Now register a device
                 mChipperService.registerDevice(
-                        Tools.generateUniqueDeviceId(mCtx),
+                        Tools.generateUniqueDeviceId(mView.getActivity()),
                         Build.MODEL,
                         Build.VERSION.SDK_INT,
-                        Utils.isTablet(mCtx),
+                        Utils.isTablet(mView.getActivity()),
                         new Callback<Device>() {
                             @Override
                             public void success(Device device, Response response) {
@@ -218,9 +225,9 @@ public class LoginPresenterImpl implements LoginPresenter {
      * Launch into the main portion of the application
      */
     private void launchMainActivity(){
-        Intent main = new Intent(mCtx, ChiptunesActivity.class);
+        Intent main = new Intent(mView.getActivity(), ChiptunesActivity.class);
         main.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        mCtx.startActivity(main);
+        mView.getActivity().startActivity(main);
         mView.close();
     }
 

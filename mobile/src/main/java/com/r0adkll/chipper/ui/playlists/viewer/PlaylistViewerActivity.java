@@ -23,8 +23,8 @@ import android.widget.ImageView;
 
 import com.activeandroid.Model;
 import com.r0adkll.chipper.R;
-import com.r0adkll.chipper.adapters.OnItemClickListener;
-import com.r0adkll.chipper.adapters.PlaylistChiptuneAdapter;
+import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
+import com.r0adkll.chipper.ui.adapters.PlaylistChiptuneAdapter;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.ChiptuneReference;
 import com.r0adkll.chipper.api.model.Playlist;

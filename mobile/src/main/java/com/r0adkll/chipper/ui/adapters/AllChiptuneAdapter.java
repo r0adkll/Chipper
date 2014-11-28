@@ -1,29 +1,28 @@
-package com.r0adkll.chipper.adapters;
+package com.r0adkll.chipper.ui.adapters;
 
+import android.graphics.PorterDuff;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.data.VoteManager;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import timber.log.Timber;
 
 /**
  * Project: Chipper
- * Package: com.r0adkll.chipper.adapters
+ * Package: com.r0adkll.chipper.ui.adapters
  * Created by drew.heavner on 11/13/14.
  */
 public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptuneAdapter.ChiptuneViewHolder>
@@ -35,6 +34,7 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
      *
      */
 
+    private VoteManager mVoteManager;
     private List<List<Chiptune>> mHeaders = new ArrayList<>();
     private List<String> mTitles = new ArrayList<>();
 
@@ -42,9 +42,11 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
      * Constructor
      *
      */
-    public AllChiptuneAdapter(){
+    public AllChiptuneAdapter(VoteManager voteManager){
         super();
         registerAdapterDataObserver(mChiptunesObserver);
+        mVoteManager = voteManager;
+
     }
 
     /***********************************************************************************************
@@ -74,6 +76,18 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
         holder.optAdd.setOnClickListener(new OptionClickListener(position));
         holder.optOffline.setOnClickListener(new OptionClickListener(position));
 
+        int voteValue = mVoteManager.getUserVoteValue(data.id);
+        int accentColor = holder.itemView.getContext().getResources().getColor(R.color.accentColor);
+        if(voteValue == 1){
+            holder.optUpvote.setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
+            holder.optDownvote.clearColorFilter();
+        }else if(voteValue == -1){
+            holder.optUpvote.clearColorFilter();
+            holder.optDownvote.setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
+        }else{
+            holder.optUpvote.clearColorFilter();
+            holder.optDownvote.clearColorFilter();
+        }
 
     }
 

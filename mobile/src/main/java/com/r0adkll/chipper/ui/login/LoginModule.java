@@ -1,8 +1,10 @@
 package com.r0adkll.chipper.ui.login;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 
 import com.r0adkll.chipper.api.ChipperService;
+import com.r0adkll.chipper.qualifiers.GenericPrefs;
 import com.r0adkll.chipper.ui.UIModule;
 
 import javax.inject.Singleton;
@@ -34,8 +36,9 @@ public class LoginModule {
 //    }
 
     @Provides @Singleton
-    public LoginPresenter providePresenter(ChipperService service, Application app){
-        return new LoginPresenterImpl(view, service, app);
+    public LoginPresenter providePresenter(ChipperService service,
+                                           @GenericPrefs SharedPreferences prefs){
+        return new LoginPresenterImpl(view, service, prefs);
     }
 
 }

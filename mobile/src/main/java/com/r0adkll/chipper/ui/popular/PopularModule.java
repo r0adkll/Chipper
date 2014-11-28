@@ -1,6 +1,6 @@
 package com.r0adkll.chipper.ui.popular;
 
-import com.r0adkll.chipper.adapters.PopularChiptuneAdapter;
+import com.r0adkll.chipper.ui.adapters.PopularChiptuneAdapter;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.data.ChiptuneProvider;

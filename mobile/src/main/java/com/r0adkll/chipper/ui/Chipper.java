@@ -10,6 +10,7 @@ import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Device;
 import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.data.VoteManager;
 import com.r0adkll.chipper.push.PushManager;
 import com.r0adkll.chipper.push.PushUtils;
 import com.r0adkll.chipper.qualifiers.CurrentDevice;
@@ -47,6 +48,9 @@ public class Chipper extends Activity {
     @Inject
     PushManager mPushManager;
 
+    @Inject
+    VoteManager mVoteManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +77,9 @@ public class Chipper extends Activity {
                 // Recheck push registration
                 mPushManager.checkRegistration(this);
 
+                // Sync the user's votes
+                mVoteManager.syncUserVotes();
+
                 // Show the Starting Activity (All List)
                 Intent main = new Intent(this, ChiptunesActivity.class);
                 startActivity(main);
@@ -97,6 +104,9 @@ public class Chipper extends Activity {
 
                                     // Recheck push registration
                                     mPushManager.checkRegistration(Chipper.this);
+
+                                    // Sync the user's votes
+                                    mVoteManager.syncUserVotes();
 
                                     // Show the Starting Activity (All List)
                                     Intent main = new Intent(Chipper.this, ChiptunesActivity.class);

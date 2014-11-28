@@ -1,4 +1,4 @@
-package com.r0adkll.chipper.adapters;
+package com.r0adkll.chipper.ui.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,7 +13,6 @@ import com.r0adkll.chipper.api.model.Chiptune;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -44,7 +43,7 @@ public class PopularChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, Popul
      */
     public void setVoteData(Map<String, Integer> voteData){
         // Update the vote data reference
-        voteData.putAll(voteData);
+        this.voteData.putAll(voteData);
 
         // Sort Votedata by votes
         sort(new PopularComparator(voteData));

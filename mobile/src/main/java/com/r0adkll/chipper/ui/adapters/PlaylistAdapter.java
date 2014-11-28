@@ -1,4 +1,4 @@
-package com.r0adkll.chipper.adapters;
+package com.r0adkll.chipper.ui.adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.r0adkll.chipper.R;
-import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 

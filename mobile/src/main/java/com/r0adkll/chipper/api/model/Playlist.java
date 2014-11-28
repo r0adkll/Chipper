@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import hugo.weaving.DebugLog;
+
 /**
  * Created by r0adkll on 11/2/14.
  */
@@ -278,6 +280,7 @@ public class Playlist extends Model implements Parcelable{
      *
      * @param tune
      */
+    @DebugLog
     public void add(Chiptune tune){
         // Generate ChiptuneReference and add it to this playlist
         ChiptuneReference reference = new ChiptuneReference();
@@ -295,6 +298,7 @@ public class Playlist extends Model implements Parcelable{
      * Add a collection of chiptunes to this playlist
      * @param tunes
      */
+    @DebugLog
     public void add(Chiptune... tunes){
 
         ActiveAndroid.beginTransaction();
@@ -321,6 +325,7 @@ public class Playlist extends Model implements Parcelable{
      * @param tune
      * @return
      */
+    @DebugLog
     public boolean remove(Chiptune tune){
         // Get Chiptune Reference, and delete it from the database, then update the playlist to the server
         ChiptuneReference reference = new Select()
@@ -350,6 +355,7 @@ public class Playlist extends Model implements Parcelable{
      * @param index     the index to move it to
      * @return          the results
      */
+    @DebugLog
     public boolean rearrange(Chiptune tune, int index){
 
         // first, find chiptunes old reference

@@ -85,4 +85,9 @@ public class Chiptune extends Model implements Parcelable{
             return new Chiptune[size];
         }
     };
+
+    @Override
+    public String toString() {
+        return String.format("id: %s\ntitle: %s\nartist: %s\nstream_url: %s\nlength: %d", id, title, artist, stream_url, length);
+    }
 }

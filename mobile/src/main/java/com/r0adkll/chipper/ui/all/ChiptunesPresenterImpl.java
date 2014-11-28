@@ -77,35 +77,31 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
     }
 
     @Override
-    public void upvoteChiptune(Chiptune chiptune) {
-        final String title = chiptune.title;
+    public void upvoteChiptune(final Chiptune chiptune) {
         mVoteManager.upvote(chiptune, new CallbackHandler() {
             @Override
             public void onHandle(Object value) {
-                // Update UI
-
+                Timber.i("Upvote Successful [%s, %s]", chiptune.title, chiptune.id);
             }
 
             @Override
             public void onFailure(String msg) {
-                Timber.e("Unable to upvote %s : %s", title, msg);
+                Timber.e("Error upvoting chiptune: %s", msg);
             }
         });
     }
 
     @Override
-    public void downvoteChiptune(Chiptune chiptune) {
-        final String title = chiptune.title;
+    public void downvoteChiptune(final Chiptune chiptune) {
         mVoteManager.downvote(chiptune, new CallbackHandler() {
             @Override
             public void onHandle(Object value) {
-                // Update UI
-
+                Timber.i("Downvote Successful [%s, %s]", chiptune.title, chiptune.id);
             }
 
             @Override
             public void onFailure(String msg) {
-                Timber.e("Unable to downvote %s : %s", title, msg);
+                Timber.e("Error downvoting chiptune: %s", msg);
             }
         });
     }

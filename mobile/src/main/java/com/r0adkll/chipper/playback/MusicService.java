@@ -22,6 +22,7 @@ import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.data.PlaylistManager;
+import com.r0adkll.chipper.data.VoteManager;
 import com.r0adkll.chipper.playback.model.PlaybackState;
 import com.r0adkll.chipper.playback.model.SessionState;
 import com.r0adkll.chipper.prefs.BooleanPreference;
@@ -35,7 +36,7 @@ import timber.log.Timber;
 /**
  * Created by r0adkll on 11/25/14.
  */
-public class MusicService extends Service implements AudioPlayer.PlayerCallbacks {
+public class MusicService extends Service {
 
     /***********************************************************************************************
      *
@@ -65,6 +66,7 @@ public class MusicService extends Service implements AudioPlayer.PlayerCallbacks
     @Inject AudioManager mAudioManager;
     @Inject NotificationManagerCompat mNotificationManager;
     @Inject PlaylistManager mPlaylistManager;
+    @Inject VoteManager mVoteManager;
     @Inject ChiptuneProvider mProvider;
     @Inject CashMachine mATM;
     @Inject Bus mBus;
@@ -91,7 +93,7 @@ public class MusicService extends Service implements AudioPlayer.PlayerCallbacks
         mBus.register(this);
 
         // Setup the Player Callbacks
-        mPlayer.setPlayerCallbacks(this);
+        mPlayer.setPlayerCallbacks(mPlayerCallbacks);
 
         // Register Receivers
         registerReceiver(mNoisyAudioStreamReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
@@ -149,8 +151,6 @@ public class MusicService extends Service implements AudioPlayer.PlayerCallbacks
     private void play(){
         // Start playback
         mPlayer.play();
-
-        // Set the playback state
         mCurrentSession.setPlaybackState(buildPlaybackState(PlaybackStateCompat.STATE_PLAYING));
 
         // Update Notification
@@ -162,8 +162,6 @@ public class MusicService extends Service implements AudioPlayer.PlayerCallbacks
     private void pause(){
         // Pause Playback
         mPlayer.pause();
-
-        // Set the playback state
         mCurrentSession.setPlaybackState(buildPlaybackState(PlaybackStateCompat.STATE_PAUSED));
 
         // Update Notification
@@ -206,15 +204,15 @@ public class MusicService extends Service implements AudioPlayer.PlayerCallbacks
     }
 
     private void shuffle(boolean enabled){
-
+        mCurrentState.setShuffle(enabled);
     }
 
     private void repeat(int mode){
-
+        mCurrentState.setRepeatMode(mode);
     }
 
     private void seek(long position){
-
+        mPlayer.seekTo((int) position);
     }
 
 
@@ -257,6 +255,11 @@ public class MusicService extends Service implements AudioPlayer.PlayerCallbacks
         return stateBuilder.build();
     }
 
+    /**
+     * Build the metadata related to the current chiptune
+     *
+     * @return  the media metadata attributed to the current song
+     */
     private MediaMetadataCompat buildMetaData(){
         Chiptune chiptune = mCurrentState.getCurrentChiptune();
 
@@ -265,10 +268,18 @@ public class MusicService extends Service implements AudioPlayer.PlayerCallbacks
 
         if(chiptune != null){
 
+            int voteValue = mVoteManager.getUserVoteValue(mCurrentState.getCurrentChiptune().id);
+            RatingCompat rating;
+            if(voteValue != 0) {
+                rating = RatingCompat.newThumbRating(voteValue == 1 ? true : false);
+            }else{
+                rating = RatingCompat.newUnratedRating(RatingCompat.RATING_THUMB_UP_DOWN);
+            }
+
             metaBuilder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, chiptune.artist)
                        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, chiptune.title)
                        .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, chiptune.length)
-                       .putRating(MediaMetadataCompat.METADATA_KEY_RATING, null);
+                       .putRating(MediaMetadataCompat.METADATA_KEY_RATING, rating);
 
         }
 
@@ -395,12 +406,12 @@ public class MusicService extends Service implements AudioPlayer.PlayerCallbacks
         @Override
         public void onSetRating(RatingCompat rating) {
             if(rating.getRatingStyle() == RatingCompat.RATING_THUMB_UP_DOWN){
-                if(rating.isThumbUp()){
-                    // TODO: Upvote
-
-                }else{
-                    // TODO: Downvote
-
+                if(mCurrentState.isValid()) {
+                    if (rating.isThumbUp()) {
+                        mVoteManager.upvote(mCurrentState.getCurrentChiptune(), null);
+                    } else {
+                        mVoteManager.downvote(mCurrentState.getCurrentChiptune(), null);
+                    }
                 }
             }
         }
@@ -412,41 +423,29 @@ public class MusicService extends Service implements AudioPlayer.PlayerCallbacks
      *
      */
 
-    @Override
-    public boolean onError(MediaPlayer mp, int what, int extra) {
-        Timber.e("MediaPlayer Error [what: %d][extra: %d]", what, extra);
-        return false;
-    }
+    private AudioPlayer.SimplePlayerCallbacks mPlayerCallbacks = new AudioPlayer.SimplePlayerCallbacks() {
+        @Override
+        public boolean onError(MediaPlayer mp, int what, int extra) {
+            Timber.e("MediaPlayer Error [what: %d][extra: %d]", what, extra);
+            return false;
+        }
 
-    @Override
-    public boolean onInfo(MediaPlayer mp, int what, int extra) {
-        Timber.i("MediaPlayer Info [what: %d][extra: %d]", what, extra);
-        return false;
-    }
+        @Override
+        public boolean onInfo(MediaPlayer mp, int what, int extra) {
+            Timber.i("MediaPlayer Info [what: %d][extra: %d]", what, extra);
+            return false;
+        }
 
-    @Override
-    public void onPrepared(MediaPlayer mp) {
-        Timber.d("MediaPlayer Prepared"); // Add current session data to this output
+        @Override
+        public void onSeekComplete(MediaPlayer mp) {
+            Timber.d("MediaPlayer Seek Complete [%d - %d]", mp.getCurrentPosition(), mp.getDuration());
+        }
 
-    }
+        @Override
+        public void onBufferingUpdate(MediaPlayer mp, int percent) {
 
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-        Timber.d("MediaPlayer Completion"); // Add current session data to this output
-
-    }
-
-    @Override
-    public void onSeekComplete(MediaPlayer mp) {
-        Timber.d("MediaPlayer Seek Complete [%d - %d]", mp.getCurrentPosition(), mp.getDuration());
-
-    }
-
-    @Override
-    public void onBufferingUpdate(MediaPlayer mp, int percent) {
-
-
-    }
+        }
+    };
 
     /***********************************************************************************************
      *

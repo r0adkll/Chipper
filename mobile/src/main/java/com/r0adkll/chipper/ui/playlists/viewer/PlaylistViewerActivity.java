@@ -63,8 +63,8 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
      *
      */
 
-    @InjectView(R.id.recycle_view)          RecyclerView mRecyclerView;
-    @InjectView(R.id.empty_layout)          EmptyView mEmptyView;
+    @InjectView(R.id.recycle_view)  RecyclerView mRecyclerView;
+    @InjectView(R.id.empty_layout)  EmptyView mEmptyView;
     @InjectView(R.id.fab_play)      FrameLayout mFabPlay;
 
     @Inject ChiptuneProvider chiptuneProvider;

@@ -5,6 +5,7 @@ import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.data.PlaylistManager;
+import com.r0adkll.chipper.data.VoteManager;
 import com.r0adkll.chipper.qualifiers.CurrentUser;
 import com.r0adkll.chipper.ui.UIModule;
 
@@ -37,9 +38,10 @@ public class ChiptunesModule {
     ChiptunesPresenter providePresenter(ChiptunesView chiptunesView,
                                         ChiptuneProvider provider,
                                         ChipperService service,
-                                        PlaylistManager manager,
+                                        PlaylistManager playlistManager,
+                                        VoteManager voteManager,
                                         @CurrentUser User user){
-        return new ChiptunesPresenterImpl(chiptunesView, provider, service, manager, user);
+        return new ChiptunesPresenterImpl(chiptunesView, provider, service, playlistManager, voteManager, user);
     }
 
     @Provides @Singleton

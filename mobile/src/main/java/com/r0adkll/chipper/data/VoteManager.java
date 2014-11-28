@@ -6,6 +6,7 @@ import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.api.model.Vote;
+import com.r0adkll.chipper.qualifiers.CurrentUser;
 import com.r0adkll.chipper.utils.CallbackHandler;
 
 import java.util.HashMap;
@@ -44,7 +45,7 @@ public class VoteManager {
      * Injectable Constructor
      */
     @Inject
-    public VoteManager(ChipperService service, User currentUser){
+    public VoteManager(ChipperService service, @CurrentUser User currentUser){
         mOverallVoteMap = new HashMap<>();
         mService = service;
         mCurrentUser = currentUser;
@@ -66,13 +67,14 @@ public class VoteManager {
      * @param chiptune      the chiptune to upvote
      * @param cb            the callback
      */
+    @DebugLog
     public void upvote(Chiptune chiptune, final CallbackHandler cb){
         mService.vote(mCurrentUser.id, Vote.TYPE_UP, chiptune.id, new retrofit.Callback<Map<String, Object>>() {
             @Override
             public void success(Map<String, Object> voteData, Response response) {
                 Map<String, Object> updatedVote = (Map<String, Object>) voteData.get("vote");
                 Vote vote = new Vote(updatedVote);
-                int totalValue = (int) voteData.get("total_vote");
+                int totalValue = ((Double)voteData.get("total_vote")).intValue();
 
                 // Update the local vote value
                 Vote existing = new Select()
@@ -92,12 +94,12 @@ public class VoteManager {
                 mOverallVoteMap.put(vote.tune_id, totalValue);
 
                 // Handle callback
-                cb.onHandle(null);
+                if(cb != null) cb.onHandle(null);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                cb.onFailure(error.getLocalizedMessage());
+                if(cb != null) cb.onFailure(error.getLocalizedMessage());
             }
         });
     }
@@ -108,13 +110,14 @@ public class VoteManager {
      * @param chiptune      the chiptune to downvote
      * @param cb            the callback
      */
+    @DebugLog
     public void downvote(Chiptune chiptune, final CallbackHandler cb){
         mService.vote(mCurrentUser.id, Vote.TYPE_DOWN, chiptune.id, new retrofit.Callback<Map<String, Object>>() {
             @Override
             public void success(Map<String, Object> voteData, Response response) {
                 Map<String, Object> updatedVote = (Map<String, Object>) voteData.get("vote");
                 Vote vote = new Vote(updatedVote);
-                int totalValue = (int) voteData.get("total_vote");
+                int totalValue = ((Double)voteData.get("total_vote")).intValue();
 
                 // Update the local vote value
                 Vote existing = new Select()
@@ -134,12 +137,12 @@ public class VoteManager {
                 mOverallVoteMap.put(vote.tune_id, totalValue);
 
                 // Handle callback
-                cb.onHandle(null);
+                if(cb != null) cb.onHandle(null);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                cb.onFailure(error.getLocalizedMessage());
+                if(cb != null) cb.onFailure(error.getLocalizedMessage());
             }
         });
     }

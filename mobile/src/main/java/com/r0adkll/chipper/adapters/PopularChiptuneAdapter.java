@@ -168,11 +168,8 @@ public class PopularChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, Popul
             int rhsVoteValue = getVoteValue(voteData, rhs.id);
 
             // First compare the vote values
-            if(lhsVoteValue > rhsVoteValue){
-                return 1;
-            }else if(lhsVoteValue < rhsVoteValue){
-                return -1;
-            }else if(lhsVoteValue == rhsVoteValue){
+            int result = intCompare(lhsVoteValue, rhsVoteValue);
+            if(result == 0){
                 int c1 = lhs.artist.compareTo(rhs.artist);
                 if (c1 == 0) {
                     int c2 = lhs.title.compareTo(rhs.title);
@@ -181,8 +178,12 @@ public class PopularChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, Popul
                 return c1;
             }
 
-            return 0;
+            return result;
         }
+    }
+
+    public static int intCompare(int lhs, int rhs){
+        return lhs < rhs ? 1 : (lhs == rhs ? 0 : -1);
     }
 
 }

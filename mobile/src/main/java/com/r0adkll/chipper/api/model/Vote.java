@@ -47,7 +47,9 @@ public class Vote extends Model implements Parcelable{
         super();
         id = (String) map.get("id");
         tune_id = (String) map.get("tune_id");
-        value = (int) map.get("value");
+
+        Double val = (Double) map.get("value");
+        value = val.intValue();
     }
 
     /***********************************************************************************************

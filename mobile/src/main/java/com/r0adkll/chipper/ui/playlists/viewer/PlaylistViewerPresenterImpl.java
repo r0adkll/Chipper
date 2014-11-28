@@ -18,6 +18,8 @@ import com.r0adkll.chipper.utils.CallbackHandler;
 
 import java.util.Arrays;
 
+import timber.log.Timber;
+
 /**
  * Created by r0adkll on 11/16/14.
  */
@@ -59,31 +61,31 @@ public class PlaylistViewerPresenterImpl implements PlaylistViewerPresenter {
     }
 
     @Override
-    public void upvoteChiptune(Chiptune chiptune) {
+    public void upvoteChiptune(final Chiptune chiptune) {
         mVoteManager.upvote(chiptune, new CallbackHandler() {
             @Override
             public void onHandle(Object value) {
-
+                Timber.i("Upvote Successful [%s, %s]", chiptune.title, chiptune.id);
             }
 
             @Override
             public void onFailure(String msg) {
-
+                Timber.e("Error upvoting chiptune: %s", msg);
             }
         });
     }
 
     @Override
-    public void downvoteChiptune(Chiptune chiptune) {
+    public void downvoteChiptune(final Chiptune chiptune) {
         mVoteManager.downvote(chiptune, new CallbackHandler() {
             @Override
             public void onHandle(Object value) {
-
+                Timber.i("Downvote Successful [%s, %s]", chiptune.title, chiptune.id);
             }
 
             @Override
             public void onFailure(String msg) {
-
+                Timber.e("Error downvoting chiptune: %s", msg);
             }
         });
     }

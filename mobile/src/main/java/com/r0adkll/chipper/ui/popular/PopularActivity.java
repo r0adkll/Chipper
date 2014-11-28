@@ -114,8 +114,7 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView, 
                 presenter.downvoteChiptune(item);
                 break;
             case R.id.opt_add:
-                // TODO: Show dialog with the list of current playlists, so the user can choose one to add to
-
+                presenter.addChiptunesToPlaylist(item);
                 break;
             case R.id.opt_offline:
                 presenter.offlineChiptunes(item);

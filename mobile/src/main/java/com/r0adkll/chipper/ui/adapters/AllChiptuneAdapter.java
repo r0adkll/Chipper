@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.data.CashMachine;
+import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.VoteManager;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 
@@ -34,7 +36,10 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
      *
      */
 
+    private PlaylistManager mPlaylistManager;
     private VoteManager mVoteManager;
+    private CashMachine mCache;
+
     private List<List<Chiptune>> mHeaders = new ArrayList<>();
     private List<String> mTitles = new ArrayList<>();
 
@@ -42,11 +47,14 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
      * Constructor
      *
      */
-    public AllChiptuneAdapter(VoteManager voteManager){
+    public AllChiptuneAdapter(PlaylistManager playlistManager,
+                              VoteManager voteManager,
+                              CashMachine cashMachine){
         super();
         registerAdapterDataObserver(mChiptunesObserver);
+        mPlaylistManager = playlistManager;
         mVoteManager = voteManager;
-
+        mCache = cashMachine;
     }
 
     /***********************************************************************************************
@@ -76,6 +84,7 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
         holder.optAdd.setOnClickListener(new OptionClickListener(position));
         holder.optOffline.setOnClickListener(new OptionClickListener(position));
 
+        // Color the Vote Options
         int voteValue = mVoteManager.getUserVoteValue(data.id);
         int accentColor = holder.itemView.getContext().getResources().getColor(R.color.accentColor);
         if(voteValue == 1){
@@ -87,6 +96,22 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
         }else{
             holder.optUpvote.clearColorFilter();
             holder.optDownvote.clearColorFilter();
+        }
+
+        // Color the favorites option
+        if(mPlaylistManager.isFavorited(data)){
+            holder.optFav.setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
+        }else{
+            holder.optFav.clearColorFilter();
+        }
+
+        // Color the Offline option
+        if(mCache.isOffline(data)){
+            holder.optOffline.setImageResource(R.drawable.ic_action_cloud_done);
+            holder.optOffline.setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
+        }else{
+            holder.optOffline.setImageResource(R.drawable.ic_action_cloud_download);
+            holder.optOffline.clearColorFilter();
         }
 
     }

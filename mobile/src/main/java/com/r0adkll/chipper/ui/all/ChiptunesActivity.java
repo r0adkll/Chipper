@@ -107,6 +107,7 @@ public class ChiptunesActivity extends BaseDrawerActivity
                 presenter.offlineChiptunes(item);
                 break;
         }
+        mChiptuneRecycler.closeOpenedItems();
     }
 
     /***********************************************************************************************

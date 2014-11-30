@@ -1,11 +1,13 @@
 package com.r0adkll.chipper.account;
 
+import android.accounts.Account;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 
+import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -52,7 +54,6 @@ public class GoogleAccountManager {
      *
      */
 
-    @Inject @GenericPrefs
     SharedPreferences mPrefs;
 
     private GoogleApiClient mClient;
@@ -71,7 +72,8 @@ public class GoogleAccountManager {
      * Injectable Constructor
      */
     @Inject
-    private GoogleAccountManager(Application ctx){
+    public GoogleAccountManager(Application ctx, @GenericPrefs SharedPreferences prefs){
+        mPrefs = prefs;
 
         // Initialize the Play Client
         mClient = new GoogleApiClient.Builder(ctx)
@@ -87,7 +89,6 @@ public class GoogleAccountManager {
         mPrefDisplayName = new StringPreference(mPrefs, PREF_DISPLAY_NAME);
         mPrefImageUrl = new StringPreference(mPrefs, PREF_IMAGE_URL);
         mPrefCoverUrl = new StringPreference(mPrefs, PREF_COVER_URL);
-
     }
 
     /**
@@ -112,8 +113,6 @@ public class GoogleAccountManager {
      */
     public void onStart(){
         mClient.connect();
-
-
     }
 
     public void onStop(){
@@ -148,6 +147,15 @@ public class GoogleAccountManager {
         return mPrefCoverUrl.get();
     }
 
+    public Account getActiveAccount(){
+        String name = getAccountName();
+        if(name != null){
+            return new Account(name, GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE);
+        }else{
+            return null;
+        }
+    }
+
     /***********************************************************************************************
      *
      * Callback Methods
@@ -156,6 +164,7 @@ public class GoogleAccountManager {
 
     /**
      * The callback for loading the currently logged in person
+     *
      */
     private ResultCallback<People.LoadPeopleResult> mLoadPeopleCallback = new ResultCallback<People.LoadPeopleResult>() {
         @Override
@@ -205,6 +214,13 @@ public class GoogleAccountManager {
         @Override
         public void onConnected(Bundle bundle) {
             Timber.i("User is connected to PlayServices!");
+
+            // Check for plus info
+            if(getProfileId() == null){
+                Plus.PeopleApi.load(mClient, "me").setResultCallback(mLoadPeopleCallback);
+            }else{
+                // No need to load plus info
+            }
 
 
         }

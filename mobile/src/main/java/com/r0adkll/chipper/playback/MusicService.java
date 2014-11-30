@@ -19,10 +19,12 @@ import android.view.KeyEvent;
 
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.VoteManager;
+import com.r0adkll.chipper.playback.model.AudioSession;
 import com.r0adkll.chipper.playback.model.PlaybackState;
 import com.r0adkll.chipper.playback.model.SessionState;
 import com.r0adkll.chipper.prefs.BooleanPreference;
@@ -221,6 +223,66 @@ public class MusicService extends Service {
      * Helper Methods
      *
      */
+
+    /**
+     * Starting playing a chiptune (and by association it's playlist)
+     *
+     * @param chiptune      the chiptune to play
+     * @param playlist      the associated playlist
+     */
+    private void playChiptune(Chiptune chiptune, Playlist playlist){
+
+        // Request audio focus and only play if granted
+        int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+        if(result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED){
+
+            // Check the current player state, reset if needed
+            if(mPlayer.getCurrentState() == AudioPlayer.COMPLETED ||
+                    mPlayer.getCurrentState() == AudioPlayer.PAUSED ||
+                    mPlayer.isPlaying()){
+                stop();
+            }
+
+            // Update media session state to buffering
+            mCurrentSession.setPlaybackState(buildPlaybackState(PlaybackStateCompat.STATE_BUFFERING));
+
+            // Update the current state
+            mCurrentState.updateState(chiptune, playlist);
+
+            // Log
+            Timber.i("Preparing[%s] at [%s]", chiptune.title, chiptune.stream_url);
+
+            // Build audio session to play
+            AudioSession session = new AudioSession(mATM, chiptune);
+            mPlayer.prepareAudioSession(session, new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+
+                    // Initiate Playback
+                    play();
+
+                    // TODO: Update Notification
+
+                    // TODO: Update Widget
+
+
+                }
+            }, new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+
+                    // Update Player State
+                    mPlayer.setCurrentState(AudioPlayer.COMPLETED);
+
+                    // Attempt to get the next chiptune and play it
+
+                }
+            });
+
+        }
+
+
+    }
 
     /**
      * Build the MediaSession playback state after a state change in the service

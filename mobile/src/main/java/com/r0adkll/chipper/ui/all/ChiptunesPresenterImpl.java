@@ -1,6 +1,5 @@
 package com.r0adkll.chipper.ui.all;
 
-import android.widget.Toast;
 
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Chiptune;

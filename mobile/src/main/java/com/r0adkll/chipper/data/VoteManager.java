@@ -229,7 +229,6 @@ public class VoteManager {
      * Save all the vote data into the database
      * @param votes
      */
-    @DebugLog
     private void saveVoteData(List<Vote> votes){
         ActiveAndroid.beginTransaction();
         try{

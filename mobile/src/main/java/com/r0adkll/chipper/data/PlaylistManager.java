@@ -55,7 +55,6 @@ public class PlaylistManager  {
         return new Select()
                 .from(Playlist.class)
                 .where("name=?", "Favorites")
-                .and("owner=?", mCurrentUser)
                 .limit(1)
                 .executeSingle();
     }
@@ -196,15 +195,32 @@ public class PlaylistManager  {
      *
      * @param chiptunes     the set of chiptunes to add
      */
-    public void addToFavorites(Chiptune... chiptunes){
+    public boolean addToFavorites(Chiptune... chiptunes){
 
         Playlist favs = getFavorites();
         if(favs != null){
             favs.add(chiptunes);
+            Timber.i("%d chiptunes added to favorites", chiptunes.length);
+            return true;
         }
 
+        return false;
     }
 
+    /**
+     * Return whether or not a chiptune is contained in
+     * the favorites playlist
+     *
+     * @param chiptune      the chiptune to check
+     * @return
+     */
+    public boolean isFavorited(Chiptune chiptune){
+        Playlist favs = getFavorites();
+        if(favs != null){
+            return favs.contains(chiptune);
+        }
+        return false;
+    }
 
 
 }

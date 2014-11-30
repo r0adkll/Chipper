@@ -49,7 +49,6 @@ public class CashMachine {
     public CashMachine(Application app){
         // Set the offline directory that all the files should be cached to
         mCacheDir = new File(app.getFilesDir(), CACHE_DIRECTORY_NAME);
-
     }
 
     /***********************************************************************************************

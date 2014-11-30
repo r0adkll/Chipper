@@ -16,12 +16,14 @@ import android.widget.TextView;
 
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.account.GoogleAccountManager;
 import com.r0adkll.chipper.prefs.BooleanPreference;
 import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
 import com.r0adkll.chipper.ui.all.ChiptunesActivity;
 import com.r0adkll.chipper.ui.playlists.PlaylistActivity;
 import com.r0adkll.chipper.ui.popular.PopularActivity;
 import com.r0adkll.chipper.ui.widget.ScrimInsetsScrollView;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +45,7 @@ import dagger.ObjectGraph;
  * Package: com.r0adkll.chipper.ui
  * Created by drew.heavner on 11/12/14.
  */
-public abstract class BaseDrawerActivity extends ActionBarActivity {
+public abstract class BaseDrawerActivity extends ActionBarActivity implements GoogleAccountManager.OnAccountLoadedListener {
 
     /***********************************************************************************************
      *
@@ -86,6 +88,9 @@ public abstract class BaseDrawerActivity extends ActionBarActivity {
     @Inject @OfflineSwitchPreference
     BooleanPreference mOfflineSwitchPreference;
 
+    @Inject
+    GoogleAccountManager mAccountManager;
+
     private final Handler mHandler = new Handler();
     private ObjectGraph activityGraph;
 
@@ -111,6 +116,10 @@ public abstract class BaseDrawerActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         activityGraph = ChipperApp.get(this).createScopedGraph(getModules());
         activityGraph.inject(this);
+
+        // Setup Account Manager
+        mAccountManager.setOnAccountLoadedListener(this);
+
     }
 
     @Override
@@ -141,6 +150,27 @@ public abstract class BaseDrawerActivity extends ActionBarActivity {
         setupNavDrawer();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAccountManager.onStart();
+        setupAccountBox();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mAccountManager.onStop();
+    }
+
+    /**
+     * Called when the plus account info is loaded
+     */
+    @Override
+    public void onLoaded() {
+        setupAccountBox();
+    }
+
     /***********************************************************************************************
      *
      *  Helper Methods
@@ -161,6 +191,53 @@ public abstract class BaseDrawerActivity extends ActionBarActivity {
             }
         }
         return mActionBarToolbar;
+    }
+
+    /**
+     * Setup the account box
+     */
+    private void setupAccountBox(){
+
+        // Get Views
+        View chosenAccountView = findViewById(R.id.chosen_account_view);
+        if(mAccountManager.getProfileId() == null){
+            chosenAccountView.setVisibility(View.GONE);
+        }else{
+            chosenAccountView.setVisibility(View.VISIBLE);
+        }
+
+        ImageView coverImageView = ButterKnife.findById(chosenAccountView, R.id.profile_cover_image);
+        ImageView profileImageView = ButterKnife.findById(chosenAccountView, R.id.profile_image);
+        TextView nameTextView = ButterKnife.findById(chosenAccountView, R.id.profile_name_text);
+        TextView email = ButterKnife.findById(chosenAccountView, R.id.profile_email_text);
+
+        // Now attempt to load the information from leh profile
+        String imageUrl = mAccountManager.getImageUrl();
+        if(imageUrl != null){
+            Picasso.with(this)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.person_image_empty)
+                    .into(profileImageView);
+        }
+
+        String coverImageUrl = mAccountManager.getCoverUrl();
+        if(coverImageUrl != null){
+            Picasso.with(this)
+                    .load(coverImageUrl)
+                    .placeholder(R.drawable.default_cover)
+                    .into(coverImageView);
+        }
+
+        String displayName = mAccountManager.getDisplayName();
+        if(displayName != null){
+            nameTextView.setVisibility(View.VISIBLE);
+            nameTextView.setText(displayName);
+        }else{
+            nameTextView.setVisibility(View.GONE);
+        }
+
+        email.setText(mAccountManager.getAccountName());
+
     }
 
     /**
@@ -498,5 +575,4 @@ public abstract class BaseDrawerActivity extends ActionBarActivity {
      * @return      the list of accompanying Dagger modules
      */
     protected abstract Object[] getModules();
-
 }

@@ -239,6 +239,23 @@ public class Playlist extends Model implements Parcelable{
     }
 
     /**
+     * Return whether or not this chiptune is in this playlist
+     *
+     * @param chiptune      the chiptune to check for
+     * @return              true if the chiptune is in this playlist
+     */
+    public boolean contains(Chiptune chiptune){
+        List<ChiptuneReference> references = chiptuneReferences();
+        for(ChiptuneReference ref: references){
+            if(ref.chiptune_id.equals(chiptune.id)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Get all the chiptunes straight from the database
      * @return
      */

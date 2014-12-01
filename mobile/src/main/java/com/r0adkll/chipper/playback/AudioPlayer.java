@@ -9,6 +9,8 @@ import com.r0adkll.chipper.playback.model.AudioSession;
 
 import java.io.IOException;
 
+import timber.log.Timber;
+
 /**
  * This class manages playing Audio Session Objects
  * @author drew.heavner
@@ -129,8 +131,7 @@ public class AudioPlayer {
 
 			// Construct Media Player
 			mPlayer = new MediaPlayer();
-			if(session.getAudioFilePath().contains("http://") || session.getAudioFilePath().contains("https://"))
-				mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
 			// Set listeners
 			mPlayer.setOnPreparedListener(listener);
@@ -148,6 +149,9 @@ public class AudioPlayer {
 					mPlayer.setDataSource(mCtx, Uri.parse(session.getAudioFilePath()));
 				else
 					mPlayer.setDataSource(session.getAudioFilePath());
+
+                // LOG
+                Timber.i("Preparing [%s] @ [path: %s]", session.getChiptune().title, session.getAudioFilePath());
 
 				// INITIALIZED STATE
 				STATE = INITIALIZED;

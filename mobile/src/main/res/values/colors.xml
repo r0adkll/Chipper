@@ -4,6 +4,9 @@
     <color name="primaryDark">#99cc00</color>
     <color name="primary">#669900</color>
     <color name="accentColor">#9FD700</color>
+
+    <color name="secondary">#333333</color>
+
     <color name="fab">@color/button_material_dark</color>
     <color name="fabPressed">#2F2F2F</color>
 
@@ -24,6 +27,9 @@
     <color name="session_photo_scrim">#6000</color>
     <color name="body_text_1_inverse">#deffffff</color>
     <color name="body_text_2_inverse">#8affffff</color>
+
+    <color name="chiptune_title_color">#DDFFFFFF</color>
+    <color name="chiptune_subtitle_color">#DDF2F2F2</color>
 
     <color name="body_text_primary_light">@color/black80</color>
     <color name="body_text_secondary_light">@color/black35</color>

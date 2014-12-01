@@ -17,12 +17,14 @@ import android.widget.TextView;
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.account.GoogleAccountManager;
+import com.r0adkll.chipper.ui.player.MusicPlayer;
 import com.r0adkll.chipper.prefs.BooleanPreference;
 import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
 import com.r0adkll.chipper.ui.all.ChiptunesActivity;
 import com.r0adkll.chipper.ui.playlists.PlaylistActivity;
 import com.r0adkll.chipper.ui.popular.PopularActivity;
 import com.r0adkll.chipper.ui.widget.ScrimInsetsScrollView;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -81,6 +83,9 @@ public abstract class BaseDrawerActivity extends ActionBarActivity implements Go
     @InjectView(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
 
+    @InjectView(R.id.sliding_layout)
+    SlidingUpPanelLayout mSlidingLayout;
+
     @Optional
     @InjectView(R.id.navdrawer_items_list)
     ViewGroup mDrawerItemsListContainer;
@@ -90,6 +95,8 @@ public abstract class BaseDrawerActivity extends ActionBarActivity implements Go
 
     @Inject
     GoogleAccountManager mAccountManager;
+
+    private MusicPlayer mPlayer;
 
     private final Handler mHandler = new Handler();
     private ObjectGraph activityGraph;
@@ -133,6 +140,8 @@ public abstract class BaseDrawerActivity extends ActionBarActivity implements Go
         super.setContentView(layoutResID);
         getActionBarToolbar();
         ButterKnife.inject(this);
+        mPlayer = (MusicPlayer) getFragmentManager().findFragmentById(R.id.music_player);
+        mPlayer.setSlidingLayout(mSlidingLayout);
     }
 
     @Override
@@ -148,6 +157,7 @@ public abstract class BaseDrawerActivity extends ActionBarActivity implements Go
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         setupNavDrawer();
+        mSlidingLayout.hidePanel();
     }
 
     @Override
@@ -191,6 +201,22 @@ public abstract class BaseDrawerActivity extends ActionBarActivity implements Go
             }
         }
         return mActionBarToolbar;
+    }
+
+    /**
+     * Get the reference to the music player
+     * @return
+     */
+    protected MusicPlayer getPlayer(){
+        return mPlayer;
+    }
+
+    /**
+     * Get the sliding layout reference
+     * @return
+     */
+    protected SlidingUpPanelLayout getSlidingLayout(){
+        return mSlidingLayout;
     }
 
     /**

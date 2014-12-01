@@ -7,6 +7,7 @@ import com.activeandroid.query.Select;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.deadskunk.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,6 +62,25 @@ public class ChiptuneProvider {
      */
     public Chiptune getChiptune(String id){
         return mChiptuneMap.get(id);
+    }
+
+    /**
+     * Get a random chiptune from the list of the chiptunes
+     *
+     * @return      get a random chiptune
+     */
+    public Chiptune getRandomChiptune(){
+        int index = Utils.getRandom().nextInt(mChiptunes.size());
+        return mChiptunes.get(index);
+    }
+
+    /**
+     * Return a new list of all chiptunes available
+     *
+     * @return      all teh chiptunes
+     */
+    public List<Chiptune> getAllChiptunes(){
+        return new ArrayList<>(mChiptunes);
     }
 
     /**

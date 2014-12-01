@@ -6,10 +6,11 @@ import android.support.v7.widget.Toolbar;
 
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
-
-import java.util.List;
+import com.r0adkll.chipper.ui.player.MusicPlayer;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import butterknife.ButterKnife;
+import butterknife.InjectView;
 import dagger.ObjectGraph;
 
 /**
@@ -22,7 +23,11 @@ import dagger.ObjectGraph;
  */
 public abstract class BaseActivity extends ActionBarActivity {
 
+    @InjectView(R.id.sliding_layout)
+    SlidingUpPanelLayout mSlidingLayout;
+
     protected Toolbar actionBarToolbar;
+    private MusicPlayer player;
     private ObjectGraph activityGraph;
 
     @Override
@@ -36,6 +41,9 @@ public abstract class BaseActivity extends ActionBarActivity {
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
         getActionBarToolbar();
+        ButterKnife.inject(this);
+        player = (MusicPlayer) getFragmentManager().findFragmentById(R.id.music_player);
+        player.setSlidingLayout(mSlidingLayout);
     }
 
     @Override
@@ -44,6 +52,21 @@ public abstract class BaseActivity extends ActionBarActivity {
         activityGraph = null;
     }
 
+    /**
+     * Get teh reference to the music player interface
+     * @return
+     */
+    protected MusicPlayer getPlayer(){
+        return player;
+    }
+
+    /**
+     * Get the sliding layout reference
+     * @return
+     */
+    protected SlidingUpPanelLayout getSlidingLayout(){
+        return mSlidingLayout;
+    }
 
     /**
      * Get the toolbar actionbar

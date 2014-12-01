@@ -34,9 +34,6 @@ public class SessionState {
     private BooleanPreference mShufflePref;
     private IntPreference mRepeatPref;
 
-    private Chiptune mChiptune;
-    private Playlist mPlaylist;
-
     private boolean mIsShuffleEnabled = false;
     private int mRepeatMode = MODE_NONE;
 
@@ -50,64 +47,6 @@ public class SessionState {
         // Load shuffle and repeat states
         mIsShuffleEnabled = mShufflePref.get();
         mRepeatMode = mRepeatPref.get();
-    }
-
-    /**
-     * Return whether or not this current session state is
-     * valid. I.E. if the chiptune and playlist have been set
-     * @return
-     */
-    public boolean isValid(){
-        return mChiptune != null && mPlaylist != null;
-    }
-
-    /**
-     * Clear the session and make it invalid
-     */
-    public void clear(){
-        mChiptune = null;
-        mPlaylist = null;
-    }
-
-    /**
-     * Get the current chiptune for this state
-     * @return      the current chiptune
-     */
-    public Chiptune getCurrentChiptune(){
-        return mChiptune;
-    }
-
-    /**
-     * Get the current playlist for this state
-     * @return      the current playlist
-     */
-    public Playlist getCurrentPlaylist(){
-        return mPlaylist;
-    }
-
-    /**
-     * Update this service state with new chiptune and playlist
-     *
-     * @param chiptune      the new current chiptune
-     * @param playlist      the new(or old) current playlist
-     */
-    public void updateState(Chiptune chiptune, Playlist playlist){
-        mChiptune = chiptune;
-        mPlaylist = playlist;
-    }
-
-    /**
-     * Update the current chiptune
-     */
-    public void updateCurrentChiptune(Chiptune chiptune){
-        mChiptune = chiptune;
-    }
-
-    /**
-     * Update the current playlist
-     */
-    public void updateCurrentPlaylist(Playlist playlist){
-        mPlaylist = playlist;
     }
 
     /**

@@ -23,5 +23,13 @@
     <string name="error_no_response">There was no response from the server.</string>
     <string name="error_network_http_error">There was an issue in communicating with the server.</string>
     <string name="error_unknown">An unknown error has occurred.</string>
+    <string name="action_play">Play</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_next">Next</string>
+    <string name="action_previous">Previous</string>
+    <string name="action_upvote">Upvote</string>
+    <string name="action_downvote">Downvote</string>
+    <string name="default_current_tune_title">Press play</string>
+    <string name="default_current_tune_description">to play a random tune</string>
 
 </resources>

@@ -1,5 +1,6 @@
 package com.r0adkll.chipper.ui.popular;
 
+import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.ui.adapters.PopularChiptuneAdapter;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.User;
@@ -46,8 +47,11 @@ public class PopularModule {
     }
 
     @Provides
-    PopularChiptuneAdapter provideAdapter(){
-        return new PopularChiptuneAdapter();
+    PopularChiptuneAdapter provideAdapter(PlaylistManager playlistManager,
+                                          VoteManager voteManager,
+                                          CashMachine cashMachine){
+
+        return new PopularChiptuneAdapter(playlistManager, voteManager, cashMachine);
     }
 
 }

@@ -72,4 +72,5 @@ dependencies {
     compile 'com.timehop.stickyheadersrecyclerview:library:0.3.3@aar'
     compile 'com.fortysevendeg:swipelistview:1.0.0'
     compile 'com.nispok:snackbar:2.3.0'
+    compile 'com.sothree.slidinguppanel:library:2.0.+'
 }

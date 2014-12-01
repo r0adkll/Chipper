@@ -1,64 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.sothree.slidinguppanel.SlidingUpPanelLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:sothree="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/sliding_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:gravity="bottom"
+    sothree:panelHeight="68dp"
+    sothree:shadowHeight="4dp"
+    sothree:paralaxOffset="0dp"
+    sothree:anchorPoint=".13"
+    sothree:dragView="@+id/music_player"
+    >
 
-    <!-- The Custom Actionbar -->
-    <android.support.v7.widget.Toolbar
+    <RelativeLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        style="@style/Widget.Chipper.HeaderBar"
-        android:id="@+id/toolbar_actionbar"
-        android:layout_height="@dimen/actionbar_extended_height"
-        android:layout_width="match_parent"
-        android:minHeight="?attr/actionBarSize"
-        android:gravity="bottom"
-        android:paddingBottom="@dimen/activity_padding"
-
-        app:theme="@style/ThemeOverlay.Chipper.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.Chipper.ActionBar.Popup"
-        app:titleTextAppearance="@style/TextAppearance.Chipper.ExtendedActionBar.Title"
-        />
-
-    <!-- The fragment content container, This will always be on the bottom-->
-    <FrameLayout
-        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/toolbar_actionbar"
-        >
+        android:orientation="vertical">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycle_view"
-            android:scrollbars="vertical"
+        <!-- The Custom Actionbar -->
+        <android.support.v7.widget.Toolbar
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            style="@style/Widget.Chipper.HeaderBar"
+            android:id="@+id/toolbar_actionbar"
+            android:layout_height="@dimen/actionbar_extended_height"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:minHeight="?attr/actionBarSize"
+            android:gravity="bottom"
+            android:paddingBottom="@dimen/activity_padding"
 
-            android:clipToPadding="false"
-            android:paddingTop="@dimen/half_padding"
+            app:theme="@style/ThemeOverlay.Chipper.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.Chipper.ActionBar.Popup"
+            app:titleTextAppearance="@style/TextAppearance.Chipper.ExtendedActionBar.Title"
             />
 
-        <com.r0adkll.chipper.ui.widget.EmptyView
-            android:id="@+id/empty_layout"
+        <!-- The fragment content container, This will always be on the bottom-->
+        <FrameLayout
+            android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_below="@+id/toolbar_actionbar"
+            >
 
-            app:emptyIcon="@drawable/ic_launcher"
-            app:emptyMessage="@string/playlist_viewer_message"
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycle_view"
+                android:scrollbars="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                android:clipToPadding="false"
+                android:paddingTop="@dimen/half_padding"
+                />
+
+            <com.r0adkll.chipper.ui.widget.EmptyView
+                android:id="@+id/empty_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                app:emptyIcon="@drawable/ic_launcher"
+                app:emptyMessage="@string/playlist_viewer_message"
+                />
+
+        </FrameLayout>
+
+        <include layout="@layout/layout_fab_play"
+            android:id="@+id/fab_play"
+            android:layout_width="@dimen/fab_button_height"
+            android:layout_height="@dimen/fab_button_height"
+            android:layout_alignParentRight="true"
+
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="100dp"
             />
 
-    </FrameLayout>
+    </RelativeLayout>
 
-    <include layout="@layout/layout_fab_play"
-        android:id="@+id/fab_play"
-        android:layout_width="@dimen/fab_button_height"
-        android:layout_height="@dimen/fab_button_height"
-        android:layout_alignParentRight="true"
-
-        android:layout_marginRight="16dp"
-        android:layout_marginTop="100dp"
+    <!-- The Player widget bar -->
+    <fragment
+        android:id="@+id/music_player"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:name="com.r0adkll.chipper.ui.player.MusicPlayer"
+        android:layout_alignParentBottom="true"
+        tools:layout="@layout/fragment_music_player"
         />
 
-</RelativeLayout>
+</com.sothree.slidinguppanel.SlidingUpPanelLayout>

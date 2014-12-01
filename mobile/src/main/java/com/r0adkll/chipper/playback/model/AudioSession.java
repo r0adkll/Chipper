@@ -20,16 +20,9 @@ public class AudioSession{
      *
 	 */
 
-	private String audioFile;		
+    private Chiptune chiptune;
+	private String audioFile;
 	private long length;
-
-    /**
-     * Constructor
-     * @param file      the file url, web or local
-     */
-	public AudioSession(String file){
-		this.audioFile = file;
-	}
 
     /**
      * Chiptune cache constructor
@@ -41,12 +34,17 @@ public class AudioSession{
         File offline = cash.getOfflineFile(chiptune);
         this.audioFile = offline != null ? offline.getAbsolutePath() : chiptune.stream_url;
         this.length = chiptune.length;
+        this.chiptune = chiptune;
     }
 	
 	public String getAudioFilePath(){
 		return audioFile;
 	}
-	
+
+    public Chiptune getChiptune(){
+        return chiptune;
+    }
+
 	public long getLength(){
 		return length;
 	}

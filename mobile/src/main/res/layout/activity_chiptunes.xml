@@ -8,58 +8,77 @@
     android:fitsSystemWindows="true"
     tools:context=".ui.all.AllActivity">
 
-    <LinearLayout android:layout_width="match_parent"
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        xmlns:sothree="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/sliding_layout"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:gravity="bottom"
+        sothree:panelHeight="68dp"
+        sothree:shadowHeight="4dp"
+        sothree:paralaxOffset="0dp"
+        sothree:anchorPoint=".13"
+        sothree:dragView="@+id/music_player"
+        >
 
-        <!-- The Custom Actionbar -->
-        <android.support.v7.widget.Toolbar
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            style="@style/Widget.Chipper.HeaderBar"
-            android:id="@+id/toolbar_actionbar"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:minHeight="?attr/actionBarSize"
+        <!-- Main Content -->
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            app:theme="@style/ThemeOverlay.Chipper.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.Chipper.ActionBar.Popup"
-            app:titleTextAppearance="@style/TextAppearance.Chipper.ActionBar.Title"
-            />
-
-        <!-- The fragment content container, This will always be on the bottom-->
-        <FrameLayout
-            android:id="@+id/container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <!--<android.support.v7.widget.RecyclerView-->
-                <!--android:id="@+id/chiptune_recycler"-->
-                <!--android:scrollbars="vertical"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="match_parent"/>-->
-
-            <com.fortysevendeg.swipelistview.SwipeListView
-                xmlns:swipe="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/chiptune_recycler"
+            <!-- The Custom Actionbar -->
+            <android.support.v7.widget.Toolbar
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                style="@style/Widget.Chipper.HeaderBar"
+                android:id="@+id/toolbar_actionbar"
+                android:layout_height="wrap_content"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:minHeight="?attr/actionBarSize"
 
-                swipe:swipeFrontView="@+id/front"
-                swipe:swipeBackView="@+id/back"
-
-                swipe:swipeOffsetLeft="25dp"
-
-                swipe:swipeDrawableChecked="@drawable/choice_selected"
-
-                swipe:swipeCloseAllItemsWhenMoveList="true"
-                swipe:swipeMode="left"
-                swipe:onlyOneOpenedWhenSwipe="true"
+                app:theme="@style/ThemeOverlay.Chipper.ActionBar"
+                app:popupTheme="@style/ThemeOverlay.Chipper.ActionBar.Popup"
+                app:titleTextAppearance="@style/TextAppearance.Chipper.ActionBar.Title"
                 />
 
+            <!-- The fragment content container, This will always be on the bottom-->
+            <FrameLayout
+                android:id="@+id/container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-        </FrameLayout>
+                <com.fortysevendeg.swipelistview.SwipeListView
+                    xmlns:swipe="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/chiptune_recycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
 
-    </LinearLayout>
+                    swipe:swipeFrontView="@+id/front"
+                    swipe:swipeBackView="@+id/back"
+
+                    swipe:swipeOffsetLeft="25dp"
+
+                    swipe:swipeDrawableChecked="@drawable/choice_selected"
+
+                    swipe:swipeCloseAllItemsWhenMoveList="true"
+                    swipe:swipeMode="left"
+                    swipe:onlyOneOpenedWhenSwipe="true"
+                    />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+        <!-- The Player widget bar -->
+        <fragment
+            android:id="@+id/music_player"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:name="com.r0adkll.chipper.ui.player.MusicPlayer"
+            android:layout_alignParentBottom="true"
+            tools:layout="@layout/fragment_music_player"
+            />
+
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
     <!-- Nav drawer -->
     <include layout="@layout/navdrawer" />

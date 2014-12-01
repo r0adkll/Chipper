@@ -1,5 +1,9 @@
 package com.r0adkll.chipper.playback;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,9 +11,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.ResultReceiver;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat.Action;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
@@ -18,21 +25,27 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.KeyEvent;
 
 import com.r0adkll.chipper.ChipperApp;
+import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
-import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.VoteManager;
+import com.r0adkll.chipper.playback.events.MediaSessionEvent;
 import com.r0adkll.chipper.playback.model.AudioSession;
-import com.r0adkll.chipper.playback.model.PlaybackState;
+import com.r0adkll.chipper.playback.model.PlayQueue;
 import com.r0adkll.chipper.playback.model.SessionState;
 import com.r0adkll.chipper.prefs.BooleanPreference;
 import com.r0adkll.chipper.prefs.IntPreference;
+import com.r0adkll.chipper.qualifiers.SessionRepeatPreference;
+import com.r0adkll.chipper.qualifiers.SessionShufflePreference;
+import com.r0adkll.deadskunk.utils.Utils;
 import com.squareup.otto.Bus;
+import com.squareup.otto.Produce;
 
 import javax.inject.Inject;
 
+import dagger.Provides;
 import timber.log.Timber;
 
 /**
@@ -48,16 +61,30 @@ public class MusicService extends Service {
 
     public static final String MEDIA_SESSION_TAG = "Chipper Session";
 
-    public static final String INTENT_ACTION_PLAY = "com.r0adkll.chipper.intent.PLAY";
-    public static final String INTENT_ACTION_PAUSE = "com.r0adkll.chipper.intent.PAUSE";
-    public static final String INTENT_ACTION_PLAYPAUSE = "com.r0adkll.chipper.intent.PLAYPAUSE";
-    public static final String INTENT_ACTION_SHUFFLEPLAY = "com.r0adkll.chipper.action.WIDGET_SHUFFLE_PLAY";
-    public static final String INTENT_ACTION_NEXT = "com.r0adkll.chipper.intent.NEXT";
-    public static final String INTENT_ACTION_PREV = "com.r0adkll.chipper.intent.PREV";
-    public static final String INTENT_ACTION_EXIT = "com.r0adkll.chipper.intent.EXIT";
-    public static final String INTENT_ACTION_UPVOTE = "com.r0adkll.chipper.intent.UPVOTE";
-    public static final String INTENT_ACTION_DOWNVOTE = "com.r0adkll.chipper.intent.DOWNVOTE";
+    public static final String ACTION_PLAY = "com.r0adkll.chipper.intent.PLAY";
+    public static final String ACTION_PAUSE = "com.r0adkll.chipper.intent.PAUSE";
+    public static final String ACTION_PLAYPAUSE = "com.r0adkll.chipper.intent.PLAYPAUSE";
+    public static final String ACTION_SHUFFLEPLAY = "com.r0adkll.chipper.action.WIDGET_SHUFFLE_PLAY";
+    public static final String ACTION_NEXT = "com.r0adkll.chipper.intent.NEXT";
+    public static final String ACTION_PREV = "com.r0adkll.chipper.intent.PREV";
+    public static final String ACTION_EXIT = "com.r0adkll.chipper.intent.EXIT";
+    public static final String ACTION_UPVOTE = "com.r0adkll.chipper.intent.UPVOTE";
+    public static final String ACTION_DOWNVOTE = "com.r0adkll.chipper.intent.DOWNVOTE";
 
+    public static final String ACTION_ENABLE_NOTIFICATION = "com.r0adkll.chipper.command.ENABLE_NOTIFICATION";
+    public static final String ACTION_DISABLE_NOTIFICATION = "com.r0adkll.chipper.command.DISABLE_NOTIFICATION";
+    public static final String ACTION_SHOW_NOTIFICATION = "com.r0adkll.chipper.command.SHOW_NOTIFICATION";
+    public static final String ACTION_SHUFFLE = "com.r0adkll.chipper.command.SHUFFLE";
+    public static final String ACTION_REPEAT = "com.r0adkll.chipper.command.REPEAT";
+
+    public static final String EXTRA_CHIPTUNE = "com.r0adkll.chipper.extra.CHIPTUNE";
+    public static final String EXTRA_PLAYLIST = "com.r0adkll.chipper.extra.PLAYLIST";
+    public static final String EXTRA_SHUFFLE = "com.r0adkll.chipper.extra.SHUFFLE";
+    public static final String EXTRA_REPEAT = "com.r0adkll.chipper.extra.REPEAT";
+
+    private static final float DUCK_VOLUME_LEVEL = 0.25f;
+    private static final int PREVIOUS_TIME_CUTOFF = 5 * 1000; // 5 seconds
+    private static final int NOTIFICATION_ID = 100;
 
     /***********************************************************************************************
      *
@@ -67,18 +94,20 @@ public class MusicService extends Service {
 
     @Inject AudioManager mAudioManager;
     @Inject NotificationManagerCompat mNotificationManager;
-    @Inject PlaylistManager mPlaylistManager;
     @Inject VoteManager mVoteManager;
     @Inject ChiptuneProvider mProvider;
     @Inject CashMachine mATM;
     @Inject Bus mBus;
 
-    @Inject BooleanPreference mShufflePref;
-    @Inject IntPreference mRepeatPref;
+    @Inject @SessionShufflePreference BooleanPreference mShufflePref;
+    @Inject @SessionRepeatPreference IntPreference mRepeatPref;
     @Inject AudioPlayer mPlayer;
 
+    private PlayQueue mQueue;
     private SessionState mCurrentState;
     private MediaSessionCompat mCurrentSession;
+
+    private boolean mCanShowNotification = true;
 
     /***********************************************************************************************
      *
@@ -98,6 +127,16 @@ public class MusicService extends Service {
         mPlayer.setPlayerCallbacks(mPlayerCallbacks);
 
         // Register Receivers
+        IntentFilter remoteActionFilter = new IntentFilter();
+        remoteActionFilter.addAction(ACTION_PLAY);
+        remoteActionFilter.addAction(ACTION_PAUSE);
+        remoteActionFilter.addAction(ACTION_PLAYPAUSE);
+        remoteActionFilter.addAction(ACTION_NEXT);
+        remoteActionFilter.addAction(ACTION_PREV);
+        remoteActionFilter.addAction(ACTION_UPVOTE);
+        remoteActionFilter.addAction(ACTION_DOWNVOTE);
+        remoteActionFilter.addAction(ACTION_EXIT);
+        registerReceiver(mRemoteActionReceiver, remoteActionFilter);
         registerReceiver(mNoisyAudioStreamReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
 
         // Initialize the Session State
@@ -106,12 +145,45 @@ public class MusicService extends Service {
         // Initialize the Media Session
         mCurrentSession = new MediaSessionCompat(this, MEDIA_SESSION_TAG);
         mCurrentSession.setCallback(mMediaSessionCallbacks);
-        mCurrentSession.setActive(true);
     }
 
+    /**
+     * Called when this service is started with an intent
+     *
+     * @param intent        the intent this service was started with
+     * @param flags         the flags this service was started with
+     * @param startId       the start count
+     * @return              {@link #START_STICKY}
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // TODO: Handle incoming intent
+        Timber.i("MusicService::onStartCommand(%s, %d, %d)", intent.toString(), flags, startId);
+
+        // Handle intent
+        if(intent != null) {
+            Bundle xtras = intent.getExtras();
+            if (xtras != null) {
+
+                // Parse the Chiptune and Playlist(optional) from the extras
+                Chiptune chiptune = xtras.getParcelable(EXTRA_CHIPTUNE);
+                Playlist playlist = xtras.getParcelable(EXTRA_PLAYLIST);
+
+                // If a chiptune was found, determine if playlist was sent as well
+                if (chiptune != null) {
+                    if (playlist != null) {
+                        mQueue = new PlayQueue(mProvider, chiptune, playlist);
+                    } else {
+                        mQueue = new PlayQueue(mProvider, chiptune);
+                    }
+
+                    // Set session as active
+                    mCurrentSession.setActive(true);
+
+                    // Start playback
+                    startPlayback();
+                }
+            }
+        }
 
         return START_STICKY;
     }
@@ -130,9 +202,13 @@ public class MusicService extends Service {
 
         // Unregister Receivers
         unregisterReceiver(mNoisyAudioStreamReceiver);
+        unregisterReceiver(mRemoteActionReceiver);
 
         // Relinquish playback resources
         stop();
+
+        // Dismiss the playback notification
+        dismissNotification();
 
         // Abandon Focus
         mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
@@ -156,6 +232,7 @@ public class MusicService extends Service {
         mCurrentSession.setPlaybackState(buildPlaybackState(PlaybackStateCompat.STATE_PLAYING));
 
         // Update Notification
+        showNotification();
 
         // Dispatch Otto Event
 
@@ -167,14 +244,14 @@ public class MusicService extends Service {
         mCurrentSession.setPlaybackState(buildPlaybackState(PlaybackStateCompat.STATE_PAUSED));
 
         // Update Notification
-
+        showNotification();
 
         // Dispatch Otto event
 
     }
 
     private void playPause(){
-        if(mCurrentState.isValid()){
+        if(mQueue != null){
             if(mPlayer.isPlaying()){
                 pause();
             }else{
@@ -190,33 +267,92 @@ public class MusicService extends Service {
         mPlayer.stop();
         mPlayer.release();
         mCurrentSession.setPlaybackState(buildPlaybackState(PlaybackStateCompat.STATE_STOPPED));
-
-        // Update Notification
+        mCurrentSession.setActive(false);
 
         // Dispatch Otto Event
 
+
     }
 
+    /**
+     * Start playing the next chiptune in the queue
+     */
     private void next(){
-
+        if(mQueue != null){
+            mQueue.next(mCurrentState, true);
+            startPlayback();
+        }
     }
 
+    /**
+     * Start playing the previous chiptune in the queue, or if
+     * the playback is old enough, restart the current chiptune
+     */
     private void previous(){
+        if(mQueue != null){
 
+            // Check playback time
+            if(mPlayer.isPlaying()){
+                int progress = mPlayer.getCurrentPosition();
+
+                // if the playback is less than X seconds long, go to previous, otherwise restart the current.
+                if(progress > PREVIOUS_TIME_CUTOFF){
+                    seek(0);
+                }else{
+                    mQueue.previous(mCurrentState);
+                    startPlayback();
+                }
+            }else{
+                mQueue.previous(mCurrentState);
+                startPlayback();
+            }
+
+        }
     }
 
+    /**
+     * Shuffle the current playback queue and save to the preferences
+     *
+     * @param enabled       shuffle flag
+     */
     private void shuffle(boolean enabled){
         mCurrentState.setShuffle(enabled);
+
+        // Re shuffle the queue
+        if(enabled){
+            if(mQueue != null){
+                mQueue.shuffle();
+            }
+        }
     }
 
+    /**
+     * Update the repeat mode
+     *
+     * @see com.r0adkll.chipper.playback.model.SessionState#MODE_ONE
+     * @see com.r0adkll.chipper.playback.model.SessionState#MODE_ALL
+     * @see com.r0adkll.chipper.playback.model.SessionState#MODE_NONE
+     * @param mode  the repeat mode
+     */
     private void repeat(int mode){
         mCurrentState.setRepeatMode(mode);
     }
 
-    private void seek(long position){
-        mPlayer.seekTo((int) position);
+    /**
+     * Seek to a certain position in hte playback
+     * @param position
+     */
+    private void seek(int position){
+        mPlayer.seekTo(position);
     }
 
+    /**
+     * Send the proprietary event to the MediaSession Controllers and
+     * listeners
+     */
+    private void publishPlaybackProgress(){
+
+    }
 
     /***********************************************************************************************
      *
@@ -225,12 +361,10 @@ public class MusicService extends Service {
      */
 
     /**
-     * Starting playing a chiptune (and by association it's playlist)
+     * Starting playing the current item in the play queue
      *
-     * @param chiptune      the chiptune to play
-     * @param playlist      the associated playlist
      */
-    private void playChiptune(Chiptune chiptune, Playlist playlist){
+    private void startPlayback(){
 
         // Request audio focus and only play if granted
         int result = mAudioManager.requestAudioFocus(mOnAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
@@ -246,11 +380,8 @@ public class MusicService extends Service {
             // Update media session state to buffering
             mCurrentSession.setPlaybackState(buildPlaybackState(PlaybackStateCompat.STATE_BUFFERING));
 
-            // Update the current state
-            mCurrentState.updateState(chiptune, playlist);
-
-            // Log
-            Timber.i("Preparing[%s] at [%s]", chiptune.title, chiptune.stream_url);
+            // Get teh current chiptune from the queue to play
+            Chiptune chiptune = mQueue.current(mCurrentState);
 
             // Build audio session to play
             AudioSession session = new AudioSession(mATM, chiptune);
@@ -261,7 +392,12 @@ public class MusicService extends Service {
                     // Initiate Playback
                     play();
 
-                    // TODO: Update Notification
+                    // Update playback state and metadata
+                    mCurrentSession.setPlaybackState(buildPlaybackState(PlaybackStateCompat.STATE_PLAYING));
+                    mCurrentSession.setMetadata(buildMetaData());
+
+                    // Update Notification
+                    showNotification();
 
                     // TODO: Update Widget
 
@@ -275,12 +411,28 @@ public class MusicService extends Service {
                     mPlayer.setCurrentState(AudioPlayer.COMPLETED);
 
                     // Attempt to get the next chiptune and play it
+                    Chiptune next = mQueue.next(mCurrentState, false);
+                    if(next != null){
+                        startPlayback();
+                    }else{
+                        stop();
+
+                        // Dismiss notification
+                        dismissNotification();
+
+                        // Relenquish focus
+                        mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
+
+                        // Publish State
+
+                    }
 
                 }
             });
 
+        }else{
+            Timber.e("Audio Focus Request Failed: %d", result);
         }
-
 
     }
 
@@ -323,14 +475,14 @@ public class MusicService extends Service {
      * @return  the media metadata attributed to the current song
      */
     private MediaMetadataCompat buildMetaData(){
-        Chiptune chiptune = mCurrentState.getCurrentChiptune();
+        Chiptune chiptune = mQueue.current(mCurrentState);
 
         // Create the builder
         MediaMetadataCompat.Builder metaBuilder = new MediaMetadataCompat.Builder();
 
         if(chiptune != null){
 
-            int voteValue = mVoteManager.getUserVoteValue(mCurrentState.getCurrentChiptune().id);
+            int voteValue = mVoteManager.getUserVoteValue(chiptune.id);
             RatingCompat rating;
             if(voteValue != 0) {
                 rating = RatingCompat.newThumbRating(voteValue == 1 ? true : false);
@@ -356,7 +508,12 @@ public class MusicService extends Service {
      */
     private void coldStartRandomPlayback(){
 
+        // Get a random chiptune, and construct the play queue from it
+        Chiptune randomChiptune = mProvider.getRandomChiptune();
+        mQueue = new PlayQueue(mProvider, randomChiptune);
 
+        // Start playback of the current queue
+        startPlayback();
 
     }
 
@@ -364,10 +521,125 @@ public class MusicService extends Service {
      * Shut down the this service
      */
     private void shutdown(){
-
         stopSelf();
 
+    }
 
+    @SuppressLint("NewApi")
+    private void showNotification(){
+
+        if(mQueue != null && mCanShowNotification) {
+
+            Chiptune current = mQueue.current(mCurrentState);
+
+            // Build info
+            String title = current.title;
+            String text = current.artist;
+
+            if(!Utils.isLollipop()) {
+
+                // Build the notification
+                Notification.Builder builder = new Notification.Builder(this)
+                        .setSmallIcon(R.drawable.ic_stat_chipper)
+                        .setColor(getResources().getColor(R.color.primary))
+                        .setVisibility(Notification.VISIBILITY_PUBLIC)
+                        .setContentTitle(title)
+                        .setContentText(text)
+                        .setOngoing(mPlayer.isPlaying());
+
+                // Build actions/intents
+                Notification.Action play = buildActionLollipop(R.drawable.ic_action_notif_play, R.string.action_play, ACTION_PLAY);
+                Notification.Action pause = buildActionLollipop(R.drawable.ic_action_notif_pause, R.string.action_pause, ACTION_PAUSE);
+                Notification.Action next = buildActionLollipop(R.drawable.ic_action_notif_next, R.string.action_next, ACTION_NEXT);
+                Notification.Action previous = buildActionLollipop(R.drawable.ic_action_notif_previous, R.string.action_previous, ACTION_PREV);
+                Notification.Action upvote = buildActionLollipop(R.drawable.ic_action_notif_thumb_up, R.string.action_upvote, ACTION_UPVOTE);
+                Notification.Action downvote = buildActionLollipop(R.drawable.ic_action_notif_thumb_down, R.string.action_downvote, ACTION_DOWNVOTE);
+
+                // Build the actions
+                builder.addAction(downvote)
+                        .addAction(previous)
+                        .addAction(mPlayer.isPlaying() ? pause : play)
+                        .addAction(next)
+                        .addAction(upvote);
+
+                // Build the lollipop media session
+                builder.setStyle(new Notification.MediaStyle()
+                        .setMediaSession((android.media.session.MediaSession.Token) mCurrentSession.getSessionToken().getToken())
+                        .setShowActionsInCompactView(2, 3));
+
+                // Show notification
+                mNotificationManager.notify(NOTIFICATION_ID, builder.build());
+
+            }else{
+
+                // Build the notification
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_stat_chipper)
+                        .setColor(getResources().getColor(R.color.primary))
+                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                        .setContentTitle(title)
+                        .setContentText(text)
+                        .setOngoing(mPlayer.isPlaying());
+
+                // Build actions/intents
+                Action play = buildAction(R.drawable.ic_action_notif_play, R.string.action_play, ACTION_PLAY);
+                Action pause = buildAction(R.drawable.ic_action_notif_pause, R.string.action_pause, ACTION_PAUSE);
+                Action next = buildAction(R.drawable.ic_action_notif_next, R.string.action_next, ACTION_NEXT);
+                Action previous = buildAction(R.drawable.ic_action_notif_previous, R.string.action_previous, ACTION_PREV);
+
+                // Build teh actions
+                builder.addAction(previous)
+                       .addAction(mPlayer.isPlaying() ? pause : play)
+                       .addAction(next);
+
+                // Show notification
+                mNotificationManager.notify(NOTIFICATION_ID, builder.build());
+            }
+
+        }
+    }
+
+    /**
+     * Dismiss the current playback notification
+     */
+    private void dismissNotification(){
+        mNotificationManager.cancel(NOTIFICATION_ID);
+    }
+
+    /**
+     * Build a remote action pending intent
+     *
+     * @param action        the action to perform
+     * @return              the associated pending intent
+     */
+    private PendingIntent buildRemoteAction(String action){
+        Intent intent = new Intent(action);
+        return PendingIntent.getBroadcast(this, 0, intent, 0);
+    }
+
+    /**
+     * Build a remote action notification action
+     *
+     * @param icon      the icon resource to use
+     * @param title     the title string resource to use
+     * @param action    the associated remote action
+     * @return          the built notification action item
+     */
+    private Action buildAction(int icon, int title, String action){
+        return new Action(icon, getString(title), buildRemoteAction(action));
+    }
+
+    /**
+     * Build a remote action notification action
+     *
+     * @param icon      the icon resource to use
+     * @param title     the title string resource to use
+     * @param action    the associated remote action
+     * @return          the built notification action item
+     */
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private Notification.Action buildActionLollipop(int icon, int title, String action){
+        return new Notification.Action(icon, getString(title), buildRemoteAction(action));
     }
 
     /***********************************************************************************************
@@ -377,6 +649,18 @@ public class MusicService extends Service {
      */
 
 
+    /**
+     * Produce the current media session if available
+     *
+     * @return      the available media session event
+     */
+    @Produce
+    public MediaSessionEvent produceMediaSession(){
+        if(mCurrentSession != null){
+            return new MediaSessionEvent(mCurrentSession);
+        }
+        return null;
+    }
 
 
     /***********************************************************************************************
@@ -393,6 +677,37 @@ public class MusicService extends Service {
         @Override
         public void onCommand(String command, Bundle extras, ResultReceiver cb) {
             // Handle custom command
+            switch (command){
+                case ACTION_PLAYPAUSE:
+                    playPause();
+                    break;
+                case ACTION_SHUFFLEPLAY:
+                    coldStartRandomPlayback();
+                    break;
+                case ACTION_EXIT:
+                    shutdown();
+                    break;
+                case ACTION_DISABLE_NOTIFICATION:
+                    mCanShowNotification = false;
+                    dismissNotification();
+                    break;
+                case ACTION_ENABLE_NOTIFICATION:
+                    mCanShowNotification = true;
+                    break;
+                case ACTION_SHOW_NOTIFICATION:
+                    mCanShowNotification = true;
+                    showNotification();
+                    break;
+                case ACTION_SHUFFLE:
+                    // Get shuffle value from data
+                    boolean shuffle = extras.getBoolean(EXTRA_SHUFFLE, false);
+                    shuffle(shuffle);
+                    break;
+                case ACTION_REPEAT:
+                    int repeat = extras.getInt(EXTRA_REPEAT, SessionState.MODE_NONE);
+                    repeat(repeat);
+                    break;
+            }
         }
 
         @Override
@@ -407,7 +722,7 @@ public class MusicService extends Service {
                         pause();
                         return true;
                     case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-
+                        playPause();
                         return true;
                     case KeyEvent.KEYCODE_MEDIA_NEXT:
                         next();
@@ -419,7 +734,6 @@ public class MusicService extends Service {
                         stop();
                         return true;
                 }
-
             }
 
             return false;
@@ -462,17 +776,17 @@ public class MusicService extends Service {
 
         @Override
         public void onSeekTo(long pos) {
-            seek(pos);
+            seek((int)pos);
         }
 
         @Override
         public void onSetRating(RatingCompat rating) {
             if(rating.getRatingStyle() == RatingCompat.RATING_THUMB_UP_DOWN){
-                if(mCurrentState.isValid()) {
+                if(mQueue != null) {
                     if (rating.isThumbUp()) {
-                        mVoteManager.upvote(mCurrentState.getCurrentChiptune(), null);
+                        mVoteManager.upvote(mQueue.current(mCurrentState), null);
                     } else {
-                        mVoteManager.downvote(mCurrentState.getCurrentChiptune(), null);
+                        mVoteManager.downvote(mQueue.current(mCurrentState), null);
                     }
                 }
             }
@@ -485,6 +799,10 @@ public class MusicService extends Service {
      *
      */
 
+    /**
+     * The AudioPlayer callbacks for the audio player. these are called on info, error, seek, and
+     * buffering events.
+     */
     private AudioPlayer.SimplePlayerCallbacks mPlayerCallbacks = new AudioPlayer.SimplePlayerCallbacks() {
         @Override
         public boolean onError(MediaPlayer mp, int what, int extra) {
@@ -505,6 +823,7 @@ public class MusicService extends Service {
 
         @Override
         public void onBufferingUpdate(MediaPlayer mp, int percent) {
+            // Update UI
 
         }
     };
@@ -514,6 +833,45 @@ public class MusicService extends Service {
      * Receivers
      *
      */
+
+    /**
+     * The BroadcastReceiver for all the pending intent actions from the notifications,
+     * or widgets
+     */
+    public BroadcastReceiver mRemoteActionReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            switch (intent.getAction()){
+                case ACTION_PLAY:
+                    play();
+                    break;
+                case ACTION_PAUSE:
+                    pause();
+                    break;
+                case ACTION_PLAYPAUSE:
+                    playPause();
+                    break;
+                case ACTION_NEXT:
+                    next();
+                    break;
+                case ACTION_PREV:
+                    previous();
+                    break;
+                case ACTION_UPVOTE:
+                    mVoteManager.upvote(mQueue.current(mCurrentState), null);
+                    break;
+                case ACTION_DOWNVOTE:
+                    mVoteManager.downvote(mQueue.current(mCurrentState), null);
+                    break;
+                case ACTION_SHUFFLEPLAY:
+                    coldStartRandomPlayback();
+                    break;
+                case ACTION_EXIT:
+                    shutdown();
+                    break;
+            }
+        }
+    };
 
     /**
      * This receiver catches the intent when a user unplugs a headset, or disconnects
@@ -532,11 +890,35 @@ public class MusicService extends Service {
     /**
      * The AudioManager focus change listener to listen for focus changes in the OS system
      */
+    boolean wasPlaying = false;
     private AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener =
             new AudioManager.OnAudioFocusChangeListener() {
         @Override
         public void onAudioFocusChange(int focusChange) {
-
+            Timber.d( "Audio Focus Change: %d", focusChange);
+            switch (focusChange){
+                case AudioManager.AUDIOFOCUS_LOSS:
+                    mAudioManager.abandonAudioFocus(this);
+                    if(mPlayer.isPlaying()) wasPlaying = true;
+                    pause();
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                    if(mPlayer.isPlaying()) wasPlaying = true;
+                    pause();
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                    mPlayer.setVolume(DUCK_VOLUME_LEVEL, DUCK_VOLUME_LEVEL);
+                    break;
+                case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT:
+                    int result = mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, 0);
+                    // Resume playback
+                    mPlayer.setVolume(1, 1);
+                    if(wasPlaying){
+                        play();
+                        wasPlaying = false;
+                    }
+                    break;
+            }
         }
     };
 }

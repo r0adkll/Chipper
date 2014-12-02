@@ -67,12 +67,12 @@ public final class ChipperModule {
     }
 
     @Provides @Singleton
-    OkHttpClient provideOkHttpClient(Application app) {
+    OkHttpClient provideOkHttpClient() {
         return new OkHttpClient();
     }
 
     @Provides @Singleton @GenericPrefs
-    SharedPreferences provideGenericPreferences(Application app) {
+    SharedPreferences provideGenericPreferences() {
         return app.getSharedPreferences(GENERIC_PREFERENCE_NAME, MODE_PRIVATE);
     }
 

@@ -4,6 +4,7 @@
     <color name="primaryDark">#99cc00</color>
     <color name="primary">#669900</color>
     <color name="accentColor">#9FD700</color>
+    <color name="controlHighlight">#9699cc00</color>
 
     <color name="secondary">#333333</color>
 

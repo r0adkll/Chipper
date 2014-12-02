@@ -7,7 +7,7 @@
         android:id="@+id/current_tune"
         android:layout_width="match_parent"
         android:layout_height="68dp"
-        android:background="@color/primary"
+        android:background="@color/primaryDark"
         android:elevation="6dp"
         android:outlineProvider="bounds"
         >
@@ -22,7 +22,8 @@
             android:id="@+id/top_bar"
             android:layout_width="match_parent"
             android:layout_height="4dp"
-            android:background="@color/primaryDark"
+            android:background="@color/primary"
+            android:visibility="gone"
             />
 
         <ProgressBar
@@ -238,7 +239,9 @@
         android:id="@+id/master_controls"
         android:layout_width="match_parent"
         android:layout_height="104dp"
-        android:background="@color/primary"
+        android:background="@color/primaryDark"
+        android:elevation="6dp"
+        android:outlineProvider="bounds"
 
         android:layout_alignParentBottom="true"
         >
@@ -253,7 +256,8 @@
             android:id="@+id/top_bar2"
             android:layout_width="match_parent"
             android:layout_height="4dp"
-            android:background="@color/primaryDark"
+            android:background="@color/primary"
+            android:visibility="gone"
             />
 
         <RelativeLayout

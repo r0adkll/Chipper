@@ -7,6 +7,7 @@
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primaryDark</item>
         <item name="colorAccent">@color/accentColor</item>
+        <item name="colorControlHighlight">@color/controlHighlight</item>
 
         <item name="windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>

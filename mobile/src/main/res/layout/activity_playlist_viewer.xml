@@ -10,7 +10,7 @@
     sothree:panelHeight="68dp"
     sothree:shadowHeight="4dp"
     sothree:paralaxOffset="0dp"
-    sothree:anchorPoint=".13"
+    sothree:anchorPoint="@dimen/slidingview_anchor_point"
     sothree:dragView="@+id/music_player"
     >
 

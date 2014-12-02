@@ -14,7 +14,9 @@ import dagger.Provides;
  */
 @Module(
     injects = MusicPlayer.class,
-    addsTo = UIModule.class
+    addsTo = UIModule.class,
+    complete = false
+
 )
 public class MusicPlayerModule {
 

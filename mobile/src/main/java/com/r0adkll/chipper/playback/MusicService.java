@@ -30,6 +30,7 @@ import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
+import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.VoteManager;
 import com.r0adkll.chipper.playback.events.MediaSessionEvent;
 import com.r0adkll.chipper.playback.model.AudioSession;
@@ -39,13 +40,13 @@ import com.r0adkll.chipper.prefs.BooleanPreference;
 import com.r0adkll.chipper.prefs.IntPreference;
 import com.r0adkll.chipper.qualifiers.SessionRepeatPreference;
 import com.r0adkll.chipper.qualifiers.SessionShufflePreference;
+import com.r0adkll.chipper.ui.Chipper;
 import com.r0adkll.deadskunk.utils.Utils;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Produce;
 
 import javax.inject.Inject;
 
-import dagger.Provides;
 import timber.log.Timber;
 
 /**
@@ -71,16 +72,22 @@ public class MusicService extends Service {
     public static final String ACTION_UPVOTE = "com.r0adkll.chipper.intent.UPVOTE";
     public static final String ACTION_DOWNVOTE = "com.r0adkll.chipper.intent.DOWNVOTE";
 
-    public static final String ACTION_ENABLE_NOTIFICATION = "com.r0adkll.chipper.command.ENABLE_NOTIFICATION";
-    public static final String ACTION_DISABLE_NOTIFICATION = "com.r0adkll.chipper.command.DISABLE_NOTIFICATION";
-    public static final String ACTION_SHOW_NOTIFICATION = "com.r0adkll.chipper.command.SHOW_NOTIFICATION";
-    public static final String ACTION_SHUFFLE = "com.r0adkll.chipper.command.SHUFFLE";
-    public static final String ACTION_REPEAT = "com.r0adkll.chipper.command.REPEAT";
+    public static final String COMMAND_ENABLE_NOTIFICATION = "com.r0adkll.chipper.command.ENABLE_NOTIFICATION";
+    public static final String COMMAND_DISABLE_NOTIFICATION = "com.r0adkll.chipper.command.DISABLE_NOTIFICATION";
+    public static final String COMMAND_SHOW_NOTIFICATION = "com.r0adkll.chipper.command.SHOW_NOTIFICATION";
+    public static final String COMMAND_SHUFFLE = "com.r0adkll.chipper.command.SHUFFLE";
+    public static final String COMMAND_REPEAT = "com.r0adkll.chipper.command.REPEAT";
+
+    public static final String EVENT_PLAY_PROGRESS_UPDATED = "com.r0adkll.chipper.event.PROGRESS_CHANGE";
 
     public static final String EXTRA_CHIPTUNE = "com.r0adkll.chipper.extra.CHIPTUNE";
     public static final String EXTRA_PLAYLIST = "com.r0adkll.chipper.extra.PLAYLIST";
     public static final String EXTRA_SHUFFLE = "com.r0adkll.chipper.extra.SHUFFLE";
     public static final String EXTRA_REPEAT = "com.r0adkll.chipper.extra.REPEAT";
+    public static final String EXTRA_CURRENT_POSITION = "com.r0adkll.chipper.extra.CURRENT_POSITION";
+    public static final String EXTRA_TOTAL_DURATION = "com.r0adkll.chipper.extra.TOTAL_DURATION";
+
+    public static final String METADATA_KEY_FAVORITED = "com.r0adkll.chipper.metadata.FAVORITED";
 
     private static final float DUCK_VOLUME_LEVEL = 0.25f;
     private static final int PREVIOUS_TIME_CUTOFF = 5 * 1000; // 5 seconds
@@ -94,6 +101,7 @@ public class MusicService extends Service {
 
     @Inject AudioManager mAudioManager;
     @Inject NotificationManagerCompat mNotificationManager;
+    @Inject PlaylistManager mPlaylistManager;
     @Inject VoteManager mVoteManager;
     @Inject ChiptuneProvider mProvider;
     @Inject CashMachine mATM;
@@ -347,10 +355,15 @@ public class MusicService extends Service {
     }
 
     /**
-     * Send the proprietary event to the MediaSession Controllers and
-     * listeners
+     * Send an event to let the controllers know to update their UI with updated playback state
+     * and metadata information already available in their system
      */
-    private void publishPlaybackProgress(){
+    private void publishPlayProgress(){
+
+        Bundle extras = new Bundle();
+        extras.putInt(EXTRA_CURRENT_POSITION, mPlayer.getCurrentPosition());
+        extras.putInt(EXTRA_TOTAL_DURATION, mPlayer.getTotalDuration());
+        mCurrentSession.sendSessionEvent(EVENT_PLAY_PROGRESS_UPDATED, extras);
 
     }
 
@@ -379,6 +392,7 @@ public class MusicService extends Service {
 
             // Update media session state to buffering
             mCurrentSession.setPlaybackState(buildPlaybackState(PlaybackStateCompat.STATE_BUFFERING));
+            mCurrentSession.setMetadata(buildMetaData());
 
             // Get teh current chiptune from the queue to play
             Chiptune chiptune = mQueue.current(mCurrentState);
@@ -394,7 +408,6 @@ public class MusicService extends Service {
 
                     // Update playback state and metadata
                     mCurrentSession.setPlaybackState(buildPlaybackState(PlaybackStateCompat.STATE_PLAYING));
-                    mCurrentSession.setMetadata(buildMetaData());
 
                     // Update Notification
                     showNotification();
@@ -424,6 +437,7 @@ public class MusicService extends Service {
                         mAudioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
 
                         // Publish State
+                        mCurrentSession.setPlaybackState(buildPlaybackState(PlaybackStateCompat.STATE_STOPPED));
 
                     }
 
@@ -493,7 +507,8 @@ public class MusicService extends Service {
             metaBuilder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, chiptune.artist)
                        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, chiptune.title)
                        .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, chiptune.length)
-                       .putRating(MediaMetadataCompat.METADATA_KEY_RATING, rating);
+                       .putRating(MediaMetadataCompat.METADATA_KEY_USER_RATING, rating)
+                       .putString(METADATA_KEY_FAVORITED, String.valueOf(mPlaylistManager.isFavorited(chiptune)));
 
         }
 
@@ -536,6 +551,13 @@ public class MusicService extends Service {
             String title = current.title;
             String text = current.artist;
 
+            // Build Content and Delete PendingIntents
+            Intent deleteIntent = new Intent(ACTION_EXIT);
+            PendingIntent deletePI = PendingIntent.getBroadcast(this, 0, deleteIntent, 0);
+
+            Intent contentIntent = new Intent(this, Chipper.class);
+            PendingIntent contentPI = PendingIntent.getActivity(this, 0, contentIntent, 0);
+
             if(!Utils.isLollipop()) {
 
                 // Build the notification
@@ -545,6 +567,8 @@ public class MusicService extends Service {
                         .setVisibility(Notification.VISIBILITY_PUBLIC)
                         .setContentTitle(title)
                         .setContentText(text)
+                        .setContentIntent(contentPI)
+                        .setDeleteIntent(deletePI)
                         .setOngoing(mPlayer.isPlaying());
 
                 // Build actions/intents
@@ -579,13 +603,15 @@ public class MusicService extends Service {
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                         .setContentTitle(title)
                         .setContentText(text)
+                        .setContentIntent(contentPI)
+                        .setDeleteIntent(deletePI)
                         .setOngoing(mPlayer.isPlaying());
 
                 // Build actions/intents
-                Action play = buildAction(R.drawable.ic_action_notif_play, R.string.action_play, ACTION_PLAY);
-                Action pause = buildAction(R.drawable.ic_action_notif_pause, R.string.action_pause, ACTION_PAUSE);
-                Action next = buildAction(R.drawable.ic_action_notif_next, R.string.action_next, ACTION_NEXT);
-                Action previous = buildAction(R.drawable.ic_action_notif_previous, R.string.action_previous, ACTION_PREV);
+                Action play = buildAction(R.drawable.ic_action_play, R.string.action_play, ACTION_PLAY);
+                Action pause = buildAction(R.drawable.ic_action_pause, R.string.action_pause, ACTION_PAUSE);
+                Action next = buildAction(R.drawable.ic_action_skip_next, R.string.action_next, ACTION_NEXT);
+                Action previous = buildAction(R.drawable.ic_action_skip_previous, R.string.action_previous, ACTION_PREV);
 
                 // Build teh actions
                 builder.addAction(previous)
@@ -687,23 +713,23 @@ public class MusicService extends Service {
                 case ACTION_EXIT:
                     shutdown();
                     break;
-                case ACTION_DISABLE_NOTIFICATION:
+                case COMMAND_DISABLE_NOTIFICATION:
                     mCanShowNotification = false;
                     dismissNotification();
                     break;
-                case ACTION_ENABLE_NOTIFICATION:
+                case COMMAND_ENABLE_NOTIFICATION:
                     mCanShowNotification = true;
                     break;
-                case ACTION_SHOW_NOTIFICATION:
+                case COMMAND_SHOW_NOTIFICATION:
                     mCanShowNotification = true;
                     showNotification();
                     break;
-                case ACTION_SHUFFLE:
+                case COMMAND_SHUFFLE:
                     // Get shuffle value from data
                     boolean shuffle = extras.getBoolean(EXTRA_SHUFFLE, false);
                     shuffle(shuffle);
                     break;
-                case ACTION_REPEAT:
+                case COMMAND_REPEAT:
                     int repeat = extras.getInt(EXTRA_REPEAT, SessionState.MODE_NONE);
                     repeat(repeat);
                     break;

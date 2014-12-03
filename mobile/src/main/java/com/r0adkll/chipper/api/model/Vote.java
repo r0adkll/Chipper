@@ -18,6 +18,10 @@ public class Vote extends Model implements Parcelable{
     public static final String TYPE_UP = "up";
     public static final String TYPE_DOWN = "down";
 
+    public static final int UP = 1;
+    public static final int DOWN = -1;
+    public static final int NONE = 0;
+
     @Column(name = "vote_id")
     public String id;
 

@@ -1,6 +1,7 @@
 package com.r0adkll.chipper.ui.player;
 
 
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.media.MediaMetadataCompat;
@@ -17,17 +18,23 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.api.model.Vote;
 import com.r0adkll.chipper.playback.events.MediaSessionEvent;
+import com.r0adkll.chipper.playback.events.PlayQueueEvent;
+import com.r0adkll.chipper.playback.model.SessionState;
 import com.r0adkll.chipper.ui.model.BaseFragment;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+
+import java.text.DecimalFormat;
 
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import timber.log.Timber;
 
 /**
  * Created by r0adkll on 11/30/14.
@@ -39,6 +46,9 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
      * <p/>
      * Variables
      */
+
+    private final DecimalFormat minFormat = new DecimalFormat("#0");
+    private final DecimalFormat secFormat = new DecimalFormat("00");
 
     @Inject
     MusicPlayerPresenter presenter;
@@ -82,8 +92,6 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-
     }
 
     @Nullable
@@ -117,11 +125,6 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
         return new Object[]{
                 new MusicPlayerModule(this)
         };
-    }
-
-    @Override
-    public MediaControllerCompat getMediaController() {
-        return mController;
     }
 
     /***********************************************************************************************
@@ -195,21 +198,22 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
         @Override
         public void onSessionDestroyed() {
             // TODO: Reset views
+            mSlidingLayout.hidePanel();
         }
 
         @Override
         public void onSessionEvent(String event, Bundle extras) {
-
+            presenter.onSessionEvent(event, extras);
         }
 
         @Override
         public void onPlaybackStateChanged(PlaybackStateCompat state) {
-
+            presenter.onPlaybackStateChanged(state);
         }
 
         @Override
         public void onMetadataChanged(MediaMetadataCompat metadata) {
-
+            presenter.onMetadataChanged(metadata);
         }
     };
 
@@ -220,10 +224,157 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
      */
 
     @Subscribe
-    public void answerMediaSession(MediaSessionEvent event){
+    public void answerMediaSessionEvent(MediaSessionEvent event){
         mSession = event.session;
         mController = new MediaControllerCompat(getActivity(), mSession);
         mController.registerCallback(mControllerCallbacks);
+        Timber.i("Media Session Received, Initializing Controller callbacks");
     }
 
+    @Subscribe
+    public void answerPlayQueueEvent(PlayQueueEvent event){
+        // Update UI accordingly
+
+    }
+
+    /***********************************************************************************************
+     *
+     * View Methods
+     *
+     */
+
+    @Override
+    public MediaControllerCompat getMediaController() {
+        return mController;
+    }
+
+    @Override
+    public void setPlaybackProgress(int progress, int total) {
+        if(total == 0 && progress == 0){
+            mBufferBar.setVisibility(View.VISIBLE);
+            mBufferBar.setIndeterminate(true);
+
+            mScrubber.setEnabled(true);
+            mScrubber.setIndeterminate(true);
+        }else if(total == -1 && progress == -1){
+            mBufferBar.setVisibility(View.GONE);
+            mScrubber.setEnabled(false);
+        }else{
+            mBufferBar.setVisibility(View.VISIBLE);
+            mBufferBar.setIndeterminate(false);
+            mBufferBar.setProgress(progress);
+            mBufferBar.setMax(total);
+
+            mScrubber.setEnabled(true);
+            mScrubber.setIndeterminate(false);
+            mScrubber.setProgress(progress);
+            mScrubber.setMax(total);
+
+            // Update play progress text fields
+            int secProg = (progress / 1000);
+            int minProg = secProg / 60;
+
+            int secTotal = (total / 1000);
+            int minTotal = secTotal / 60;
+
+            mTimeProgress.setText(minFormat.format(minProg) + ":" + secFormat.format(secProg % 60));
+            mTimeTotal.setText(minFormat.format(minTotal) + ":" + secFormat.format(secTotal % 60));
+        }
+    }
+
+    @Override
+    public void setTitle(String title) {
+        mTitle.setText(title);
+    }
+
+    @Override
+    public void setArtist(String artist) {
+        mDescription.setText(artist);
+    }
+
+    @Override
+    public void setIsPlaying(boolean value) {
+        if(value){
+            mPlayPause.setImageResource(R.drawable.ic_action_pause);
+            mMasterPlayPause.setImageResource(R.drawable.ic_action_pause);
+        }else{
+            mPlayPause.setImageResource(R.drawable.ic_action_play);
+            mMasterPlayPause.setImageResource(R.drawable.ic_action_play);
+        }
+    }
+
+    @Override
+    public void setShuffle(boolean value) {
+        if(value){
+            mShuffle.setColorFilter(getResources().getColor(R.color.primary));
+        }else{
+            mShuffle.clearColorFilter();
+        }
+    }
+
+    @Override
+    public void setRepeat(int mode) {
+        switch (mode){
+            case SessionState.MODE_ONE:
+                mRepeat.setImageResource(R.drawable.ic_action_repeat_one);
+                mRepeat.setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.SRC_IN);
+                break;
+            case SessionState.MODE_ALL:
+                mRepeat.setImageResource(R.drawable.ic_action_repeat);
+                mRepeat.setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.SRC_IN);
+                break;
+            case SessionState.MODE_NONE:
+                mRepeat.setImageResource(R.drawable.ic_action_repeat);
+                mRepeat.clearColorFilter();
+                break;
+        }
+    }
+
+    @Override
+    public void setRating(int rating) {
+        int accentColor = getResources().getColor(R.color.primary);
+        switch (rating){
+            case Vote.NONE:
+                mUpvote.clearColorFilter();
+                mDownvote.clearColorFilter();
+                break;
+            case Vote.UP:
+                mUpvote.setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
+                mDownvote.clearColorFilter();
+                break;
+            case Vote.DOWN:
+                mUpvote.clearColorFilter();
+                mDownvote.setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
+                break;
+        }
+    }
+
+    @Override
+    public void setFavorited(boolean value) {
+        if(value){
+            mFavorite.setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.SRC_IN);
+        }else{
+            mFavorite.clearColorFilter();
+        }
+    }
+
+    @Override
+    public void disableControls() {
+        mPlayPause.setEnabled(false);
+        mNext.setEnabled(false);
+        mPrevious.setEnabled(false);
+        mMasterPlayPause.setEnabled(false);
+        mMasterNext.setEnabled(false);
+        mMasterPrevious.setEnabled(false);
+    }
+
+    @Override
+    public void enableControls() {
+        mPlayPause.setEnabled(true);
+        mNext.setEnabled(true);
+        mPrevious.setEnabled(true);
+        mMasterPlayPause.setEnabled(true);
+        mMasterNext.setEnabled(true);
+        mMasterPrevious.setEnabled(true);
+    }
 }

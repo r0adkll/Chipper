@@ -2,6 +2,8 @@ package com.r0adkll.chipper.ui.player;
 
 import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.VoteManager;
+import com.r0adkll.chipper.prefs.IntPreference;
+import com.r0adkll.chipper.qualifiers.SessionRepeatPreference;
 import com.r0adkll.chipper.ui.UIModule;
 
 import javax.inject.Singleton;
@@ -34,8 +36,9 @@ public class MusicPlayerModule {
     @Provides @Singleton
     MusicPlayerPresenter providePresenter(MusicPlayerView view,
                                           PlaylistManager playlistManager,
-                                          VoteManager voteManager){
-        return new MusicPlayerPresenterImpl(view, playlistManager, voteManager);
+                                          VoteManager voteManager,
+                                          @SessionRepeatPreference IntPreference repeatPref){
+        return new MusicPlayerPresenterImpl(view, playlistManager, voteManager, repeatPref);
     }
 
 }

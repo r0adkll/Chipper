@@ -65,4 +65,8 @@ public interface MusicPlayerView {
     public void disableControls();
 
     public void enableControls();
+
+    public void showSnackBar(String message);
+
+    public void showSnackBar(String format, Object... args);
 }

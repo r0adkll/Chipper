@@ -24,7 +24,7 @@ import dagger.Provides;
  */
 @Module(
     injects = {
-        ChipperModule.class
+        MusicService.class
     },
     complete = false,
     library = true

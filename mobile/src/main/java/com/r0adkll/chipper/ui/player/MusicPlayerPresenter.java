@@ -4,6 +4,10 @@ import android.os.Bundle;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
+import com.r0adkll.chipper.playback.events.PlayProgressEvent;
+import com.r0adkll.chipper.playback.events.PlayQueueEvent;
+import com.r0adkll.chipper.playback.model.PlayQueue;
+
 /**
  * Created by r0adkll on 12/1/14.
  */
@@ -19,6 +23,8 @@ public interface MusicPlayerPresenter {
 
     public void repeat();
 
+    public void seek(long position);
+
     public void upvote();
 
     public void downvote();
@@ -27,7 +33,9 @@ public interface MusicPlayerPresenter {
 
     public void add();
 
+    public void onPlayProgressEvent(PlayProgressEvent event);
 
+    public void onPlayQueueEvent(PlayQueueEvent queue);
 
     public void onSessionEvent(String event, Bundle extras);
 

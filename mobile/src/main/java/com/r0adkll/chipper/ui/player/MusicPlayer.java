@@ -1,6 +1,8 @@
 package com.r0adkll.chipper.ui.player;
 
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,9 +19,14 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.nispok.snackbar.Snackbar;
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.Playlist;
+import com.r0adkll.chipper.playback.MusicService;
 import com.r0adkll.chipper.api.model.Vote;
 import com.r0adkll.chipper.playback.events.MediaSessionEvent;
+import com.r0adkll.chipper.playback.events.PlayProgressEvent;
 import com.r0adkll.chipper.playback.events.PlayQueueEvent;
 import com.r0adkll.chipper.playback.model.SessionState;
 import com.r0adkll.chipper.ui.model.BaseFragment;
@@ -41,10 +48,59 @@ import timber.log.Timber;
  */
 public class MusicPlayer extends BaseFragment implements MusicPlayerView {
 
+    /**********************************************************************************************
+     *
+     * Static Methods
+     *
+     */
+
     /**
-     * ********************************************************************************************
-     * <p/>
+     * Create a playback intent that will start playing a chiptune on the master list of chiptunes
+     * (aka all of them)
+     *
+     * @param ctx           the context reference
+     * @param chiptune      the chiptune to play
+     * @return              the intent to send to the service
+     */
+    public static Intent createPlayback(Context ctx, Chiptune chiptune){
+        Intent intent = new Intent(ctx, MusicService.class);
+        intent.setAction(MusicService.INTENT_ACTION_PLAY);
+        intent.putExtra(MusicService.EXTRA_CHIPTUNE, chiptune);
+        return intent;
+    }
+
+    /**
+     * Create a playback intent to send to the MusicService to start playback
+     *
+     * @param ctx           the context reference
+     * @param chiptune      the chiptune to play
+     * @param playlist      the playlist the chiptune belongs to
+     * @return              the intent to send to the service
+     */
+    public static Intent createPlayback(Context ctx, Chiptune chiptune, Playlist playlist){
+        Intent intent = new Intent(ctx, MusicService.class);
+        intent.setAction(MusicService.INTENT_ACTION_PLAY);
+        intent.putExtra(MusicService.EXTRA_CHIPTUNE, chiptune);
+        intent.putExtra(MusicService.EXTRA_PLAYLIST, playlist);
+        return intent;
+    }
+
+    /**
+     * Create an intent to start the coldstart shuffle play
+     *
+     * @param ctx       the context reference
+     * @return          the intent to send to the service
+     */
+    public static Intent createShufflePlayback(Context ctx){
+        Intent intent = new Intent(ctx, MusicService.class);
+        intent.setAction(MusicService.INTENT_ACTION_COLDSTART);
+        return intent;
+    }
+
+    /**********************************************************************************************
+     *
      * Variables
+     *
      */
 
     private final DecimalFormat minFormat = new DecimalFormat("#0");
@@ -82,6 +138,7 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
     private MediaSessionCompat mSession;
     private MediaControllerCompat mController;
     private SlidingUpPanelLayout mSlidingLayout;
+    private MusicPlayerCallbacks mCallbacks;
 
     /**********************************************************************************************
      *
@@ -92,6 +149,10 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        // Set the scrubber listener
+        mScrubber.setOnSeekBarChangeListener(mSeekBarChangeListener);
+
     }
 
     @Nullable
@@ -132,6 +193,15 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
      * Helper Methods
      *
      */
+
+    /**
+     * Set the music player callbacks to receive pertinent changes
+     * to the music player
+     * @param callbacks
+     */
+    public void setCallbacks(MusicPlayerCallbacks callbacks){
+        mCallbacks = callbacks;
+    }
 
     /**
      * Setup the sliding layout that this player is contained in
@@ -197,8 +267,7 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
     private MediaControllerCompat.Callback mControllerCallbacks = new MediaControllerCompat.Callback() {
         @Override
         public void onSessionDestroyed() {
-            // TODO: Reset views
-            mSlidingLayout.hidePanel();
+            if(mCallbacks != null) mCallbacks.onStopped();
         }
 
         @Override
@@ -215,6 +284,19 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
         public void onMetadataChanged(MediaMetadataCompat metadata) {
             presenter.onMetadataChanged(metadata);
         }
+    };
+
+    /**
+     * SeekBar change listener
+     */
+    private SeekBar.OnSeekBarChangeListener mSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            if(fromUser) presenter.seek(progress);
+        }
+
+        @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+        @Override public void onStopTrackingTouch(SeekBar seekBar) {}
     };
 
     /***********************************************************************************************
@@ -234,7 +316,13 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
     @Subscribe
     public void answerPlayQueueEvent(PlayQueueEvent event){
         // Update UI accordingly
+        presenter.onPlayQueueEvent(event);
+        if(mCallbacks != null) mCallbacks.onStarted();
+    }
 
+    @Subscribe
+    public void answerPlayProgressEvent(PlayProgressEvent event){
+        presenter.onPlayProgressEvent(event);
     }
 
     /***********************************************************************************************
@@ -306,7 +394,7 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
     @Override
     public void setShuffle(boolean value) {
         if(value){
-            mShuffle.setColorFilter(getResources().getColor(R.color.primary));
+            mShuffle.setColorFilter(getResources().getColor(R.color.primaryDark));
         }else{
             mShuffle.clearColorFilter();
         }
@@ -317,11 +405,11 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
         switch (mode){
             case SessionState.MODE_ONE:
                 mRepeat.setImageResource(R.drawable.ic_action_repeat_one);
-                mRepeat.setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.SRC_IN);
+                mRepeat.setColorFilter(getResources().getColor(R.color.primaryDark), PorterDuff.Mode.SRC_IN);
                 break;
             case SessionState.MODE_ALL:
                 mRepeat.setImageResource(R.drawable.ic_action_repeat);
-                mRepeat.setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.SRC_IN);
+                mRepeat.setColorFilter(getResources().getColor(R.color.primaryDark), PorterDuff.Mode.SRC_IN);
                 break;
             case SessionState.MODE_NONE:
                 mRepeat.setImageResource(R.drawable.ic_action_repeat);
@@ -332,7 +420,7 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
 
     @Override
     public void setRating(int rating) {
-        int accentColor = getResources().getColor(R.color.primary);
+        int accentColor = getResources().getColor(R.color.primaryDark);
         switch (rating){
             case Vote.NONE:
                 mUpvote.clearColorFilter();
@@ -352,7 +440,7 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
     @Override
     public void setFavorited(boolean value) {
         if(value){
-            mFavorite.setColorFilter(getResources().getColor(R.color.primary), PorterDuff.Mode.SRC_IN);
+            mFavorite.setColorFilter(getResources().getColor(R.color.primaryDark), PorterDuff.Mode.SRC_IN);
         }else{
             mFavorite.clearColorFilter();
         }
@@ -376,5 +464,18 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
         mMasterPlayPause.setEnabled(true);
         mMasterNext.setEnabled(true);
         mMasterPrevious.setEnabled(true);
+    }
+
+    @Override
+    public void showSnackBar(String message) {
+        Snackbar.with(getActivity())
+                .text(message)
+                .duration(Snackbar.SnackbarDuration.LENGTH_SHORT)
+                .show(getActivity());
+    }
+
+    @Override
+    public void showSnackBar(String format, Object... args) {
+        showSnackBar(String.format(format, args));
     }
 }

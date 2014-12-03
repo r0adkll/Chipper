@@ -6,14 +6,23 @@ import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
+import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.Vote;
 import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.VoteManager;
 import com.r0adkll.chipper.playback.MusicService;
+import com.r0adkll.chipper.playback.events.PlayProgressEvent;
+import com.r0adkll.chipper.playback.events.PlayQueueEvent;
+import com.r0adkll.chipper.playback.model.PlayQueue;
 import com.r0adkll.chipper.playback.model.SessionState;
 import com.r0adkll.chipper.prefs.BooleanPreference;
 import com.r0adkll.chipper.prefs.IntPreference;
 import com.r0adkll.chipper.qualifiers.SessionRepeatPreference;
+import com.r0adkll.chipper.utils.CallbackHandler;
+
+import hugo.weaving.DebugLog;
+import timber.log.Timber;
 
 import static android.support.v4.media.session.PlaybackStateCompat.*;
 import static android.support.v4.media.MediaMetadataCompat.*;
@@ -32,6 +41,8 @@ public class MusicPlayerPresenterImpl implements MusicPlayerPresenter {
     private MusicPlayerView mView;
     private PlaylistManager mPlaylistManager;
     private VoteManager mVoteManager;
+    private PlayQueue mQueue;
+    private SessionState mState;
 
     private IntPreference mRepeatPreference;
     private BooleanPreference mShufflePreference;
@@ -69,7 +80,12 @@ public class MusicPlayerPresenterImpl implements MusicPlayerPresenter {
     public void playPause() {
         MediaControllerCompat controller = mView.getMediaController();
         if(controller != null){
-
+            int state = controller.getPlaybackState().getState();
+            if(state == PlaybackStateCompat.STATE_PLAYING){
+                controller.getTransportControls().pause();
+            }else if(state == PlaybackStateCompat.STATE_PAUSED){
+                controller.getTransportControls().play();
+            }
         }
     }
 
@@ -106,36 +122,126 @@ public class MusicPlayerPresenterImpl implements MusicPlayerPresenter {
     }
 
     @Override
-    public void upvote() {
+    public void seek(long position) {
         MediaControllerCompat controller = mView.getMediaController();
         if(controller != null){
+            controller.getTransportControls().seekTo(position);
+        }
+    }
+
+    @Override
+    public void upvote() {
+        if(mQueue != null && mState != null){
+            final Chiptune current = mQueue.current(mState);
+
+            mVoteManager.upvote(current, new CallbackHandler() {
+                @Override
+                public void onHandle(Object value) {
+                    mView.setRating(Vote.UP);
+                }
+
+                @Override
+                public void onFailure(String msg) {
+                    // TODO: Display error to UI
+                    Timber.e("Unable to upvote %s", current.title);
+                    mView.showSnackBar(msg);
+                }
+            });
 
         }
     }
 
     @Override
     public void downvote() {
-        MediaControllerCompat controller = mView.getMediaController();
-        if(controller != null){
+        if(mQueue != null && mState != null){
+            final Chiptune current = mQueue.current(mState);
 
+            mVoteManager.downvote(current, new CallbackHandler() {
+                @Override
+                public void onHandle(Object value) {
+                    mView.setRating(Vote.DOWN);
+                }
+
+                @Override
+                public void onFailure(String msg) {
+                    // TODO: Display error to UI
+                    Timber.e("Unable to downvote %s : %s", current.title, msg);
+                    mView.showSnackBar(msg);
+                }
+            });
         }
     }
 
     @Override
     public void favorite() {
+        if(mQueue != null && mState != null){
+            Chiptune current = mQueue.current(mState);
 
+            if(!mPlaylistManager.isFavorited(current)) {
+                mPlaylistManager.addToFavorites(current);
+                mView.setFavorited(true);
+            }else{
+                mPlaylistManager.getFavorites().remove(current);
+                mView.setFavorited(false);
+            }
+        }
     }
 
     @Override
     public void add() {
+        if(mQueue != null && mState != null){
+            final Chiptune current = mQueue.current(mState);
+            mPlaylistManager.addToPlaylist(mView.getActivity(), new CallbackHandler<Playlist>() {
+                @Override
+                public void onHandle(Playlist value) {
+                    // Chiptune added to playlist, TODO: notify UI
+                    mView.showSnackBar("%s added to %s", current.title, value.name);
+                }
 
+                @Override
+                public void onFailure(String msg) {
+                    // Chiptune failed to be added to playlist, TODO: notify UI
+                    if(msg != null){
+                        mView.showSnackBar(msg);
+                    }
+                }
+            }, current);
+        }
+    }
+
+    @Override
+    public void onPlayProgressEvent(PlayProgressEvent event) {
+        mView.setPlaybackProgress(event.position, event.duration);
+    }
+
+    @DebugLog
+    @Override
+    public void onPlayQueueEvent(PlayQueueEvent event) {
+        mQueue = event.queue;
+        mState = event.state;
+
+        // Update accordingly
+        mView.setShuffle(mState.isShuffleEnabled());
+        mView.setRepeat(mState.getRepeatMode());
     }
 
     @Override
     public void onSessionEvent(String event, Bundle extras) {
-
+//        switch (event){
+//            case MusicService.EVENT_PLAY_PROGRESS_UPDATED:
+//
+//                int position = extras.getInt(MusicService.EXTRA_CURRENT_POSITION);
+//                int duration = extras.getInt(MusicService.EXTRA_TOTAL_DURATION);
+//
+//                Timber.i("Play Progress Event: %d - %d", position, duration);
+//
+//                // Update ui
+//                mView.setPlaybackProgress(position, duration);
+//                break;
+//        }
     }
 
+    @DebugLog
     @Override
     public void onPlaybackStateChanged(PlaybackStateCompat state) {
         // Update UI accordingly
@@ -162,6 +268,7 @@ public class MusicPlayerPresenterImpl implements MusicPlayerPresenter {
         }
     }
 
+    @DebugLog
     @Override
     public void onMetadataChanged(MediaMetadataCompat metadata) {
 

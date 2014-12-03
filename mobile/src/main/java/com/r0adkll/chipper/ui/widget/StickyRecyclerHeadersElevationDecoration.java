@@ -141,7 +141,6 @@ public class StickyRecyclerHeadersElevationDecoration extends RecyclerView.ItemD
                     ImageView shadow = ButterKnife.findById(header, R.id.shadow);
                     shadow.setVisibility(View.GONE);
 
-
                     canvas.save();
                     canvas.translate(translationX, translationY);
                     header.draw(canvas);

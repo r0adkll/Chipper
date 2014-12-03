@@ -1,9 +1,13 @@
 package com.r0adkll.chipper.ui.all;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -20,11 +24,14 @@ import android.widget.ImageView;
 import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
 import com.fortysevendeg.swipelistview.SwipeListView;
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.playback.MusicService;
 import com.r0adkll.chipper.ui.adapters.AllChiptuneAdapter;
 import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
 import com.r0adkll.chipper.ui.adapters.RecyclerArrayAdapter;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
+import com.r0adkll.chipper.ui.player.MusicPlayer;
+import com.r0adkll.chipper.ui.player.MusicPlayerCallbacks;
 import com.r0adkll.chipper.ui.widget.StickyRecyclerHeadersElevationDecoration;
 import com.r0adkll.deadskunk.utils.Utils;
 import com.r0adkll.postoffice.PostOffice;
@@ -41,7 +48,7 @@ import butterknife.InjectView;
  * Created by r0adkll on 11/12/14.
  */
 public class ChiptunesActivity extends BaseDrawerActivity
-        implements ChiptunesView, OnItemClickListener<Chiptune>,RecyclerArrayAdapter.OnItemOptionSelectedListener<Chiptune> {
+        implements ChiptunesView, OnItemClickListener<Chiptune>,RecyclerArrayAdapter.OnItemOptionSelectedListener<Chiptune>,MusicPlayerCallbacks {
 
     /***********************************************************************************************
      *
@@ -78,6 +85,9 @@ public class ChiptunesActivity extends BaseDrawerActivity
 
         // Setuyp the FAB
         setupFAB();
+
+        // Setup the music player callbacks
+        getPlayer().setCallbacks(this);
 
         // Setup the adapter with the recycler view
         mChiptuneRecycler.setAdapter(mAdapter);
@@ -166,7 +176,10 @@ public class ChiptunesActivity extends BaseDrawerActivity
     private View.OnClickListener mFABClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            // Start playing a random tune on shuffle
+
+            // Prepare intent to start playback
+            Intent playback = MusicPlayer.createShufflePlayback(getActivity());
+            startService(playback);
 
         }
     };
@@ -228,5 +241,44 @@ public class ChiptunesActivity extends BaseDrawerActivity
         PostOffice.newMail(this)
                 .setMessage(msg)
                 .show(getSupportFragmentManager());
+    }
+
+    @Override
+    public void onStarted() {
+        if(getSlidingLayout().isPanelHidden()) {
+            // Start playing a random tune on shuffle
+            ObjectAnimator anim = ObjectAnimator.ofFloat(mFABShufflePlay, "alpha", 1, 0)
+                    .setDuration(300);
+
+            anim.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mFABShufflePlay.setVisibility(View.GONE);
+                }
+            });
+
+            anim.start();
+            getSlidingLayout().showPanel();
+        }
+    }
+
+    @Override
+    public void onStopped() {
+        if(!getSlidingLayout().isPanelHidden()) {
+            // Animate the FAB back onto screen
+            // Start playing a random tune on shuffle
+            ObjectAnimator anim = ObjectAnimator.ofFloat(mFABShufflePlay, "alpha", 0, 1)
+                    .setDuration(300);
+
+            anim.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    mFABShufflePlay.setVisibility(View.VISIBLE);
+                }
+            });
+
+            anim.start();
+            getSlidingLayout().hidePanel();
+        }
     }
 }

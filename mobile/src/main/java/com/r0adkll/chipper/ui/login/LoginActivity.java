@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.GoogleAuthException;
@@ -27,6 +28,7 @@ import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.qualifiers.GenericPrefs;
 import com.r0adkll.chipper.utils.CallbackHandler;
 import com.r0adkll.chipper.ui.model.BaseActivity;
+import com.r0adkll.deadskunk.utils.Utils;
 import com.r0adkll.postoffice.PostOffice;
 
 import java.io.IOException;
@@ -98,6 +100,11 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
         mSignIn.setOnClickListener(this);
         mTempAccount.setOnClickListener(this);
         mSignIn.setSize(SignInButton.SIZE_WIDE);
+
+        // Set Translucent decor
+        if(Utils.isKitKat()){
+
+        }
 
     }
 

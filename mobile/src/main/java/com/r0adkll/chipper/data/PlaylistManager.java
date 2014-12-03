@@ -125,7 +125,7 @@ public class PlaylistManager  {
      * @param activity      the activity to launch from
      * @param chiptunes     the chiptunes to potentially add
      */
-    public void addToPlaylist(final Activity activity, final CallbackHandler cb, final Chiptune... chiptunes){
+    public void addToPlaylist(final Activity activity, final CallbackHandler<Playlist> cb, final Chiptune... chiptunes){
 
         // Show playlist selection dialog
         PlaylistStyle style = new PlaylistStyle(activity, mCurrentUser)
@@ -153,7 +153,7 @@ public class PlaylistManager  {
                                                 Playlist playlist = createPlaylist(s);
                                                 if(playlist != null) {
                                                     playlist.add(chiptunes);
-                                                    cb.onHandle(null);
+                                                    cb.onHandle(playlist);
                                                 }else{
                                                     cb.onFailure("Unable to create playlist");
                                                 }

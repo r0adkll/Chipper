@@ -11,6 +11,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.Optional;
 import dagger.ObjectGraph;
 
 /**
@@ -23,6 +24,7 @@ import dagger.ObjectGraph;
  */
 public abstract class BaseActivity extends ActionBarActivity {
 
+    @Optional
     @InjectView(R.id.sliding_layout)
     SlidingUpPanelLayout mSlidingLayout;
 
@@ -43,7 +45,7 @@ public abstract class BaseActivity extends ActionBarActivity {
         getActionBarToolbar();
         ButterKnife.inject(this);
         player = (MusicPlayer) getFragmentManager().findFragmentById(R.id.music_player);
-        player.setSlidingLayout(mSlidingLayout);
+        if(player != null) player.setSlidingLayout(mSlidingLayout);
     }
 
     @Override

@@ -13,6 +13,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.ResultReceiver;
 import android.support.v4.app.NotificationCompat;
@@ -33,6 +34,8 @@ import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.VoteManager;
 import com.r0adkll.chipper.playback.events.MediaSessionEvent;
+import com.r0adkll.chipper.playback.events.PlayProgressEvent;
+import com.r0adkll.chipper.playback.events.PlayQueueEvent;
 import com.r0adkll.chipper.playback.model.AudioSession;
 import com.r0adkll.chipper.playback.model.PlayQueue;
 import com.r0adkll.chipper.playback.model.SessionState;
@@ -41,12 +44,16 @@ import com.r0adkll.chipper.prefs.IntPreference;
 import com.r0adkll.chipper.qualifiers.SessionRepeatPreference;
 import com.r0adkll.chipper.qualifiers.SessionShufflePreference;
 import com.r0adkll.chipper.ui.Chipper;
+import com.r0adkll.chipper.utils.CallbackHandler;
 import com.r0adkll.deadskunk.utils.Utils;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Produce;
 
+import java.util.concurrent.ConcurrentLinkedDeque;
+
 import javax.inject.Inject;
 
+import hugo.weaving.DebugLog;
 import timber.log.Timber;
 
 /**
@@ -61,6 +68,9 @@ public class MusicService extends Service {
      */
 
     public static final String MEDIA_SESSION_TAG = "Chipper Session";
+
+    public static final String INTENT_ACTION_PLAY = "com.r0adkll.chipper.intent.action.START_PLAYBACK";
+    public static final String INTENT_ACTION_COLDSTART = "com.r0adkll.chipper.intent.action.COLDSTART_PLAYBACK";
 
     public static final String ACTION_PLAY = "com.r0adkll.chipper.intent.PLAY";
     public static final String ACTION_PAUSE = "com.r0adkll.chipper.intent.PAUSE";
@@ -111,6 +121,7 @@ public class MusicService extends Service {
     @Inject @SessionRepeatPreference IntPreference mRepeatPref;
     @Inject AudioPlayer mPlayer;
 
+    private final Handler mHandler = new Handler();
     private PlayQueue mQueue;
     private SessionState mCurrentState;
     private MediaSessionCompat mCurrentSession;
@@ -169,27 +180,37 @@ public class MusicService extends Service {
 
         // Handle intent
         if(intent != null) {
-            Bundle xtras = intent.getExtras();
-            if (xtras != null) {
+            switch (intent.getAction()) {
+                case INTENT_ACTION_PLAY:
+                    Bundle xtras = intent.getExtras();
+                    if (xtras != null) {
 
-                // Parse the Chiptune and Playlist(optional) from the extras
-                Chiptune chiptune = xtras.getParcelable(EXTRA_CHIPTUNE);
-                Playlist playlist = xtras.getParcelable(EXTRA_PLAYLIST);
+                        // Parse the Chiptune and Playlist(optional) from the extras
+                        Chiptune chiptune = xtras.getParcelable(EXTRA_CHIPTUNE);
+                        Playlist playlist = xtras.getParcelable(EXTRA_PLAYLIST);
 
-                // If a chiptune was found, determine if playlist was sent as well
-                if (chiptune != null) {
-                    if (playlist != null) {
-                        mQueue = new PlayQueue(mProvider, chiptune, playlist);
-                    } else {
-                        mQueue = new PlayQueue(mProvider, chiptune);
+                        // If a chiptune was found, determine if playlist was sent as well
+                        if (chiptune != null) {
+                            if (playlist != null) {
+                                mQueue = new PlayQueue(mProvider, chiptune, playlist);
+                            } else {
+                                mQueue = new PlayQueue(mProvider, chiptune);
+                            }
+
+                            // Set session as active
+                            mCurrentSession.setActive(true);
+
+                            // Post Session Queue change event
+                            mBus.post(new PlayQueueEvent(mQueue, mCurrentState));
+
+                            // Start playback
+                            startPlayback();
+                        }
                     }
-
-                    // Set session as active
-                    mCurrentSession.setActive(true);
-
-                    // Start playback
-                    startPlayback();
-                }
+                    break;
+                case INTENT_ACTION_COLDSTART:
+                    coldStartRandomPlayback();
+                    break;
             }
         }
 
@@ -241,9 +262,6 @@ public class MusicService extends Service {
 
         // Update Notification
         showNotification();
-
-        // Dispatch Otto Event
-
     }
 
     private void pause(){
@@ -253,11 +271,12 @@ public class MusicService extends Service {
 
         // Update Notification
         showNotification();
-
-        // Dispatch Otto event
-
     }
 
+    /**
+     * Play/Pause toggle function. If the player is setup and playing/paused it will toggle the
+     * play and pause states. Otherwise it will initiate a cold start random playback
+     */
     private void playPause(){
         if(mQueue != null){
             if(mPlayer.isPlaying()){
@@ -271,15 +290,16 @@ public class MusicService extends Service {
         }
     }
 
+    /**
+     * Stop the playback and release immediate resources
+     */
     private void stop(){
         mPlayer.stop();
         mPlayer.release();
         mCurrentSession.setPlaybackState(buildPlaybackState(PlaybackStateCompat.STATE_STOPPED));
-        mCurrentSession.setActive(false);
-
-        // Dispatch Otto Event
-
-
+        mCurrentSession.release();
+        mCurrentSession = null;
+        mHandler.removeCallbacks(mPlayProgressUpdater);
     }
 
     /**
@@ -289,6 +309,9 @@ public class MusicService extends Service {
         if(mQueue != null){
             mQueue.next(mCurrentState, true);
             startPlayback();
+
+            // Post Session Queue change event
+            mBus.post(new PlayQueueEvent(mQueue, mCurrentState));
         }
     }
 
@@ -309,10 +332,16 @@ public class MusicService extends Service {
                 }else{
                     mQueue.previous(mCurrentState);
                     startPlayback();
+
+                    // Post Session Queue change event
+                    mBus.post(new PlayQueueEvent(mQueue, mCurrentState));
                 }
             }else{
                 mQueue.previous(mCurrentState);
                 startPlayback();
+
+                // Post Session Queue change event
+                mBus.post(new PlayQueueEvent(mQueue, mCurrentState));
             }
 
         }
@@ -332,6 +361,9 @@ public class MusicService extends Service {
                 mQueue.shuffle();
             }
         }
+
+        // Post Session Queue change event
+        mBus.post(new PlayQueueEvent(mQueue, mCurrentState));
     }
 
     /**
@@ -344,6 +376,9 @@ public class MusicService extends Service {
      */
     private void repeat(int mode){
         mCurrentState.setRepeatMode(mode);
+
+        // Post Session Queue change event
+        mBus.post(new PlayQueueEvent(mQueue, mCurrentState));
     }
 
     /**
@@ -359,12 +394,10 @@ public class MusicService extends Service {
      * and metadata information already available in their system
      */
     private void publishPlayProgress(){
+        int position = mPlayer.getCurrentPosition();
+        int duration = mPlayer.getTotalDuration();
 
-        Bundle extras = new Bundle();
-        extras.putInt(EXTRA_CURRENT_POSITION, mPlayer.getCurrentPosition());
-        extras.putInt(EXTRA_TOTAL_DURATION, mPlayer.getTotalDuration());
-        mCurrentSession.sendSessionEvent(EVENT_PLAY_PROGRESS_UPDATED, extras);
-
+        mBus.post(new PlayProgressEvent(position, duration));
     }
 
     /***********************************************************************************************
@@ -412,6 +445,9 @@ public class MusicService extends Service {
                     // Update Notification
                     showNotification();
 
+                    // Execute Play progress update handler loop
+                    mHandler.postDelayed(mPlayProgressUpdater, 200);
+
                     // TODO: Update Widget
 
 
@@ -423,10 +459,16 @@ public class MusicService extends Service {
                     // Update Player State
                     mPlayer.setCurrentState(AudioPlayer.COMPLETED);
 
+                    // Kill Play Progress update handler
+                    mHandler.removeCallbacks(mPlayProgressUpdater);
+
                     // Attempt to get the next chiptune and play it
                     Chiptune next = mQueue.next(mCurrentState, false);
                     if(next != null){
                         startPlayback();
+
+                        // Post Session Queue change event
+                        mBus.post(new PlayQueueEvent(mQueue, mCurrentState));
                     }else{
                         stop();
 
@@ -529,6 +571,9 @@ public class MusicService extends Service {
 
         // Start playback of the current queue
         startPlayback();
+
+        // Post Session Queue change event
+        mBus.post(new PlayQueueEvent(mQueue, mCurrentState));
 
     }
 
@@ -688,6 +733,18 @@ public class MusicService extends Service {
         return null;
     }
 
+    /**
+     * Produce a play queue event if it exists
+     *
+     * @return      the play queue event
+     */
+    @Produce
+    public PlayQueueEvent producePlayQueueEvent(){
+        if(mQueue != null){
+            return new PlayQueueEvent(mQueue, mCurrentState);
+        }
+        return null;
+    }
 
     /***********************************************************************************************
      *
@@ -700,8 +757,10 @@ public class MusicService extends Service {
      *
      */
     private MediaSessionCompat.Callback mMediaSessionCallbacks = new MediaSessionCompat.Callback() {
+
         @Override
         public void onCommand(String command, Bundle extras, ResultReceiver cb) {
+            Timber.i("onCommand(%s, %s)", command, extras.toString());
             // Handle custom command
             switch (command){
                 case ACTION_PLAYPAUSE:
@@ -810,9 +869,29 @@ public class MusicService extends Service {
             if(rating.getRatingStyle() == RatingCompat.RATING_THUMB_UP_DOWN){
                 if(mQueue != null) {
                     if (rating.isThumbUp()) {
-                        mVoteManager.upvote(mQueue.current(mCurrentState), null);
+                        mVoteManager.upvote(mQueue.current(mCurrentState), new CallbackHandler() {
+                            @Override
+                            public void onHandle(Object value) {
+                                mCurrentSession.setMetadata(buildMetaData());
+                            }
+
+                            @Override
+                            public void onFailure(String msg) {
+                                Timber.e("Unable to upvote from MediaSession: %s", msg);
+                            }
+                        });
                     } else {
-                        mVoteManager.downvote(mQueue.current(mCurrentState), null);
+                        mVoteManager.downvote(mQueue.current(mCurrentState), new CallbackHandler() {
+                            @Override
+                            public void onHandle(Object value) {
+                                mCurrentSession.setMetadata(buildMetaData());
+                            }
+
+                            @Override
+                            public void onFailure(String msg) {
+                                Timber.e("Unable to upvote from MediaSession: %s", msg);
+                            }
+                        });
                     }
                 }
             }
@@ -945,6 +1024,26 @@ public class MusicService extends Service {
                     }
                     break;
             }
+        }
+    };
+
+    /**
+     * The Runnable that runs updates for play progress
+     * updates
+     *
+     */
+    private Runnable mPlayProgressUpdater = new Runnable() {
+        @Override
+        public void run() {
+
+            // Dispatch Play Progress
+            if(mPlayer.isPlaying()){
+                publishPlayProgress();
+            }
+
+            // Rerun the handler execution of this runnable
+            mHandler.postDelayed(mPlayProgressUpdater, 900);
+
         }
     };
 }

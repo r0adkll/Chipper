@@ -2,6 +2,7 @@ package com.r0adkll.chipper.ui.playlists.viewer;
 
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.VoteManager;
 import com.r0adkll.chipper.qualifiers.CurrentUser;
@@ -37,8 +38,9 @@ public class PlaylistViewerModule {
                                              ChipperService service,
                                              PlaylistManager playlistManager,
                                              VoteManager voteManager,
+                                             ChiptuneProvider provider,
                                              @CurrentUser User user){
-        return new PlaylistViewerPresenterImpl(view, service, playlistManager, voteManager, user);
+        return new PlaylistViewerPresenterImpl(view, service, playlistManager, voteManager, provider, user);
     }
 
 }

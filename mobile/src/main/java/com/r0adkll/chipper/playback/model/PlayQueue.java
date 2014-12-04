@@ -262,4 +262,36 @@ public class PlayQueue {
         }
     }
 
+    /**
+     * Re-index this queue to the provided chiptune
+     *
+     * @param chiptune      the chiptune to re-index to
+     */
+    public void reIndex(Chiptune chiptune){
+        mShuffleIndex = mShuffleQueue.indexOf(chiptune);
+        mIndex = mQueue.indexOf(chiptune);
+    }
+
+    /**
+     * Get the display list for this queue depending on the state
+     *
+     * @param state     the current sessionstate of the playback engine (shuffle, repeatmode, etc)
+     * @return          the list to display
+     */
+    public List<Chiptune> getDisplayList(SessionState state){
+        if(state.isShuffleEnabled()){
+            List<Chiptune> list = new ArrayList<>(mShuffleQueue.subList(mShuffleIndex, mShuffleQueue.size()));
+            if(state.getRepeatMode() == SessionState.MODE_ALL){
+                list.addAll(mShuffleQueue.subList(0, mShuffleIndex));
+            }
+            return list;
+        }else{
+            List<Chiptune> list = new ArrayList<>(mQueue.subList(mIndex, mQueue.size()));
+            if(state.getRepeatMode() == SessionState.MODE_ALL){
+                list.addAll(mQueue.subList(0, mIndex));
+            }
+            return list;
+        }
+    }
+
 }

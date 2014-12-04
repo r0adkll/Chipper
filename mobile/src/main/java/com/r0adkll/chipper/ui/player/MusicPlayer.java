@@ -11,6 +11,8 @@ import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,19 +24,26 @@ import android.widget.TextView;
 import com.nispok.snackbar.Snackbar;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.ChiptuneReference;
 import com.r0adkll.chipper.api.model.Playlist;
+import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.playback.MusicService;
 import com.r0adkll.chipper.api.model.Vote;
 import com.r0adkll.chipper.playback.events.MediaSessionEvent;
 import com.r0adkll.chipper.playback.events.PlayProgressEvent;
 import com.r0adkll.chipper.playback.events.PlayQueueEvent;
 import com.r0adkll.chipper.playback.model.SessionState;
+import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
+import com.r0adkll.chipper.ui.adapters.PlaylistChiptuneAdapter;
+import com.r0adkll.chipper.ui.adapters.QueueChiptuneAdapter;
 import com.r0adkll.chipper.ui.model.BaseFragment;
+import com.r0adkll.chipper.ui.widget.DividerDecoration;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import java.text.DecimalFormat;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -46,7 +55,7 @@ import timber.log.Timber;
 /**
  * Created by r0adkll on 11/30/14.
  */
-public class MusicPlayer extends BaseFragment implements MusicPlayerView {
+public class MusicPlayer extends BaseFragment implements MusicPlayerView, OnItemClickListener<Chiptune>, SlidingUpPanelLayout.PanelSlideListener {
 
     /**********************************************************************************************
      *
@@ -65,7 +74,7 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
     public static Intent createPlayback(Context ctx, Chiptune chiptune){
         Intent intent = new Intent(ctx, MusicService.class);
         intent.setAction(MusicService.INTENT_ACTION_PLAY);
-        intent.putExtra(MusicService.EXTRA_CHIPTUNE, chiptune);
+        intent.putExtra(MusicService.EXTRA_CHIPTUNE, chiptune.getId());
         return intent;
     }
 
@@ -80,8 +89,8 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
     public static Intent createPlayback(Context ctx, Chiptune chiptune, Playlist playlist){
         Intent intent = new Intent(ctx, MusicService.class);
         intent.setAction(MusicService.INTENT_ACTION_PLAY);
-        intent.putExtra(MusicService.EXTRA_CHIPTUNE, chiptune);
-        intent.putExtra(MusicService.EXTRA_PLAYLIST, playlist);
+        intent.putExtra(MusicService.EXTRA_CHIPTUNE, chiptune.getId());
+        intent.putExtra(MusicService.EXTRA_PLAYLIST, playlist.getId());
         return intent;
     }
 
@@ -95,6 +104,17 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
         Intent intent = new Intent(ctx, MusicService.class);
         intent.setAction(MusicService.INTENT_ACTION_COLDSTART);
         return intent;
+    }
+
+    /**
+     * Start playback of a built intent to send to the
+     * music service
+     *
+     * @param ctx
+     * @param intent
+     */
+    public static void startPlayback(Context ctx, Intent intent){
+        ctx.startService(intent);
     }
 
     /**********************************************************************************************
@@ -112,6 +132,13 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
     @Inject
     Bus mBus;
 
+    @Inject
+    QueueChiptuneAdapter adapter;
+
+    @Inject
+    ChiptuneProvider chiptuneProvider;
+
+    @InjectView(R.id.recycle_view)              RecyclerView mRecyclerView;
     @InjectView(R.id.buffer_bar)                ProgressBar mBufferBar;
     @InjectView(R.id.title)                     TextView mTitle;
     @InjectView(R.id.description)               TextView mDescription;
@@ -124,7 +151,6 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
     @InjectView(R.id.downvote)                  ImageView mDownvote;
     @InjectView(R.id.favorite)                  ImageView mFavorite;
     @InjectView(R.id.add)                       ImageView mAdd;
-    @InjectView(R.id.player_content_pager)      ViewPager mPlayerContentPager;
     @InjectView(R.id.time_progress)             TextView mTimeProgress;
     @InjectView(R.id.scrubber)                  SeekBar mScrubber;
     @InjectView(R.id.time_total)                TextView mTimeTotal;
@@ -152,6 +178,9 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
 
         // Set the scrubber listener
         mScrubber.setOnSeekBarChangeListener(mSeekBarChangeListener);
+        setupRecyclerView();
+
+        mSlidingLayout.setPanelSlideListener(this);
 
     }
 
@@ -167,12 +196,14 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
     public void onPause() {
         super.onPause();
         mBus.unregister(this);
+        if(mController != null) mController.unregisterCallback(mControllerCallbacks);
     }
 
     @Override
     public void onResume() {
         super.onResume();
         mBus.register(this);
+        if(mController != null) mController.registerCallback(mControllerCallbacks);
     }
 
     @Override
@@ -193,6 +224,18 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
      * Helper Methods
      *
      */
+
+    /**
+     * Setup the recycler view
+     */
+    private void setupRecyclerView(){
+
+        mRecyclerView.setAdapter(adapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+        mRecyclerView.addItemDecoration(new DividerDecoration(getActivity()));
+        adapter.setOnItemClickListener(this);
+
+    }
 
     /**
      * Set the music player callbacks to receive pertinent changes
@@ -267,7 +310,10 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
     private MediaControllerCompat.Callback mControllerCallbacks = new MediaControllerCompat.Callback() {
         @Override
         public void onSessionDestroyed() {
+            presenter.onSessionDestroyed();
             if(mCallbacks != null) mCallbacks.onStopped();
+            mController = null;
+            mSession = null;
         }
 
         @Override
@@ -283,6 +329,7 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
         @Override
         public void onMetadataChanged(MediaMetadataCompat metadata) {
             presenter.onMetadataChanged(metadata);
+
         }
     };
 
@@ -290,14 +337,18 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
      * SeekBar change listener
      */
     private SeekBar.OnSeekBarChangeListener mSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            if(fromUser) presenter.seek(progress);
-        }
-
+        @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
         @Override public void onStartTrackingTouch(SeekBar seekBar) {}
-        @Override public void onStopTrackingTouch(SeekBar seekBar) {}
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+            if(mController != null) presenter.seek(seekBar.getProgress());
+        }
     };
+
+    @Override
+    public void onItemClick(View v, Chiptune item, int position) {
+        presenter.onQueueItemSelected(item);
+    }
 
     /***********************************************************************************************
      *
@@ -307,10 +358,16 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
 
     @Subscribe
     public void answerMediaSessionEvent(MediaSessionEvent event){
-        mSession = event.session;
-        mController = new MediaControllerCompat(getActivity(), mSession);
-        mController.registerCallback(mControllerCallbacks);
-        Timber.i("Media Session Received, Initializing Controller callbacks");
+        if(mSession == null) {
+            mSession = event.session;
+            mController = new MediaControllerCompat(getActivity(), mSession);
+            mController.registerCallback(mControllerCallbacks);
+            Timber.i("Media Session Received, Initializing Controller callbacks");
+
+            // Inflate playback and metadata
+            presenter.onPlaybackStateChanged(mController.getPlaybackState());
+            presenter.onMetadataChanged(mController.getMetadata());
+        }
     }
 
     @Subscribe
@@ -477,5 +534,52 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView {
     @Override
     public void showSnackBar(String format, Object... args) {
         showSnackBar(String.format(format, args));
+    }
+
+    @Override
+    public void setQueueList(List<Chiptune> chiptunes) {
+        adapter.clear();
+        adapter.addAll(chiptunes);
+    }
+
+    /***********************************************************************************************
+     *
+     * Panel Slide Listener Methods
+     *
+     */
+
+    @Override
+    public void onPanelSlide(View view, float v) {
+
+        float anchorOffset = 0.115f;
+        if(v > anchorOffset) {
+            float alpha = v / (1 - anchorOffset);
+            alpha = 1 - alpha;
+
+            mPlayPause.setAlpha(alpha);
+            mNext.setAlpha(alpha);
+            mPrevious.setAlpha(alpha);
+            mBufferBar.setAlpha(alpha);
+        }
+    }
+
+    @Override
+    public void onPanelCollapsed(View view) {
+
+    }
+
+    @Override
+    public void onPanelExpanded(View view) {
+
+    }
+
+    @Override
+    public void onPanelAnchored(View view) {
+
+    }
+
+    @Override
+    public void onPanelHidden(View view) {
+
     }
 }

@@ -3,6 +3,7 @@ package com.r0adkll.chipper.playback;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -25,6 +26,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.KeyEvent;
 
+import com.activeandroid.Model;
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
@@ -87,6 +89,7 @@ public class MusicService extends Service {
     public static final String COMMAND_SHOW_NOTIFICATION = "com.r0adkll.chipper.command.SHOW_NOTIFICATION";
     public static final String COMMAND_SHUFFLE = "com.r0adkll.chipper.command.SHUFFLE";
     public static final String COMMAND_REPEAT = "com.r0adkll.chipper.command.REPEAT";
+    public static final String COMMAND_QUEUE_JUMP = "com.r0adkll.chipper.command.QUEUE_JUMP";
 
     public static final String EVENT_PLAY_PROGRESS_UPDATED = "com.r0adkll.chipper.event.PROGRESS_CHANGE";
 
@@ -110,7 +113,8 @@ public class MusicService extends Service {
      */
 
     @Inject AudioManager mAudioManager;
-    @Inject NotificationManagerCompat mNotificationManager;
+    @Inject NotificationManagerCompat mNotificationManagerCompat;
+    @Inject NotificationManager mNotificationManager;
     @Inject PlaylistManager mPlaylistManager;
     @Inject VoteManager mVoteManager;
     @Inject ChiptuneProvider mProvider;
@@ -164,6 +168,9 @@ public class MusicService extends Service {
         // Initialize the Media Session
         mCurrentSession = new MediaSessionCompat(this, MEDIA_SESSION_TAG);
         mCurrentSession.setCallback(mMediaSessionCallbacks);
+
+        // Post the session
+        mBus.post(new MediaSessionEvent(mCurrentSession));
     }
 
     /**
@@ -176,7 +183,7 @@ public class MusicService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Timber.i("MusicService::onStartCommand(%s, %d, %d)", intent.toString(), flags, startId);
+        Timber.i("MusicService::onStartCommand(%s, %d, %d)", intent, flags, startId);
 
         // Handle intent
         if(intent != null) {
@@ -186,12 +193,16 @@ public class MusicService extends Service {
                     if (xtras != null) {
 
                         // Parse the Chiptune and Playlist(optional) from the extras
-                        Chiptune chiptune = xtras.getParcelable(EXTRA_CHIPTUNE);
-                        Playlist playlist = xtras.getParcelable(EXTRA_PLAYLIST);
+                        long chiptuneId = xtras.getLong(EXTRA_CHIPTUNE, -1);
+                        long playlistId = xtras.getLong(EXTRA_PLAYLIST, -1);
 
                         // If a chiptune was found, determine if playlist was sent as well
-                        if (chiptune != null) {
-                            if (playlist != null) {
+                        if (chiptuneId != -1) {
+                            // Get the Chiptune from DB
+                            Chiptune chiptune = Model.load(Chiptune.class, chiptuneId);
+
+                            if (playlistId != -1) {
+                                Playlist playlist = Model.load(Playlist.class, playlistId);
                                 mQueue = new PlayQueue(mProvider, chiptune, playlist);
                             } else {
                                 mQueue = new PlayQueue(mProvider, chiptune);
@@ -297,8 +308,6 @@ public class MusicService extends Service {
         mPlayer.stop();
         mPlayer.release();
         mCurrentSession.setPlaybackState(buildPlaybackState(PlaybackStateCompat.STATE_STOPPED));
-        mCurrentSession.release();
-        mCurrentSession = null;
         mHandler.removeCallbacks(mPlayProgressUpdater);
     }
 
@@ -575,6 +584,9 @@ public class MusicService extends Service {
         // Post Session Queue change event
         mBus.post(new PlayQueueEvent(mQueue, mCurrentState));
 
+        // Update the shuffle
+        shuffle(true);
+
     }
 
     /**
@@ -603,18 +615,20 @@ public class MusicService extends Service {
             Intent contentIntent = new Intent(this, Chipper.class);
             PendingIntent contentPI = PendingIntent.getActivity(this, 0, contentIntent, 0);
 
-            if(!Utils.isLollipop()) {
+            if(Utils.isLollipop()) {
 
                 // Build the notification
                 Notification.Builder builder = new Notification.Builder(this)
                         .setSmallIcon(R.drawable.ic_stat_chipper)
-                        .setColor(getResources().getColor(R.color.primary))
                         .setVisibility(Notification.VISIBILITY_PUBLIC)
                         .setContentTitle(title)
                         .setContentText(text)
                         .setContentIntent(contentPI)
                         .setDeleteIntent(deletePI)
-                        .setOngoing(mPlayer.isPlaying());
+                        .setOngoing(mPlayer.isPlaying())
+                        .setStyle(new Notification.MediaStyle()
+                                .setMediaSession((android.media.session.MediaSession.Token) mCurrentSession.getSessionToken().getToken())
+                                .setShowActionsInCompactView(2, 3));
 
                 // Build actions/intents
                 Notification.Action play = buildActionLollipop(R.drawable.ic_action_notif_play, R.string.action_play, ACTION_PLAY);
@@ -630,11 +644,6 @@ public class MusicService extends Service {
                         .addAction(mPlayer.isPlaying() ? pause : play)
                         .addAction(next)
                         .addAction(upvote);
-
-                // Build the lollipop media session
-                builder.setStyle(new Notification.MediaStyle()
-                        .setMediaSession((android.media.session.MediaSession.Token) mCurrentSession.getSessionToken().getToken())
-                        .setShowActionsInCompactView(2, 3));
 
                 // Show notification
                 mNotificationManager.notify(NOTIFICATION_ID, builder.build());
@@ -664,7 +673,7 @@ public class MusicService extends Service {
                        .addAction(next);
 
                 // Show notification
-                mNotificationManager.notify(NOTIFICATION_ID, builder.build());
+                mNotificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
             }
 
         }
@@ -791,6 +800,21 @@ public class MusicService extends Service {
                 case COMMAND_REPEAT:
                     int repeat = extras.getInt(EXTRA_REPEAT, SessionState.MODE_NONE);
                     repeat(repeat);
+                    break;
+                case COMMAND_QUEUE_JUMP:
+                    String chiptuneId = extras.getString(EXTRA_CHIPTUNE);
+                    if(chiptuneId != null){
+                        Chiptune chiptune = mProvider.getChiptune(chiptuneId);
+
+                        // Re-index queue
+                        mQueue.reIndex(chiptune);
+
+                        // Start playing new index
+                        startPlayback();
+
+                        // Post queue event
+                        mBus.post(new PlayQueueEvent(mQueue, mCurrentState));
+                    }
                     break;
             }
         }

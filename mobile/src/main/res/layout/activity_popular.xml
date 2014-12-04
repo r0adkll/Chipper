@@ -21,9 +21,9 @@
         sothree:dragView="@+id/music_player"
         >
 
-        <LinearLayout android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <!-- The Custom Actionbar -->
             <android.support.v7.widget.Toolbar
@@ -43,7 +43,9 @@
             <FrameLayout
                 android:id="@+id/container"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_below="@+id/toolbar_actionbar"
+                >
 
 
                 <com.r0adkll.chipper.ui.widget.TightSwipeRefreshLayout
@@ -51,11 +53,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                    <!--<android.support.v7.widget.RecyclerView-->
-                        <!--android:id="@+id/recycle_view"-->
-                        <!--android:scrollbars="vertical"-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="match_parent"/>-->
                     <com.fortysevendeg.swipelistview.SwipeListView
                         xmlns:swipe="http://schemas.android.com/apk/res-auto"
                         android:id="@+id/recycle_view"
@@ -78,7 +75,18 @@
 
             </FrameLayout>
 
-        </LinearLayout>
+            <include layout="@layout/layout_fab_shuffleplay"
+                android:id="@+id/fab_shuffle_play"
+                android:layout_width="@dimen/fab_button_height"
+                android:layout_height="@dimen/fab_button_height"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+
+                android:layout_marginBottom="@dimen/activity_padding"
+                android:layout_marginRight="@dimen/activity_padding"
+                />
+
+        </RelativeLayout>
 
         <!-- The Player widget bar -->
         <fragment

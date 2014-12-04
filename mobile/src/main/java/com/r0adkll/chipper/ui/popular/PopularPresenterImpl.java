@@ -7,6 +7,7 @@ import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.VoteManager;
+import com.r0adkll.chipper.ui.player.MusicPlayer;
 import com.r0adkll.chipper.utils.CallbackHandler;
 import com.r0adkll.chipper.utils.ChiptuneComparator;
 
@@ -90,7 +91,8 @@ public class PopularPresenterImpl implements PopularPresenter {
     @Override
     public void onChiptuneSelected(Chiptune chiptune) {
         // Send to session to be played
-
+        MusicPlayer.startPlayback(mView.getActivity(),
+                MusicPlayer.createPlayback(mView.getActivity(), chiptune));
     }
 
     @Override

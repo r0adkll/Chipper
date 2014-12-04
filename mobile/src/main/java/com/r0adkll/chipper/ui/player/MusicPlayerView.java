@@ -5,6 +5,10 @@ import android.media.Rating;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 
+import com.r0adkll.chipper.api.model.Chiptune;
+
+import java.util.List;
+
 /**
  * Created by r0adkll on 12/1/14.
  */
@@ -69,4 +73,6 @@ public interface MusicPlayerView {
     public void showSnackBar(String message);
 
     public void showSnackBar(String format, Object... args);
+
+    public void setQueueList(List<Chiptune> chiptunes);
 }

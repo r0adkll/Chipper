@@ -26,6 +26,7 @@ import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
 import com.r0adkll.chipper.ui.adapters.PlaylistAdapter;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
+import com.r0adkll.chipper.ui.player.MusicPlayerCallbacks;
 import com.r0adkll.chipper.ui.widget.DividerDecoration;
 import com.r0adkll.deadskunk.utils.Utils;
 import com.r0adkll.postoffice.PostOffice;
@@ -41,7 +42,7 @@ import butterknife.InjectView;
 /**
  * Created by r0adkll on 11/16/14.
  */
-public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView, LoaderManager.LoaderCallbacks<List<Playlist>>, OnItemClickListener<Playlist> {
+public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView, LoaderManager.LoaderCallbacks<List<Playlist>>, OnItemClickListener<Playlist>,MusicPlayerCallbacks {
 
     /***********************************************************************************************
      *
@@ -73,6 +74,9 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
 
         // Setup the FAB
         setupFab();
+
+        // Set the player callbacks
+        getPlayer().setCallbacks(this);
 
         // Setup the recycler view
         mRecyclerView.setAdapter(adapter);
@@ -256,5 +260,15 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
 
         // Clear adapter and notify of change
         adapter.clear();
+    }
+
+    @Override
+    public void onStarted() {
+        getSlidingLayout().showPanel();
+    }
+
+    @Override
+    public void onStopped() {
+        getSlidingLayout().hidePanel();
     }
 }

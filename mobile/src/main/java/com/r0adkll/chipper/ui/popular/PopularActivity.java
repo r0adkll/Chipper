@@ -1,10 +1,15 @@
 package com.r0adkll.chipper.ui.popular;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
 import com.fortysevendeg.swipelistview.SwipeListView;
@@ -14,8 +19,11 @@ import com.r0adkll.chipper.ui.adapters.PopularChiptuneAdapter;
 import com.r0adkll.chipper.ui.adapters.RecyclerArrayAdapter;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
+import com.r0adkll.chipper.ui.player.MusicPlayer;
+import com.r0adkll.chipper.ui.player.MusicPlayerCallbacks;
 import com.r0adkll.chipper.ui.widget.DividerDecoration;
 import com.r0adkll.chipper.ui.widget.TightSwipeRefreshLayout;
+import com.r0adkll.chipper.utils.UIUtils;
 import com.r0adkll.postoffice.PostOffice;
 
 import java.util.List;
@@ -28,7 +36,11 @@ import butterknife.InjectView;
 /**
  * Created by r0adkll on 11/15/14.
  */
-public class PopularActivity extends BaseDrawerActivity implements PopularView, OnItemClickListener<Chiptune>, SwipeRefreshLayout.OnRefreshListener, RecyclerArrayAdapter.OnItemOptionSelectedListener<Chiptune> {
+public class PopularActivity extends BaseDrawerActivity implements PopularView,
+        OnItemClickListener<Chiptune>,
+        SwipeRefreshLayout.OnRefreshListener,
+        RecyclerArrayAdapter.OnItemOptionSelectedListener<Chiptune>,
+        MusicPlayerCallbacks {
 
     /***********************************************************************************************
      *
@@ -41,6 +53,9 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView, 
 
     @InjectView(R.id.recycle_view)
     SwipeListView mRecyclerView;
+
+    @InjectView(R.id.fab_shuffle_play)
+    FrameLayout mFABShufflePlay;
 
     @Inject
     PopularPresenter presenter;
@@ -60,6 +75,13 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView, 
         setContentView(R.layout.activity_popular);
         overridePendingTransition(0, 0);
         getSupportActionBar().setTitle(R.string.navdrawer_item_popular);
+
+        // Setuyp the FAB
+        UIUtils.setupFAB(this, mFABShufflePlay);
+        mFABShufflePlay.setOnClickListener(mFABClickListener);
+
+        // Setup the music player callbacks
+        getPlayer().setCallbacks(this);
 
         // Setup the swipe-to-refresh layout
         mSwipeLayout.setColorSchemeResources(R.color.primary, R.color.primaryDark, R.color.accentColor);
@@ -121,6 +143,20 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView, 
         }
     }
 
+    /**
+     * The floating action button click listener
+     */
+    private View.OnClickListener mFABClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            // Prepare intent to start playback
+            Intent playback = MusicPlayer.createShufflePlayback(getActivity());
+            MusicPlayer.startPlayback(PopularActivity.this, playback);
+
+        }
+    };
+
     /***********************************************************************************************
      *
      *  View Methods
@@ -158,6 +194,45 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView, 
         PostOffice.newMail(this)
                 .setMessage(msg)
                 .show(getFragmentManager());
+    }
+
+    @Override
+    public void onStarted() {
+        if(getSlidingLayout().isPanelHidden()) {
+            // Start playing a random tune on shuffle
+            ObjectAnimator anim = ObjectAnimator.ofFloat(mFABShufflePlay, "alpha", 1, 0)
+                    .setDuration(300);
+
+            anim.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mFABShufflePlay.setVisibility(View.GONE);
+                }
+            });
+
+            anim.start();
+            getSlidingLayout().showPanel();
+        }
+    }
+
+    @Override
+    public void onStopped() {
+        if(!getSlidingLayout().isPanelHidden()) {
+            // Animate the FAB back onto screen
+            // Start playing a random tune on shuffle
+            ObjectAnimator anim = ObjectAnimator.ofFloat(mFABShufflePlay, "alpha", 0, 1)
+                    .setDuration(300);
+
+            anim.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                    mFABShufflePlay.setVisibility(View.VISIBLE);
+                }
+            });
+
+            anim.start();
+            getSlidingLayout().hidePanel();
+        }
     }
 
     /***********************************************************************************************

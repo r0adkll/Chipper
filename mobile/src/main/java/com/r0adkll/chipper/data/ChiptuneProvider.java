@@ -7,9 +7,11 @@ import com.activeandroid.query.Select;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.utils.ChiptuneComparator;
 import com.r0adkll.deadskunk.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -165,6 +167,10 @@ public class ChiptuneProvider {
         for(Chiptune chiptune:chiptunes){
             mChiptuneMap.put(chiptune.id, chiptune);
         }
+
+        // Sort the chiptunes
+        Collections.sort(mChiptunes, new ChiptuneComparator());
+
     }
 
 }

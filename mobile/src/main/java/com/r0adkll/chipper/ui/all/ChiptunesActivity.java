@@ -33,6 +33,7 @@ import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
 import com.r0adkll.chipper.ui.player.MusicPlayer;
 import com.r0adkll.chipper.ui.player.MusicPlayerCallbacks;
 import com.r0adkll.chipper.ui.widget.StickyRecyclerHeadersElevationDecoration;
+import com.r0adkll.chipper.utils.UIUtils;
 import com.r0adkll.deadskunk.utils.Utils;
 import com.r0adkll.postoffice.PostOffice;
 import com.r0adkll.postoffice.styles.EditTextStyle;
@@ -84,7 +85,8 @@ public class ChiptunesActivity extends BaseDrawerActivity
         getSupportActionBar().setTitle(R.string.navdrawer_item_chiptunes);
 
         // Setuyp the FAB
-        setupFAB();
+        UIUtils.setupFAB(this, mFABShufflePlay);
+        mFABShufflePlay.setOnClickListener(mFABClickListener);
 
         // Setup the music player callbacks
         getPlayer().setCallbacks(this);
@@ -112,36 +114,6 @@ public class ChiptunesActivity extends BaseDrawerActivity
      * Helper Methods
      *
      */
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void setupFAB(){
-        // Setup the FAB
-        if(!Utils.isLollipop()) {
-            ImageView shadow = ButterKnife.findById(mFABShufflePlay, R.id.shadow);
-            int dimen = getResources().getDimensionPixelSize(R.dimen.fab_shadow_radius);
-            Bitmap blur = Bitmap.createBitmap(dimen, dimen, Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(blur);
-            Paint p = new Paint();
-            p.setColor(Color.BLACK);
-            canvas.drawCircle(dimen / 2f, dimen / 2f, dimen / 2f - Utils.dpToPx(this, 6), p);
-            shadow.setImageBitmap(Utils.blurImage(this, blur, 16));
-            mFABShufflePlay.setOnClickListener(mFABClickListener);
-        }else{
-
-            ViewOutlineProvider vop = new ViewOutlineProvider() {
-                @Override
-                public void getOutline(View view, Outline outline) {
-                    int size = (int) Utils.dpToPx(ChiptunesActivity.this, 56);
-                    outline.setOval(0, 0, size, size);
-                }
-            };
-
-            //Button btn = ButterKnife.findById(mFabAdd, R.id.button);
-            mFABShufflePlay.setOutlineProvider(vop);
-            mFABShufflePlay.setClipToOutline(true);
-            mFABShufflePlay.setOnClickListener(mFABClickListener);
-        }
-    }
 
     @Override
     public void onItemClick(View view, Chiptune item,  int position) {

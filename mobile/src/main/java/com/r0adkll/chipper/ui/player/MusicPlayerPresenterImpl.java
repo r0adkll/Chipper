@@ -210,11 +210,20 @@ public class MusicPlayerPresenterImpl implements MusicPlayerPresenter {
     }
 
     @Override
+    public void onQueueItemSelected(Chiptune chiptune) {
+        MediaControllerCompat controller = mView.getMediaController();
+        if(controller != null){
+            Bundle xtras = new Bundle();
+            xtras.putString(MusicService.EXTRA_CHIPTUNE, chiptune.id);
+            controller.sendCommand(MusicService.COMMAND_QUEUE_JUMP, xtras, null);
+        }
+    }
+
+    @Override
     public void onPlayProgressEvent(PlayProgressEvent event) {
         mView.setPlaybackProgress(event.position, event.duration);
     }
 
-    @DebugLog
     @Override
     public void onPlayQueueEvent(PlayQueueEvent event) {
         mQueue = event.queue;
@@ -223,72 +232,72 @@ public class MusicPlayerPresenterImpl implements MusicPlayerPresenter {
         // Update accordingly
         mView.setShuffle(mState.isShuffleEnabled());
         mView.setRepeat(mState.getRepeatMode());
+
+        // set the queue list
+        mView.setQueueList(mQueue.getDisplayList(mState));
+    }
+
+    @Override
+    public void onSessionDestroyed() {
+        mQueue = null;
+        mState = null;
     }
 
     @Override
     public void onSessionEvent(String event, Bundle extras) {
-//        switch (event){
-//            case MusicService.EVENT_PLAY_PROGRESS_UPDATED:
-//
-//                int position = extras.getInt(MusicService.EXTRA_CURRENT_POSITION);
-//                int duration = extras.getInt(MusicService.EXTRA_TOTAL_DURATION);
-//
-//                Timber.i("Play Progress Event: %d - %d", position, duration);
-//
-//                // Update ui
-//                mView.setPlaybackProgress(position, duration);
-//                break;
-//        }
+
     }
 
-    @DebugLog
     @Override
     public void onPlaybackStateChanged(PlaybackStateCompat state) {
-        // Update UI accordingly
-        int pstate = state.getState();
-        switch (pstate){
-            case STATE_BUFFERING:
-                mView.setPlaybackProgress(0 ,0);
-                mView.setIsPlaying(true);
-                mView.disableControls();
-                break;
-            case STATE_PLAYING:
-                mView.setIsPlaying(true);
-                mView.enableControls();
-                break;
-            case STATE_PAUSED:
-                mView.setIsPlaying(false);
-                break;
-            case STATE_STOPPED:
-                // Hide the player and show the shuffle play button
-                mView.setIsPlaying(false);
-                mView.setPlaybackProgress(-1,-1);
-                mView.disableControls();
-                break;
+        if(state != null) {
+            // Update UI accordingly
+            int pstate = state.getState();
+            switch (pstate) {
+                case STATE_BUFFERING:
+                    mView.setPlaybackProgress(0, 0);
+                    mView.setIsPlaying(true);
+                    mView.disableControls();
+                    break;
+                case STATE_PLAYING:
+                    mView.setIsPlaying(true);
+                    mView.enableControls();
+                    break;
+                case STATE_PAUSED:
+                    mView.setIsPlaying(false);
+                    break;
+                case STATE_STOPPED:
+                    // Hide the player and show the shuffle play button
+                    mView.setIsPlaying(false);
+                    mView.setPlaybackProgress(-1, -1);
+                    mView.disableControls();
+                    break;
+            }
         }
     }
 
-    @DebugLog
     @Override
     public void onMetadataChanged(MediaMetadataCompat metadata) {
+        if(metadata != null) {
 
-        // Update UI based on metadata change
-        String title = metadata.getString(METADATA_KEY_TITLE);
-        String artist = metadata.getString(METADATA_KEY_ARTIST);
+            // Update UI based on metadata change
+            String title = metadata.getString(METADATA_KEY_TITLE);
+            String artist = metadata.getString(METADATA_KEY_ARTIST);
 
-        mView.setTitle(title);
-        mView.setArtist(artist);
+            mView.setTitle(title);
+            mView.setArtist(artist);
 
-        long duration = metadata.getLong(METADATA_KEY_DURATION);
-        RatingCompat rating = metadata.getRating(METADATA_KEY_USER_RATING);
+            long duration = metadata.getLong(METADATA_KEY_DURATION);
+            RatingCompat rating = metadata.getRating(METADATA_KEY_USER_RATING);
 
-        int vote = !rating.isRated() ? Vote.NONE :
-                rating.isThumbUp() ? Vote.UP : Vote.DOWN;
-        mView.setRating(vote);
+            int vote = !rating.isRated() ? Vote.NONE :
+                    rating.isThumbUp() ? Vote.UP : Vote.DOWN;
+            mView.setRating(vote);
 
-        boolean favorited = Boolean.parseBoolean(metadata.getString(MusicService.METADATA_KEY_FAVORITED));
-        mView.setFavorited(favorited);
+            boolean favorited = Boolean.parseBoolean(metadata.getString(MusicService.METADATA_KEY_FAVORITED));
+            mView.setFavorited(favorited);
 
+        }
     }
 
     /**

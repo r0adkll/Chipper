@@ -30,10 +30,12 @@ import com.r0adkll.chipper.api.model.ChiptuneReference;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.ui.model.BaseActivity;
+import com.r0adkll.chipper.ui.player.MusicPlayerCallbacks;
 import com.r0adkll.chipper.ui.widget.DividerDecoration;
 import com.r0adkll.chipper.ui.widget.EmptyView;
 import com.r0adkll.deadskunk.utils.Utils;
 import com.r0adkll.postoffice.PostOffice;
+import com.r0adkll.slidableactivity.SlidableAttacher;
 
 import java.util.List;
 
@@ -47,7 +49,7 @@ import icepick.Icicle;
 /**
  * Created by r0adkll on 11/16/14.
  */
-public class PlaylistViewerActivity extends BaseActivity implements PlaylistViewerView, LoaderManager.LoaderCallbacks<List<ChiptuneReference>>,OnItemClickListener<ChiptuneReference> {
+public class PlaylistViewerActivity extends BaseActivity implements PlaylistViewerView, LoaderManager.LoaderCallbacks<List<ChiptuneReference>>,OnItemClickListener<ChiptuneReference>,MusicPlayerCallbacks {
 
     /***********************************************************************************************
      *
@@ -111,6 +113,9 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
         // Now present the layout
         setupFab();
         setupRecyclerView();
+
+        // Set the player callbacks
+        getPlayer().setCallbacks(this);
 
         // Setup the loader
         getSupportLoaderManager().initLoader(0, null, this);
@@ -199,7 +204,16 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
     public void onItemClick(View v, ChiptuneReference item, int position) {
         Chiptune chiptune = chiptuneProvider.getChiptune(item.chiptune_id);
         presenter.onChiptuneSelected(chiptune);
+    }
 
+    @Override
+    public void onStarted() {
+        getSlidingLayout().showPanel();
+    }
+
+    @Override
+    public void onStopped() {
+        getSlidingLayout().hidePanel();
     }
 
     /***********************************************************************************************
@@ -258,6 +272,11 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
     @Override
     public Activity getActivity() {
         return this;
+    }
+
+    @Override
+    public Playlist getPlaylist() {
+        return mPlaylist;
     }
 
     /***********************************************************************************************

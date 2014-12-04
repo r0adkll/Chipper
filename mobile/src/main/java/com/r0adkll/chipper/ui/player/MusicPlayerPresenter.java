@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
+import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.playback.events.PlayProgressEvent;
 import com.r0adkll.chipper.playback.events.PlayQueueEvent;
 import com.r0adkll.chipper.playback.model.PlayQueue;
@@ -32,6 +33,10 @@ public interface MusicPlayerPresenter {
     public void favorite();
 
     public void add();
+
+    public void onQueueItemSelected(Chiptune chiptune);
+
+    public void onSessionDestroyed();
 
     public void onPlayProgressEvent(PlayProgressEvent event);
 

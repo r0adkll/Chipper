@@ -54,6 +54,12 @@ public abstract class BaseActivity extends ActionBarActivity {
         activityGraph = null;
     }
 
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mSlidingLayout.hidePanel();
+    }
+
     /**
      * Get teh reference to the music player interface
      * @return

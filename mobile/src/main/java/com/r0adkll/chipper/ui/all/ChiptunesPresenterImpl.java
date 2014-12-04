@@ -1,6 +1,8 @@
 package com.r0adkll.chipper.ui.all;
 
 
+import android.content.Intent;
+
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.User;
@@ -8,6 +10,7 @@ import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.VoteManager;
+import com.r0adkll.chipper.ui.player.MusicPlayer;
 import com.r0adkll.chipper.utils.CallbackHandler;
 import com.r0adkll.chipper.utils.ChiptuneComparator;
 
@@ -73,6 +76,8 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
     public void onChiptuneSelected(Chiptune chiptune) {
         // Send Otto Event to start playing this selected chiptune
         Timber.i("Chiptune selected[%s]: %s-%s", chiptune.id, chiptune.artist, chiptune.title);
+        Intent playback = MusicPlayer.createPlayback(mView.getActivity(), chiptune);
+        MusicPlayer.startPlayback(mView.getActivity(), playback);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.r0adkll.chipper;
 
 import android.app.Application;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationManagerCompat;
@@ -108,8 +110,13 @@ public final class ChipperModule {
      */
 
     @Provides
-    NotificationManagerCompat provideNotificationManager(Application app){
+    NotificationManagerCompat provideNotificationManagerCompat(Application app){
         return NotificationManagerCompat.from(app);
+    }
+
+    @Provides @Singleton
+    NotificationManager provideNotificationManager(Application app){
+        return (NotificationManager) app.getSystemService(Context.NOTIFICATION_SERVICE);
     }
 
 

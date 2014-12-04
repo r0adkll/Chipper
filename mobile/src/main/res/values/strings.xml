@@ -31,5 +31,7 @@
     <string name="action_downvote">Downvote</string>
     <string name="default_current_tune_title">Press play</string>
     <string name="default_current_tune_description">to play a random tune</string>
+    <string name="action_offline">Offline</string>
+    <string name="action_share">Share</string>
 
 </resources>

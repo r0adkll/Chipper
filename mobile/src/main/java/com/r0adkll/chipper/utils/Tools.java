@@ -40,6 +40,20 @@ public class Tools {
     }
 
     /**
+     * System time in ms
+     */
+    public static long timeMS(){
+        return System.currentTimeMillis();
+    }
+
+    /**
+     * Nano time since boot
+     */
+    public static long timeNS(){
+        return System.nanoTime();
+    }
+
+    /**
      * SHA-256 hash a string
      *
      * @param base      the string to hash

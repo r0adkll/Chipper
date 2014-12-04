@@ -14,6 +14,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +24,7 @@ import android.widget.ImageView;
 
 import com.activeandroid.Model;
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
 import com.r0adkll.chipper.ui.adapters.PlaylistChiptuneAdapter;
 import com.r0adkll.chipper.api.model.Chiptune;
@@ -130,7 +132,41 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        return super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.menu_playlist_viewer, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        if(searchView != null){
+
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String s) {
+                    // Run query
+                    adapter.query(s);
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String s) {
+                    // Run query
+                    adapter.query(s);
+                    return true;
+                }
+            });
+
+            searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+                @Override
+                public boolean onClose() {
+                    adapter.clearQuery();
+                    return true;
+                }
+            });
+
+        }
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -138,6 +174,12 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
         switch (item.getItemId()){
             case android.R.id.home:
                 finish();
+                return true;
+            case R.id.action_offline:
+                presenter.offlinePlaylist(mPlaylist);
+                return true;
+            case R.id.action_share:
+                presenter.sharePlaylist(mPlaylist);
                 return true;
         }
         return super.onOptionsItemSelected(item);

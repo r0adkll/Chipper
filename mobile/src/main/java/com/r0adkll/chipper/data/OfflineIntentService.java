@@ -10,7 +10,9 @@ import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.data.events.OfflineRequestCompletedEvent;
 import com.r0adkll.chipper.data.model.OfflineRequest;
+import com.r0adkll.chipper.utils.Tools;
 import com.r0adkll.deadskunk.utils.ProgressInputStream;
+import com.r0adkll.deadskunk.utils.Utils;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
@@ -134,15 +136,17 @@ public class OfflineIntentService extends IntentService {
             // Execute the request and get the input stream
             Response response = mClient.newCall(request).execute();
             InputStream stream = response.body().byteStream();
-            ProgressInputStream pis = new ProgressInputStream(stream, stream.available(), new ProgressInputStream.OnProgressListener() {
+            ProgressInputStream pis = new ProgressInputStream(stream, response.body().contentLength(), new ProgressInputStream.OnProgressListener() {
                 @Override
                 public void onProgress(long read, long total) {
                     // Compute total progress
                     float part = 100f / (float)size;
                     float base = index * part;
-                    float current = ((float)read/(float)total) * part;
+                    float current = (new Long(read/2L).floatValue()/new Long(total).floatValue()) * part;
                     float progress = base + current;
-                    updateNotification(chiptune, index, size, progress);
+
+                    progress = Utils.clamp(progress, 0, 100);
+                    updateNotification(chiptune, index+1, size, progress);
                 }
             });
             FileOutputStream fos = new FileOutputStream(output);
@@ -193,24 +197,31 @@ public class OfflineIntentService extends IntentService {
      * @param total                 the total number of chiptunes to download
      * @param progress              the progress of the entire download
      */
+    long timeSinceLastPost = 0L;
     private void updateNotification(Chiptune currentChiptune, int index, int total, float progress){
 
-        // Prepare the notification
-        String title = String.format("Downloading %s", currentChiptune.title);
-        String text = String.format("%d out of %d songs. (%d%% Complete)", index, total, (int)progress);
+        if(Tools.timeMS() - timeSinceLastPost > 100) {
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setContentTitle(title)
-                .setContentText(text)
-                .setSmallIcon(R.drawable.ic_stat_chipper)
-                .setOngoing(true)
-                .setProgress(100, (int) (progress * 100f), false)
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setColor(getResources().getColor(R.color.primary))
-                .setLocalOnly(true);
+            // Prepare the notification
+            String title = String.format("Downloading %s", currentChiptune.title);
+            String text = String.format("%d out of %d songs. (%d%% Complete)", index, total, (int) progress);
 
-        // Show notification
-        mNotifMan.notify(NOTIFICATION_ID, builder.build());
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                    .setContentTitle(title)
+                    .setContentText(text)
+                    .setSmallIcon(R.drawable.ic_stat_chipper)
+                    .setOngoing(true)
+                    .setProgress(100, (int)progress, false)
+                    .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                    .setColor(getResources().getColor(R.color.primary))
+                    .setLocalOnly(true);
+
+            // Show notification
+            mNotifMan.notify(NOTIFICATION_ID, builder.build());
+
+            // Marke the time
+            timeSinceLastPost = Tools.timeMS();
+        }
     }
 
 

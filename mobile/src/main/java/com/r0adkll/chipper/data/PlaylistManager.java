@@ -222,5 +222,22 @@ public class PlaylistManager  {
         return false;
     }
 
+    public void sharePlaylist(Playlist playlist, String permission){
+        if(playlist.token == null || playlist.token.isEmpty()) {
+            mService.sharePlaylist(mCurrentUser.id, playlist.id, permission, new Callback() {
+                @Override
+                public void success(Object o, Response response) {
+
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+
+                }
+            });
+
+        }
+
+    }
 
 }

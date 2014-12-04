@@ -9,6 +9,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
+import hugo.weaving.DebugLog;
+
 
 public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder>
         extends RecyclerView.Adapter<VH> {
@@ -21,7 +23,9 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
 
     private OnItemOptionSelectedListener<M> itemOptionSelectedListener;
     private OnItemClickListener<M> itemClickListener;
-    private ArrayList<M> items = new ArrayList<M>();
+    protected ArrayList<M> items = new ArrayList<>();
+    protected ArrayList<M> filteredItems = new ArrayList<>();
+    protected String filter;
 
     /**
      * Default Constructor
@@ -63,6 +67,65 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
 
     /***********************************************************************************************
      *
+     * Query Methods
+     *
+     */
+
+    /**
+     * Apply a query to this adapter
+     *
+     * @param query     query
+     */
+    public void query(String query){
+        filter = query;
+
+        // Filter results
+        filter();
+
+        // Force an application of the query
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Clear out the current query
+     */
+    public void clearQuery(){
+        filter = null;
+        filter();
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Apply a filter to this adapters subset of content
+     */
+    @DebugLog
+    private void filter(){
+        if(filter != null && !filter.isEmpty()){
+            filteredItems.clear();
+            for(M item: items){
+                if(onQuery(item, filter)){
+                    filteredItems.add(item);
+                }
+            }
+        }else{
+            filteredItems.clear();
+            filteredItems.addAll(items);
+        }
+    }
+
+    /**
+     * Override this method to apply filtering to your content
+     * so you can supply queries to the adapter to filter your content out
+     * for search
+     *
+     * @param item      the item to filter check
+     * @param query     the query to check with
+     * @return          true if the item matches the query in any way
+     */
+    public abstract boolean onQuery(M item, String query);
+
+    /***********************************************************************************************
+     *
      * Array Methods
      *
      */
@@ -73,6 +136,7 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
      */
     public void add(M object) {
         items.add(object);
+        filter();
         notifyDataSetChanged();
     }
 
@@ -84,6 +148,7 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
      */
     public void add(int index, M object) {
         items.add(index, object);
+        filter();
         notifyDataSetChanged();
     }
 
@@ -95,6 +160,7 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
     public void addAll(Collection<? extends M> collection) {
         if (collection != null) {
             items.addAll(collection);
+            filter();
             notifyDataSetChanged();
         }
     }
@@ -114,6 +180,8 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
     public void clear() {
         int N = items.size();
         items.clear();
+        filteredItems.clear();
+        filter = null;
         notifyDataSetChanged();
     }
 
@@ -123,13 +191,15 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
      * @param object        the object to remove
      */
     public void remove(M object) {
-        int index = items.indexOf(object);
         items.remove(object);
+        filter();
         notifyDataSetChanged();
     }
 
     public void remove(int index){
         items.remove(index);
+        filter();
+        notifyDataSetChanged();
     }
 
     /**
@@ -140,6 +210,7 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
      */
     public void sort(Comparator<M> comparator){
         Collections.sort(items, comparator);
+        filter();
         notifyDataSetChanged();
     }
 
@@ -150,7 +221,7 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
      * @return              the item at that position, or null
      */
     public M getItem(int position) {
-        return items.get(position);
+        return filteredItems.get(position);
     }
 
     @Override
@@ -160,9 +231,8 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return filteredItems.size();
     }
-
 
     public static interface OnItemOptionSelectedListener<M>{
         public void onSelected(View view, M item);

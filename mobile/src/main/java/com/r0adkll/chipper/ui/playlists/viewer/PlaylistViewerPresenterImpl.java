@@ -133,6 +133,11 @@ public class PlaylistViewerPresenterImpl implements PlaylistViewerPresenter {
     }
 
     @Override
+    public void sharePlaylist(Playlist playlist) {
+
+    }
+
+    @Override
     public ModelLoader<ChiptuneReference> getLoader(Playlist playlist) {
         From query = new Select()
                 .from(ChiptuneReference.class)

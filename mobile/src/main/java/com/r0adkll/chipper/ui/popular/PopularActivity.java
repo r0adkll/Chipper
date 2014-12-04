@@ -8,6 +8,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.SearchView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -103,6 +106,55 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView,
         presenter.loadAllChiptunes();
         presenter.loadVotes();
 
+    }
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_popular, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        if(searchView != null){
+
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String s) {
+                    // Run query
+                    adapter.query(s);
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String s) {
+                    // Run query
+                    adapter.query(s);
+                    return true;
+                }
+            });
+
+            searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+                @Override
+                public boolean onClose() {
+                    adapter.clearQuery();
+                    return true;
+                }
+            });
+
+        }
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        return super.onOptionsItemSelected(item);
     }
 
     /***********************************************************************************************

@@ -14,6 +14,8 @@ public interface PlaylistViewerPresenter extends IActionPresenter{
 
     public void offlinePlaylist(Playlist playlist);
 
+    public void sharePlaylist(Playlist playlist);
+
     public ModelLoader<ChiptuneReference> getLoader(Playlist playlist);
 
 }

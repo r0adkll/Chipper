@@ -21,6 +21,8 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import hugo.weaving.DebugLog;
+import timber.log.Timber;
 
 /**
  * Project: Chipper
@@ -55,6 +57,12 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
         mPlaylistManager = playlistManager;
         mVoteManager = voteManager;
         mCache = cashMachine;
+    }
+
+    @Override
+    public boolean onQuery(Chiptune item, String query) {
+        return item.artist.toLowerCase().contains(query.toLowerCase()) ||
+                item.title.toLowerCase().contains(query.toLowerCase());
     }
 
     /***********************************************************************************************
@@ -175,6 +183,7 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
     /**
      * Build the section headers for use in creating the headers
      */
+    @DebugLog
     private void buildSectionHeaders(){
         // Update Artist maps
         HashMap<String, List<Chiptune>> currMap = new HashMap<String, List<Chiptune>>();
@@ -204,8 +213,6 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
     private RecyclerView.AdapterDataObserver mChiptunesObserver = new RecyclerView.AdapterDataObserver() {
         @Override
         public void onChanged() {
-            super.onChanged();
-
             // Rebuild Header maps
             buildSectionHeaders();
         }

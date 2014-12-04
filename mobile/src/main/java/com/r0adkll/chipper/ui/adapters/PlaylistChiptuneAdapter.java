@@ -35,13 +35,19 @@ public class PlaylistChiptuneAdapter extends RecyclerArrayAdapter<ChiptuneRefere
         super();
     }
 
-
     @Override
     public PlaylistChiptuneViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.layout_playlist_chiptune_item, viewGroup, false);
 
         return new PlaylistChiptuneViewHolder(view);
+    }
+
+    @Override
+    public boolean onQuery(ChiptuneReference item, String query) {
+        Chiptune chiptune = mChiptuneProvider.getChiptune(item.chiptune_id);
+        return chiptune.artist.toLowerCase().contains(query.toLowerCase()) ||
+                chiptune.title.toLowerCase().contains(query.toLowerCase());
     }
 
     @Override

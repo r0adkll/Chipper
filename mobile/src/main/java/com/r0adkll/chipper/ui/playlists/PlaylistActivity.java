@@ -15,6 +15,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewOutlineProvider;
@@ -95,6 +96,39 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_playlists, menu);
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        if(searchView != null){
+
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String s) {
+                    // Run query
+                    adapter.query(s);
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String s) {
+                    // Run query
+                    adapter.query(s);
+                    return true;
+                }
+            });
+
+            searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+                @Override
+                public boolean onClose() {
+                    adapter.clearQuery();
+                    return true;
+                }
+            });
+
+        }
+        return super.onPrepareOptionsMenu(menu);
     }
 
     /***********************************************************************************************

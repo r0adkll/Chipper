@@ -3,28 +3,19 @@ package com.r0adkll.chipper.ui.all;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Outline;
-import android.graphics.Paint;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.SearchView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewOutlineProvider;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 
 import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
 import com.fortysevendeg.swipelistview.SwipeListView;
 import com.r0adkll.chipper.R;
-import com.r0adkll.chipper.playback.MusicService;
 import com.r0adkll.chipper.ui.adapters.AllChiptuneAdapter;
 import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
 import com.r0adkll.chipper.ui.adapters.RecyclerArrayAdapter;
@@ -34,9 +25,7 @@ import com.r0adkll.chipper.ui.player.MusicPlayer;
 import com.r0adkll.chipper.ui.player.MusicPlayerCallbacks;
 import com.r0adkll.chipper.ui.widget.StickyRecyclerHeadersElevationDecoration;
 import com.r0adkll.chipper.utils.UIUtils;
-import com.r0adkll.deadskunk.utils.Utils;
 import com.r0adkll.postoffice.PostOffice;
-import com.r0adkll.postoffice.styles.EditTextStyle;
 
 import java.util.List;
 
@@ -67,7 +56,7 @@ public class ChiptunesActivity extends BaseDrawerActivity
     ChiptunesPresenter presenter;
 
     @Inject
-    AllChiptuneAdapter mAdapter;
+    AllChiptuneAdapter adapter;
 
 
     /***********************************************************************************************
@@ -92,21 +81,68 @@ public class ChiptunesActivity extends BaseDrawerActivity
         getPlayer().setCallbacks(this);
 
         // Setup the adapter with the recycler view
-        mChiptuneRecycler.setAdapter(mAdapter);
+        mChiptuneRecycler.setAdapter(adapter);
         mChiptuneRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        StickyRecyclerHeadersElevationDecoration headersDecor = new StickyRecyclerHeadersElevationDecoration(mAdapter);
+        StickyRecyclerHeadersElevationDecoration headersDecor = new StickyRecyclerHeadersElevationDecoration(adapter);
         mChiptuneRecycler.addItemDecoration(headersDecor);
-        mAdapter.setOnItemOptionSelectedListener(this);
+        adapter.setOnItemOptionSelectedListener(this);
 
         mChiptuneRecycler.setSwipeListViewListener(new BaseSwipeListViewListener(){
             @Override
             public void onClickFrontView(int position) {
-                presenter.onChiptuneSelected(mAdapter.getItem(position));
+                presenter.onChiptuneSelected(adapter.getItem(position));
             }
         });
 
         //  Load all chiptunes
         presenter.loadAllChiptunes();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_all, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        if(searchView != null){
+
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String s) {
+                    // Run query
+                    adapter.query(s);
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String s) {
+                    // Run query
+                    adapter.query(s);
+                    return true;
+                }
+            });
+
+            searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+                @Override
+                public boolean onClose() {
+                    adapter.clearQuery();
+                    return true;
+                }
+            });
+
+        }
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        return super.onOptionsItemSelected(item);
     }
 
     /***********************************************************************************************
@@ -194,8 +230,8 @@ public class ChiptunesActivity extends BaseDrawerActivity
 
     @Override
     public void setChiptunes(List<Chiptune> chiptunes) {
-        mAdapter.clear();
-        mAdapter.addAll(chiptunes);
+        adapter.clear();
+        adapter.addAll(chiptunes);
     }
 
     @Override

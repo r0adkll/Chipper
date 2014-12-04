@@ -57,7 +57,7 @@ public abstract class BaseActivity extends ActionBarActivity {
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        mSlidingLayout.hidePanel();
+        if(mSlidingLayout != null) mSlidingLayout.hidePanel();
     }
 
     /**

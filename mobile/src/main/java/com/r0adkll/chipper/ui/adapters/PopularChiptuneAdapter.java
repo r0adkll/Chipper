@@ -14,8 +14,10 @@ import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.VoteManager;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import butterknife.ButterKnife;
@@ -59,6 +61,12 @@ public class PopularChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, Popul
 
         // Sort Votedata by votes
         sort(new PopularComparator(voteData));
+    }
+
+    @Override
+    public boolean onQuery(Chiptune item, String query) {
+        return item.artist.toLowerCase().contains(query.toLowerCase()) ||
+                item.title.toLowerCase().contains(query.toLowerCase());
     }
 
     /***********************************************************************************************

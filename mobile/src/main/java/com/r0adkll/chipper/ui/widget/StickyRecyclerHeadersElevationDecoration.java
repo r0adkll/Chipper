@@ -117,36 +117,38 @@ public class StickyRecyclerHeadersElevationDecoration extends RecyclerView.ItemD
 
             }
 
-            for (int i = 1; i < parent.getChildCount(); i++) {
+            if(parent.getChildCount() > 1 && mAdapter.getItemCount() > 1) {
+                for (int i = 1; i < parent.getChildCount(); i++) {
 
-                int position = parent.getChildPosition(parent.getChildAt(i));
-                if (hasNewHeader(position)) {
+                    int position = parent.getChildPosition(parent.getChildAt(i));
+                    if (hasNewHeader(position)) {
 
-                    // this header is different than the previous, it must be drawn in the correct place
-                    int translationX = 0;
-                    int translationY = 0;
-                    View header = getHeaderView(parent, position);
+                        // this header is different than the previous, it must be drawn in the correct place
+                        int translationX = 0;
+                        int translationY = 0;
+                        View header = getHeaderView(parent, position);
 
-                    if (orientation == LinearLayoutManager.VERTICAL) {
+                        if (orientation == LinearLayoutManager.VERTICAL) {
 
-                        translationY = parent.getChildAt(i).getTop() - header.getHeight();
+                            translationY = parent.getChildAt(i).getTop() - header.getHeight();
 
-                    } else {
+                        } else {
 
-                        translationX = parent.getChildAt(i).getLeft() - header.getWidth();
+                            translationX = parent.getChildAt(i).getLeft() - header.getWidth();
 
+                        }
+
+                        // don't render shadow
+                        ImageView shadow = ButterKnife.findById(header, R.id.shadow);
+                        shadow.setVisibility(View.GONE);
+
+                        canvas.save();
+                        canvas.translate(translationX, translationY);
+                        header.draw(canvas);
+                        canvas.restore();
+                        mHeaderRects.put(position, new Rect(translationX, translationY,
+                                translationX + header.getWidth(), translationY + header.getHeight()));
                     }
-
-                    // don't render shadow
-                    ImageView shadow = ButterKnife.findById(header, R.id.shadow);
-                    shadow.setVisibility(View.GONE);
-
-                    canvas.save();
-                    canvas.translate(translationX, translationY);
-                    header.draw(canvas);
-                    canvas.restore();
-                    mHeaderRects.put(position, new Rect(translationX, translationY,
-                            translationX + header.getWidth(), translationY + header.getHeight()));
                 }
             }
         }

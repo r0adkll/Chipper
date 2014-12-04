@@ -47,6 +47,11 @@ public class QueueChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, QueueCh
     }
 
     @Override
+    public boolean onQuery(Chiptune item, String query) {
+        return true;
+    }
+
+    @Override
     public void onBindViewHolder(final PlaylistChiptuneViewHolder holder, int i) {
         Chiptune chiptune = getItem(i);
 

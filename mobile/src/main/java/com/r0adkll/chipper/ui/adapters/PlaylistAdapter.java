@@ -44,6 +44,11 @@ public class PlaylistAdapter extends RecyclerArrayAdapter<Playlist, PlaylistAdap
     }
 
     @Override
+    public boolean onQuery(Playlist item, String query) {
+        return item.name.toLowerCase().contains(query.toLowerCase());
+    }
+
+    @Override
     public void onBindViewHolder(final PlaylistViewHolder holder, int i) {
         Playlist playlist = getItem(i);
 

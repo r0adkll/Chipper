@@ -221,7 +221,7 @@ public interface ChipperService {
     @DELETE("/user/{id}/playlists/{pid}")
     void deletePlaylist(@Path("id") String userId,
                         @Path("pid") String playlistId,
-                        Callback cb);
+                        Callback<Map<String, String>> cb);
 
     /**
      * Share a playlist

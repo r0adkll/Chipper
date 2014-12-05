@@ -14,11 +14,33 @@ import com.google.gson.annotations.SerializedName;
 @Table(name = "playlist_chiptunes")
 public class ChiptuneReference extends Model implements Parcelable {
 
+    /***********************************************************************************************
+     *
+     * Static Methods
+     *
+     */
+
+    public static ChiptuneReference create(ChiptuneReference ref){
+        ChiptuneReference cr = new ChiptuneReference();
+        cr.chiptune_id = ref.chiptune_id;
+        return cr;
+    }
+
+    /***********************************************************************************************
+     *
+     * Variables
+     *
+     */
+
     @Column(index = true)
     @SerializedName("id")
     public String chiptune_id;
 
-    @Column
+    @Column(
+        name = "playlist",
+        onDelete = Column.ForeignKeyAction.CASCADE,
+        onUpdate = Column.ForeignKeyAction.CASCADE
+    )
     public Playlist playlist;
 
     @Column

@@ -4,6 +4,9 @@ import android.content.Intent;
 
 import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.listeners.ActionClickListener;
+import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
@@ -12,6 +15,8 @@ import com.r0adkll.chipper.data.model.ModelLoader;
 import com.r0adkll.chipper.data.model.OfflineRequest;
 import com.r0adkll.chipper.ui.playlists.viewer.PlaylistViewerActivity;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import retrofit.Callback;
@@ -83,8 +88,29 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
     }
 
     @Override
-    public void deletePlaylist(Playlist... playlists) {
-        mManager.deletePlaylists(playlists);
+    public void deletePlaylist(Collection<Playlist> playlists) {
+        final List<Playlist> plists = new ArrayList<>(mManager.deletePlaylists(playlists));
+        if(!plists.isEmpty()){
+            String text = plists.size() == 1 ?
+                    String.format("%s was deleted", plists.get(0).name) :
+                    String.format("%d playlists were deleted", plists.size());
+
+            Snackbar.with(mView.getActivity())
+                    .text(text)
+                    .actionLabel("UNDO")
+                    .actionColor(mView.getActivity().getResources().getColor(R.color.primaryDark))
+                    .actionListener(new ActionClickListener() {
+                        @Override
+                        public void onActionClicked() {
+                            // Resave all the playlists
+                            for(Playlist plist: plists){
+                                Playlist.create(plist);
+                            }
+                        }
+                    })
+                    .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
+                    .show(mView.getActivity());
+        }
     }
 
     @Override

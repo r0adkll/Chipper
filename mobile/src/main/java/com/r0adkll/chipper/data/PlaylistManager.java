@@ -19,6 +19,8 @@ import com.r0adkll.deadskunk.utils.IntentUtils;
 import com.r0adkll.postoffice.PostOffice;
 import com.r0adkll.postoffice.styles.EditTextStyle;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -101,24 +103,39 @@ public class PlaylistManager  {
      *
      * @param playlists     the list of playlists to delete
      */
-    public void deletePlaylists(Playlist... playlists){
+    public Collection<Playlist> deletePlaylists(Playlist... playlists){
+        return deletePlaylists(Arrays.asList(playlists));
+    }
 
+    public Collection<Playlist> deletePlaylists(Collection<Playlist> playlists){
         // iterate and delete the following playlists
         for(Playlist playlist:playlists){
 
             // DO NOT DELETE the favorites playlist
             if(playlist.name.equalsIgnoreCase("favorites")) continue;
 
+            // Load the playlists chiptune references from the database so those can be restored as welll
+            playlist.loadChiptuneReferences();
+
             // Attempt to delete the server version
-            mService.deletePlaylist(mCurrentUser.id, playlist.id, new Callback() {
-                @Override public void success(Object o, Response response) {}
-                @Override public void failure(RetrofitError error) {}
+            mService.deletePlaylist(mCurrentUser.id, playlist.id, new Callback<Map<String, String>>() {
+                @Override
+                public void success(Map<String, String> result, Response response) {
+                    String msg = result.get("message");
+                    Timber.i("Successfully deleted playlist from server: %s", msg);
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    Timber.e("Error deleting playlist on the server: %s", error.getLocalizedMessage());
+                }
             });
 
             // Delete locally
             playlist.delete();
         }
 
+        return playlists;
     }
 
     /**

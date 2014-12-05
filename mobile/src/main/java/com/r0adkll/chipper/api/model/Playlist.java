@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import hugo.weaving.DebugLog;
+import timber.log.Timber;
 
 /**
  * Created by r0adkll on 11/2/14.
@@ -52,6 +53,37 @@ public class Playlist extends Model implements Parcelable{
         return plist;
     }
 
+    /**
+     * Generate a new playlist based on another one, one that may have been deleted per-se
+     *
+     * @param playlist      the playlist to create from
+     * @return              the new playlist
+     */
+    public static Playlist create(Playlist playlist){
+        Playlist p = new Playlist();
+        // Update the basic values now
+        p.id = playlist.id;
+        p.name = playlist.name;
+        p.updated = playlist.updated;
+        p.token = playlist.token;
+        p.permissions = playlist.permissions;
+
+        // Update the complex values now
+        // 1) Find owner reference
+        p.owner = playlist.owner;
+        p.updated_by_user = playlist.updated_by_user;
+
+        // now save all the ones from the updated playlist
+        p.tuneRefs = playlist.sanatizeChiptuneReferences();
+        p.saveChiptuneReferences();
+
+        // Save ourselves
+        long id = p.save();
+        Timber.i("Playlist Created: %d", id);
+
+        return p;
+    }
+
     /***********************************************************************************************
      *
      * Variables
@@ -61,7 +93,11 @@ public class Playlist extends Model implements Parcelable{
     @Column(name = "playlist_id")
     public String id;
 
-    @Column
+    @Column(
+        name = "owner",
+        onUpdate = Column.ForeignKeyAction.CASCADE,
+        onDelete = Column.ForeignKeyAction.CASCADE
+    )
     public User owner;
 
     @Column
@@ -70,7 +106,10 @@ public class Playlist extends Model implements Parcelable{
     @Column
     public long updated;
 
-    @Column
+    @Column(
+        onUpdate = Column.ForeignKeyAction.CASCADE,
+        onDelete = Column.ForeignKeyAction.SET_NULL
+    )
     public User updated_by_user;
 
     @Column
@@ -228,6 +267,27 @@ public class Playlist extends Model implements Parcelable{
             });
         }
         return references;
+    }
+
+    /**
+     * Load this playlists chiptune references into memory so we have the chance to restore them
+     * on UNDO actions after deletion
+     */
+    public void loadChiptuneReferences(){
+        this.tuneRefs = chiptuneReferences();
+    }
+
+    /**
+     * Sanitize this playlists chiptune references for re-saving
+     *
+     * @return      the sanatized list of chiptune references
+     */
+    public List<ChiptuneReference> sanatizeChiptuneReferences(){
+        List<ChiptuneReference> refs = new ArrayList<>();
+        for(ChiptuneReference ref: tuneRefs){
+            refs.add(ChiptuneReference.create(ref));
+        }
+        return refs;
     }
 
     /**
@@ -472,7 +532,6 @@ public class Playlist extends Model implements Parcelable{
      * @param atm       the cache machine that handles all offline content
      * @return          true if every chiptune in this playlist is offline, false otherwise
      */
-    @DebugLog
     public boolean isOffline(CashMachine atm){
         List<ChiptuneReference> tunes = chiptuneReferences();
         if(tunes == null || tunes.isEmpty()) return false;

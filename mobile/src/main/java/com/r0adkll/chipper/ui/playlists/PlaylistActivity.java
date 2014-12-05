@@ -22,12 +22,15 @@ import android.view.ViewOutlineProvider;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
+import com.fortysevendeg.swipelistview.SwipeListView;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.data.events.OfflineRequestCompletedEvent;
 import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
 import com.r0adkll.chipper.ui.adapters.PlaylistAdapter;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
+import com.r0adkll.chipper.ui.model.SwipeDismissRecyclerViewTouchListener;
 import com.r0adkll.chipper.ui.player.MusicPlayerCallbacks;
 import com.r0adkll.chipper.ui.widget.DividerDecoration;
 import com.r0adkll.deadskunk.utils.Utils;
@@ -36,6 +39,7 @@ import com.r0adkll.postoffice.styles.EditTextStyle;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -54,7 +58,7 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
      *
      */
 
-    @InjectView(R.id.recycle_view)      RecyclerView mRecyclerView;
+    @InjectView(R.id.recycle_view)      SwipeListView mRecyclerView;
     @InjectView(R.id.fab_add_playlist)  FrameLayout mFabAdd;
 
     @Inject
@@ -89,7 +93,49 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mRecyclerView.addItemDecoration(new DividerDecoration(this));
-        adapter.setOnItemClickListener(this);
+        mRecyclerView.setSwipeListViewListener(new BaseSwipeListViewListener(){
+            @Override
+            public int onChangeSwipeMode(int position) {
+                return position == 0 ? SwipeListView.SWIPE_MODE_NONE : SwipeListView.SWIPE_MODE_BOTH;
+            }
+
+            @Override
+            public void onDismiss(int[] reverseSortedPositions) {
+                List<Playlist> deletedPlaylists = new ArrayList<>();
+                for (int position : reverseSortedPositions) {
+                    Playlist removed = adapter.removeRaw(position);
+                    deletedPlaylists.add(removed);
+                }
+                adapter.reconcile();
+
+                if(!deletedPlaylists.isEmpty()){
+                    presenter.deletePlaylist(deletedPlaylists);
+                }
+
+            }
+
+            @Override
+            public void onClickFrontView(int position) {
+                Playlist item = adapter.getItem(position);
+                presenter.onPlaylistSelected(item, position);
+            }
+
+            @Override
+            public void onMove(int position, float x) {
+                View itemView = mRecyclerView.getChildAt(position);
+                if(itemView != null) {
+                    View leftDel = itemView.findViewById(R.id.left_delete);
+                    View rightDel = itemView.findViewById(R.id.right_delete);
+                    if (x > 0) {
+                        leftDel.setVisibility(View.VISIBLE);
+                        rightDel.setVisibility(View.INVISIBLE);
+                    } else {
+                        leftDel.setVisibility(View.INVISIBLE);
+                        rightDel.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        });
 
         // setup loaders
         getSupportLoaderManager().initLoader(0, null, this);

@@ -137,6 +137,14 @@ public class LoginPresenterImpl implements LoginPresenter {
                 favorites.updated = Tools.time();
                 favorites.save();
                 Timber.i("Successfully linked pre-configured 'Favorites' to the new user");
+            }else{
+                favorites = new Playlist();
+                favorites.name = "Favorites";
+                favorites.updated_by_user = user;
+                favorites.owner = user;
+                favorites.updated = Tools.time();
+                favorites.save();
+                Timber.i("Successfully created new pre-configured 'Favorites' for the new user");
             }
 
             // Now create a sync account

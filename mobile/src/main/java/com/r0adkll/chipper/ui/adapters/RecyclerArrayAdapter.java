@@ -201,6 +201,17 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
         notifyDataSetChanged();
     }
 
+    public M removeRaw(int index){
+        M item = items.remove(index);
+        notifyItemRemoved(index);
+        return item;
+    }
+
+    public void reconcile(){
+        filter();
+        notifyDataSetChanged();
+    }
+
     /**
      * Sort the items in this adapter by a given
      * {@link java.util.Comparator}

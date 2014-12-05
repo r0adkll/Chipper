@@ -1,71 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
-    android:background="?android:selectableItemBackground">
+    android:layout_height="72dp">
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/back"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="start|center_vertical"
-        android:paddingLeft="@dimen/activity_padding"
-        android:layout_toLeftOf="@+id/playlist_offline"
+        android:background="@drawable/background_item">
+
+        <ImageView
+            android:id="@+id/left_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingLeft="@dimen/activity_padding"
+            android:paddingRight="@dimen/activity_padding"
+
+            android:src="@drawable/ic_action_delete"
+            />
+
+        <ImageView
+            android:id="@+id/right_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingLeft="@dimen/activity_padding"
+            android:paddingRight="@dimen/activity_padding"
+            android:layout_alignParentRight="true"
+
+            android:src="@drawable/ic_action_delete"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/front"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/list_item_background"
         >
 
-        <TextView
-            android:id="@+id/title"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="start|center_vertical"
+            android:paddingLeft="@dimen/activity_padding"
+            android:layout_toLeftOf="@+id/playlist_offline"
+            >
 
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:textSize="16sp"
+                android:textColor="@color/primary_text_default_material_light"
+                android:singleLine="true"
+                android:ellipsize="end"
+
+                tools:text="@string/placeholder_lorem_ipsum"
+                />
+
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:textSize="14sp"
+                android:textColor="@color/secondary_text_default_material_light"
+                android:singleLine="true"
+                android:ellipsize="end"
+
+                tools:text="@string/placeholder_lorem_ipsum"
+                />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/playlist_offline"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+
+            android:src="@drawable/ic_action_cloud_done"
+            android:layout_toLeftOf="@+id/tune_count"
+            />
+
+        <TextView
+            android:id="@+id/tune_count"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:layout_alignParentRight="true"
+            android:paddingRight="@dimen/activity_padding"
+            android:paddingLeft="@dimen/activity_padding"
+
+            tools:text="20 songs"
             android:textSize="16sp"
-            android:textColor="@color/primary_text_default_material_light"
-            android:singleLine="true"
-            android:ellipsize="end"
-
-            tools:text="@string/placeholder_lorem_ipsum"
+            android:textColor="@color/primary"
+            android:fontFamily="@string/font_fontFamily_medium"
+            android:textStyle="@integer/font_textStyle_medium"
             />
 
-        <TextView
-            android:id="@+id/description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+    </RelativeLayout>
 
-            android:textSize="14sp"
-            android:textColor="@color/secondary_text_default_material_light"
-            android:singleLine="true"
-            android:ellipsize="end"
 
-            tools:text="@string/placeholder_lorem_ipsum"
-            />
-
-    </LinearLayout>
-
-    <ImageView
-        android:id="@+id/playlist_offline"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-
-        android:src="@drawable/ic_action_cloud_done"
-        android:layout_toLeftOf="@+id/tune_count"
-        android:visibility="gone"
-        />
-
-    <TextView
-        android:id="@+id/tune_count"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical"
-        android:layout_alignParentRight="true"
-        android:paddingRight="@dimen/activity_padding"
-        android:paddingLeft="@dimen/activity_padding"
-
-        tools:text="20 songs"
-        android:textSize="16sp"
-        android:textColor="@color/primary"
-        android:fontFamily="@string/font_fontFamily_medium"
-        android:textStyle="@integer/font_textStyle_medium"
-        />
-
-</RelativeLayout>
+</FrameLayout>

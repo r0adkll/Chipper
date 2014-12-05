@@ -212,6 +212,7 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView,
                 presenter.offlineChiptunes(item);
                 break;
         }
+        mRecyclerView.closeOpenedItems();
     }
 
     /**

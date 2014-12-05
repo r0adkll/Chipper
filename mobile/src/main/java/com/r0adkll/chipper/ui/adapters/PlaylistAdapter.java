@@ -77,13 +77,13 @@ public class PlaylistAdapter extends RecyclerArrayAdapter<Playlist, PlaylistAdap
             holder.offline.setVisibility(View.GONE);
         }
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int i = holder.getPosition();
-                onItemClick(v, i);
-            }
-        });
+//        holder.itemView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                int i = holder.getPosition();
+//                onItemClick(v, i);
+//            }
+//        });
     }
 
     public static class PlaylistViewHolder extends RecyclerView.ViewHolder{

@@ -23,6 +23,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.data.events.OfflineRequestCompletedEvent;
 import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
 import com.r0adkll.chipper.ui.adapters.PlaylistAdapter;
 import com.r0adkll.chipper.api.model.Playlist;
@@ -32,6 +33,8 @@ import com.r0adkll.chipper.ui.widget.DividerDecoration;
 import com.r0adkll.deadskunk.utils.Utils;
 import com.r0adkll.postoffice.PostOffice;
 import com.r0adkll.postoffice.styles.EditTextStyle;
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import java.util.List;
 
@@ -59,6 +62,9 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
 
     @Inject
     PlaylistAdapter adapter;
+
+    @Inject
+    Bus mBus;
 
     /***********************************************************************************************
      *
@@ -90,6 +96,19 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
 
         // Load shared playlists
         presenter.loadSharedPlaylists();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mBus.unregister(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mBus.register(this);
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -304,5 +323,16 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
     @Override
     public void onStopped() {
         getSlidingLayout().hidePanel();
+    }
+
+    /***********************************************************************************************
+     *
+     * Otto Subscriptions
+     *
+     */
+
+    @Subscribe
+    public void answerOfflineRequestCompletedEvent(OfflineRequestCompletedEvent event){
+        adapter.notifyDataSetChanged();
     }
 }

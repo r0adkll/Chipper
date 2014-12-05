@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -23,8 +24,11 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.activeandroid.Model;
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.listeners.EventListener;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.data.CashMachine;
+import com.r0adkll.chipper.data.events.OfflineRequestCompletedEvent;
 import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
 import com.r0adkll.chipper.ui.adapters.PlaylistChiptuneAdapter;
 import com.r0adkll.chipper.api.model.Chiptune;
@@ -35,9 +39,12 @@ import com.r0adkll.chipper.ui.model.BaseActivity;
 import com.r0adkll.chipper.ui.player.MusicPlayerCallbacks;
 import com.r0adkll.chipper.ui.widget.DividerDecoration;
 import com.r0adkll.chipper.ui.widget.EmptyView;
+import com.r0adkll.chipper.utils.CallbackHandler;
 import com.r0adkll.deadskunk.utils.Utils;
 import com.r0adkll.postoffice.PostOffice;
 import com.r0adkll.slidableactivity.SlidableAttacher;
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import java.util.List;
 
@@ -74,6 +81,8 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
     @Inject ChiptuneProvider chiptuneProvider;
     @Inject PlaylistViewerPresenter presenter;
     @Inject PlaylistChiptuneAdapter adapter;
+    @Inject Bus mBus;
+    @Inject CashMachine mAtm;
 
     @Icicle
     long mPlaylistId = -1;
@@ -125,6 +134,18 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        mBus.unregister(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mBus.register(this);
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         Icepick.saveInstanceState(this, outState);
@@ -166,6 +187,16 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
             });
 
         }
+
+        MenuItem offline = menu.findItem(R.id.action_offline);
+        if(mPlaylist.isOffline(mAtm)){
+            Drawable icon = getResources().getDrawable(R.drawable.ic_action_cloud_done);
+            offline.setIcon(icon);
+        }else{
+            Drawable icon = getResources().getDrawable(R.drawable.ic_action_cloud_download);
+            offline.setIcon(icon);
+        }
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -176,7 +207,22 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
                 finish();
                 return true;
             case R.id.action_offline:
-                presenter.offlinePlaylist(mPlaylist);
+                if(mPlaylist.isOffline(mAtm)){
+
+                    // Delete the cache
+                    mAtm.deleteOfflineFiles(new CallbackHandler() {
+                        @Override
+                        public void onHandle(Object value) {
+                            supportInvalidateOptionsMenu();
+                        }
+
+                        @Override public void onFailure(String msg) {}
+                    }, mPlaylist.getChiptunes(chiptuneProvider));
+
+                }else{
+                    presenter.offlinePlaylist(mPlaylist);
+                }
+
                 return true;
             case R.id.action_share:
                 presenter.sharePlaylist(mPlaylist);
@@ -312,6 +358,13 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
     }
 
     @Override
+    public void showSnackBar(String text) {
+        Snackbar.with(this)
+                .text(text)
+                .show(this);
+    }
+
+    @Override
     public Activity getActivity() {
         return this;
     }
@@ -319,6 +372,11 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
     @Override
     public Playlist getPlaylist() {
         return mPlaylist;
+    }
+
+    @Override
+    public void refreshContent() {
+        adapter.notifyDataSetChanged();
     }
 
     /***********************************************************************************************
@@ -332,5 +390,17 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
         return new Object[]{
             new PlaylistViewerModule(this)
         };
+    }
+
+    /***********************************************************************************************
+     *
+     * Otto Subscriptions
+     *
+     */
+
+    @Subscribe
+    public void answerOfflineRequestCompletedEvent(OfflineRequestCompletedEvent event){
+        adapter.notifyDataSetChanged();
+        supportInvalidateOptionsMenu();
     }
 }

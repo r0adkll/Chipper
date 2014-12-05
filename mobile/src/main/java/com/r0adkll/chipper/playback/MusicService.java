@@ -10,6 +10,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
@@ -24,6 +28,7 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 
 import com.activeandroid.Model;
@@ -131,6 +136,8 @@ public class MusicService extends Service {
     private MediaSessionCompat mCurrentSession;
 
     private boolean mCanShowNotification = true;
+    private Bitmap mArt;
+    private Bitmap mArtAlbum;
 
     /***********************************************************************************************
      *
@@ -142,6 +149,10 @@ public class MusicService extends Service {
     public void onCreate() {
         super.onCreate();
         ChipperApp.get(this).inject(this);
+
+        // Load art
+        mArt = BitmapFactory.decodeResource(getResources(), R.drawable.dr_login_background);
+        mArtAlbum = BitmapFactory.decodeResource(getResources(), R.drawable.chipper_round_watch_bg);
 
         // Register for the Otto bus
         mBus.register(this);
@@ -168,6 +179,7 @@ public class MusicService extends Service {
         // Initialize the Media Session
         mCurrentSession = new MediaSessionCompat(this, MEDIA_SESSION_TAG);
         mCurrentSession.setCallback(mMediaSessionCallbacks);
+        mCurrentSession.setPlaybackToLocal(AudioManager.STREAM_MUSIC);
 
         // Post the session
         mBus.post(new MediaSessionEvent(mCurrentSession));
@@ -559,6 +571,9 @@ public class MusicService extends Service {
                        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, chiptune.title)
                        .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, chiptune.length)
                        .putRating(MediaMetadataCompat.METADATA_KEY_USER_RATING, rating)
+                       .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, mArtAlbum)
+                       .putBitmap(MediaMetadataCompat.METADATA_KEY_ART, mArt)
+                       .putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, mArtAlbum)
                        .putString(METADATA_KEY_FAVORITED, String.valueOf(mPlaylistManager.isFavorited(chiptune)));
 
         }
@@ -577,6 +592,9 @@ public class MusicService extends Service {
         // Get a random chiptune, and construct the play queue from it
         Chiptune randomChiptune = mProvider.getRandomChiptune();
         mQueue = new PlayQueue(mProvider, randomChiptune);
+
+        // Set session as active
+        mCurrentSession.setActive(true);
 
         // Start playback of the current queue
         startPlayback();
@@ -617,6 +635,12 @@ public class MusicService extends Service {
 
             if(Utils.isLollipop()) {
 
+                // Build wear extender
+                Notification.WearableExtender wearableExtender =
+                        new Notification.WearableExtender()
+                                .setHintHideIcon(true)
+                                .setBackground(mArtAlbum);
+
                 // Build the notification
                 Notification.Builder builder = new Notification.Builder(this)
                         .setSmallIcon(R.drawable.ic_stat_chipper)
@@ -626,6 +650,7 @@ public class MusicService extends Service {
                         .setContentIntent(contentPI)
                         .setDeleteIntent(deletePI)
                         .setOngoing(mPlayer.isPlaying())
+                        .extend(wearableExtender)
                         .setStyle(new Notification.MediaStyle()
                                 .setMediaSession((android.media.session.MediaSession.Token) mCurrentSession.getSessionToken().getToken())
                                 .setShowActionsInCompactView(2, 3));
@@ -650,6 +675,12 @@ public class MusicService extends Service {
 
             }else{
 
+                // Build wear extender
+                NotificationCompat.WearableExtender wearableExtender =
+                        new NotificationCompat.WearableExtender()
+                        .setHintHideIcon(true)
+                        .setBackground(mArtAlbum);
+
                 // Build the notification
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_stat_chipper)
@@ -659,7 +690,8 @@ public class MusicService extends Service {
                         .setContentText(text)
                         .setContentIntent(contentPI)
                         .setDeleteIntent(deletePI)
-                        .setOngoing(mPlayer.isPlaying());
+                        .setOngoing(mPlayer.isPlaying())
+                        .extend(wearableExtender);
 
                 // Build actions/intents
                 Action play = buildAction(R.drawable.ic_action_play, R.string.action_play, ACTION_PLAY);
@@ -767,6 +799,7 @@ public class MusicService extends Service {
      */
     private MediaSessionCompat.Callback mMediaSessionCallbacks = new MediaSessionCompat.Callback() {
 
+        @DebugLog
         @Override
         public void onCommand(String command, Bundle extras, ResultReceiver cb) {
             Timber.i("onCommand(%s, %s)", command, extras.toString());
@@ -823,25 +856,29 @@ public class MusicService extends Service {
         public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
             if(mediaButtonEvent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)){
                 KeyEvent event = mediaButtonEvent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-                switch (event.getAction()){
-                    case KeyEvent.KEYCODE_MEDIA_PLAY:
-                        play();
-                        return true;
-                    case KeyEvent.KEYCODE_MEDIA_PAUSE:
-                        pause();
-                        return true;
-                    case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-                        playPause();
-                        return true;
-                    case KeyEvent.KEYCODE_MEDIA_NEXT:
-                        next();
-                        return true;
-                    case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                        previous();
-                        return true;
-                    case KeyEvent.KEYCODE_MEDIA_STOP:
-                        stop();
-                        return true;
+                if(event.getAction() == KeyEvent.ACTION_UP) {
+                    Timber.i("MediaButtonEvent::onEvent(action: %d, keycode: %d)");
+
+                    switch (event.getKeyCode()) {
+                        case KeyEvent.KEYCODE_MEDIA_PLAY:
+                            play();
+                            return true;
+                        case KeyEvent.KEYCODE_MEDIA_PAUSE:
+                            pause();
+                            return true;
+                        case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+                            playPause();
+                            return true;
+                        case KeyEvent.KEYCODE_MEDIA_NEXT:
+                            next();
+                            return true;
+                        case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+                            previous();
+                            return true;
+                        case KeyEvent.KEYCODE_MEDIA_STOP:
+                            stop();
+                            return true;
+                    }
                 }
             }
 
@@ -888,6 +925,7 @@ public class MusicService extends Service {
             seek((int)pos);
         }
 
+        @DebugLog
         @Override
         public void onSetRating(RatingCompat rating) {
             if(rating.getRatingStyle() == RatingCompat.RATING_THUMB_UP_DOWN){

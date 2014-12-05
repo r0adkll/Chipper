@@ -183,7 +183,6 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
     /**
      * Build the section headers for use in creating the headers
      */
-    @DebugLog
     private void buildSectionHeaders(){
         // Update Artist maps
         HashMap<String, List<Chiptune>> currMap = new HashMap<String, List<Chiptune>>();

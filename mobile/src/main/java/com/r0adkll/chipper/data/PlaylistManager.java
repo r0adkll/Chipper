@@ -15,10 +15,12 @@ import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.qualifiers.CurrentUser;
 import com.r0adkll.chipper.ui.model.PlaylistStyle;
 import com.r0adkll.chipper.utils.CallbackHandler;
+import com.r0adkll.deadskunk.utils.IntentUtils;
 import com.r0adkll.postoffice.PostOffice;
 import com.r0adkll.postoffice.styles.EditTextStyle;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -132,7 +134,11 @@ public class PlaylistManager  {
                 .setOnPlaylistItemSelectedListener(new PlaylistStyle.OnPlaylistItemSelectedListener() {
                     @Override
                     public void onPlaylistSelected(DialogInterface dialog, Playlist playlist) {
-                        playlist.add(chiptunes);
+                        if(playlist.add(chiptunes)){
+                            cb.onHandle(playlist);
+                        }else{
+                            cb.onFailure(String.format("Chiptune%s already exist in the playlist", chiptunes.length > 1 ? "s" : ""));
+                        }
                         dialog.dismiss();
                     }
 
@@ -152,8 +158,11 @@ public class PlaylistManager  {
                                                 // Create new playlist object
                                                 Playlist playlist = createPlaylist(s);
                                                 if(playlist != null) {
-                                                    playlist.add(chiptunes);
-                                                    cb.onHandle(playlist);
+                                                    if(playlist.add(chiptunes)){
+                                                        cb.onHandle(playlist);
+                                                    }else{
+                                                        cb.onFailure(String.format("Chiptune%s already exist in the playlist", chiptunes.length > 1 ? "s" : ""));
+                                                    }
                                                 }else{
                                                     cb.onFailure("Unable to create playlist");
                                                 }
@@ -199,9 +208,10 @@ public class PlaylistManager  {
 
         Playlist favs = getFavorites();
         if(favs != null){
-            favs.add(chiptunes);
-            Timber.i("%d chiptunes added to favorites", chiptunes.length);
-            return true;
+            if(favs.add(chiptunes)) {
+                Timber.i("%d chiptunes added to favorites", chiptunes.length);
+                return true;
+            }
         }
 
         return false;
@@ -222,17 +232,27 @@ public class PlaylistManager  {
         return false;
     }
 
-    public void sharePlaylist(Playlist playlist, String permission){
+    /**
+     * Share a playlist
+     *
+     * @param playlist
+     * @param permission
+     */
+    public void sharePlaylist(Playlist playlist, String permission, final CallbackHandler<String> cbh){
         if(playlist.token == null || playlist.token.isEmpty()) {
-            mService.sharePlaylist(mCurrentUser.id, playlist.id, permission, new Callback() {
+            mService.sharePlaylist(mCurrentUser.id, playlist.id, permission, new Callback<Map<String, String>>() {
                 @Override
-                public void success(Object o, Response response) {
+                public void success(Map<String, String> shareResponse, Response response) {
+                    // get the link
+                    String link = shareResponse.get("link");
 
+                    // Prompt to share the link
+                    cbh.onHandle(link);
                 }
 
                 @Override
                 public void failure(RetrofitError error) {
-
+                    cbh.onFailure(error.getLocalizedMessage());
                 }
             });
 

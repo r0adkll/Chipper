@@ -11,7 +11,7 @@
         android:orientation="vertical"
         android:gravity="start|center_vertical"
         android:paddingLeft="@dimen/activity_padding"
-        android:layout_toLeftOf="@+id/tune_count"
+        android:layout_toLeftOf="@+id/playlist_offline"
         >
 
         <TextView
@@ -41,6 +41,16 @@
             />
 
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/playlist_offline"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+
+        android:src="@drawable/ic_action_cloud_done"
+        android:layout_toLeftOf="@+id/tune_count"
+        android:visibility="gone"
+        />
 
     <TextView
         android:id="@+id/tune_count"

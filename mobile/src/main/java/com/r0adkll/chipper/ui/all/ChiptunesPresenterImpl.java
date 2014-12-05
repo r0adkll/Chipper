@@ -3,8 +3,11 @@ package com.r0adkll.chipper.ui.all;
 
 import android.content.Intent;
 
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.listeners.EventListener;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
@@ -86,6 +89,7 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
             @Override
             public void onHandle(Object value) {
                 Timber.i("Upvote Successful [%s, %s]", chiptune.title, chiptune.id);
+                mView.refreshContent();
             }
 
             @Override
@@ -101,6 +105,7 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
             @Override
             public void onHandle(Object value) {
                 Timber.i("Downvote Successful [%s, %s]", chiptune.title, chiptune.id);
+                mView.refreshContent();
             }
 
             @Override
@@ -112,16 +117,22 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
 
     @Override
     public void favoriteChiptunes(Chiptune... chiptunes) {
-        mPlaylistManager.addToFavorites(chiptunes);
+        if(mPlaylistManager.addToFavorites(chiptunes)){
+            mView.refreshContent();
+        }
     }
 
     @Override
     public void addChiptunesToPlaylist(final Chiptune... chiptunes) {
-        mPlaylistManager.addToPlaylist(mView.getActivity(), new CallbackHandler() {
+        mPlaylistManager.addToPlaylist(mView.getActivity(), new CallbackHandler<Playlist>() {
             @Override
-            public void onHandle(Object value) {
+            public void onHandle(Playlist value) {
                 // Success fully added, Update UI
+                String text = chiptunes.length == 1 ?
+                        String.format("%s was added to %s", chiptunes[0].title, value.name) :
+                        String.format("%d tunes were added to %s", chiptunes.length, value.name);
 
+                mView.showSnackBar(text);
             }
 
             @Override

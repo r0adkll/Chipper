@@ -1,7 +1,11 @@
 package com.r0adkll.chipper.data;
 
 import android.app.IntentService;
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 
@@ -10,6 +14,7 @@ import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.data.events.OfflineRequestCompletedEvent;
 import com.r0adkll.chipper.data.model.OfflineRequest;
+import com.r0adkll.chipper.ui.Chipper;
 import com.r0adkll.chipper.utils.Tools;
 import com.r0adkll.deadskunk.utils.ProgressInputStream;
 import com.r0adkll.deadskunk.utils.Utils;
@@ -18,6 +23,7 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 import com.squareup.otto.Bus;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -82,7 +88,7 @@ public class OfflineIntentService extends IntentService {
     protected void onHandleIntent(Intent intent) {
 
         // Pull offline request from the intent
-        OfflineRequest request = intent.getParcelableExtra(EXTRA_OFFLINE_REQUEST);
+        final OfflineRequest request = intent.getParcelableExtra(EXTRA_OFFLINE_REQUEST);
         if(request == null) {
             Timber.e("Please submit a valid OfflineRequest to the offline service");
             return;
@@ -99,10 +105,15 @@ public class OfflineIntentService extends IntentService {
         }
 
         // now that we are finished downloading, dismiss the notification
-        mNotifMan.cancel(NOTIFICATION_ID);
+        showEndingNotification(N);
 
-        // Send out offline request completed event
-        mBus.post(new OfflineRequestCompletedEvent(request.getChiptunes()));
+        // Ensure that this call runs on the main thread
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                mBus.post(new OfflineRequestCompletedEvent(request.getChiptunes()));
+            }
+        });
     }
 
     /**
@@ -136,7 +147,8 @@ public class OfflineIntentService extends IntentService {
             // Execute the request and get the input stream
             Response response = mClient.newCall(request).execute();
             InputStream stream = response.body().byteStream();
-            ProgressInputStream pis = new ProgressInputStream(stream, response.body().contentLength(), new ProgressInputStream.OnProgressListener() {
+            BufferedInputStream bis = new BufferedInputStream(stream);
+            ProgressInputStream pis = new ProgressInputStream(bis, response.body().contentLength(), new ProgressInputStream.OnProgressListener() {
                 @Override
                 public void onProgress(long read, long total) {
                     // Compute total progress
@@ -152,7 +164,7 @@ public class OfflineIntentService extends IntentService {
             FileOutputStream fos = new FileOutputStream(output);
 
             // Read from the input stream
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[256];
             int count = 0;
             while((count = pis.read(buffer)) > 0){
                 fos.write(buffer);
@@ -187,6 +199,40 @@ public class OfflineIntentService extends IntentService {
 
         mNotifMan.notify(NOTIFICATION_ID, builder.build());
 
+    }
+
+    /**
+     * Show the ending notification
+     *
+     * @param numDownloaded
+     */
+    private void showEndingNotification(int numDownloaded){
+
+        String title = "Download finished";
+        String text = String.format("%d chipunes now available for offline use", numDownloaded);
+        String ticker = String.format("Finished downloading %d chiptunes", numDownloaded);
+
+        Intent main = new Intent(this, Chipper.class);
+        PendingIntent mainPi = PendingIntent.getActivity(this, 0, main, 0);
+
+        NotificationCompat.WearableExtender wearableExtender =
+                new NotificationCompat.WearableExtender()
+                .setBackground(BitmapFactory.decodeResource(getResources(), R.drawable.chipper_round_watch_bg));
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
+                .setContentTitle(title)
+                .setContentText(text)
+                .setContentIntent(mainPi)
+                .setSmallIcon(R.drawable.ic_stat_chipper)
+                .setColor(getResources().getColor(R.color.primary))
+                .setTicker(ticker)
+                .setOngoing(false)
+                .setAutoCancel(true)
+                .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
+                .extend(wearableExtender )
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+
+        mNotifMan.notify(NOTIFICATION_ID, builder.build());
     }
 
     /**

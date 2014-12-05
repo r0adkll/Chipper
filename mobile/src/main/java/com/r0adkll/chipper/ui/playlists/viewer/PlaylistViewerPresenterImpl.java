@@ -4,6 +4,7 @@ import android.content.Intent;
 
 import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
+import com.nispok.snackbar.Snackbar;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.ChiptuneReference;
@@ -78,6 +79,7 @@ public class PlaylistViewerPresenterImpl implements PlaylistViewerPresenter {
             @Override
             public void onHandle(Object value) {
                 Timber.i("Upvote Successful [%s, %s]", chiptune.title, chiptune.id);
+                mView.refreshContent();
             }
 
             @Override
@@ -93,6 +95,7 @@ public class PlaylistViewerPresenterImpl implements PlaylistViewerPresenter {
             @Override
             public void onHandle(Object value) {
                 Timber.i("Downvote Successful [%s, %s]", chiptune.title, chiptune.id);
+                mView.refreshContent();
             }
 
             @Override
@@ -104,15 +107,23 @@ public class PlaylistViewerPresenterImpl implements PlaylistViewerPresenter {
 
     @Override
     public void favoriteChiptunes(Chiptune... chiptunes) {
-        mPlaylistManager.addToFavorites(chiptunes);
+        if(mPlaylistManager.addToFavorites(chiptunes)){
+            mView.refreshContent();
+        }
     }
 
     @Override
-    public void addChiptunesToPlaylist(Chiptune... chiptunes) {
-        mPlaylistManager.addToPlaylist(mView.getActivity(), new CallbackHandler() {
+    public void addChiptunesToPlaylist(final Chiptune... chiptunes) {
+        mPlaylistManager.addToPlaylist(mView.getActivity(), new CallbackHandler<Playlist>() {
             @Override
-            public void onHandle(Object value) {
+            public void onHandle(Playlist value) {
+                // Success fully added, Update UI
+                String text = chiptunes.length == 1 ?
+                        String.format("%s was added to %s", chiptunes[0].title, value.name) :
+                        String.format("%d tunes were added to %s", chiptunes.length, value.name);
 
+                // Show snackbar
+                mView.showSnackBar(text);
             }
 
             @Override

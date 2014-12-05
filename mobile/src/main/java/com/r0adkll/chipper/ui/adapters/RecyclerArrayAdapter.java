@@ -98,7 +98,6 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
     /**
      * Apply a filter to this adapters subset of content
      */
-    @DebugLog
     private void filter(){
         if(filter != null && !filter.isEmpty()){
             filteredItems.clear();

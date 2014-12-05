@@ -3,19 +3,36 @@ package com.r0adkll.chipper.ui.all;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Outline;
+import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewOutlineProvider;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
 import com.fortysevendeg.swipelistview.SwipeListView;
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.listeners.EventListener;
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.data.events.OfflineRequestCompletedEvent;
+import com.r0adkll.chipper.playback.MusicService;
 import com.r0adkll.chipper.ui.adapters.AllChiptuneAdapter;
 import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
 import com.r0adkll.chipper.ui.adapters.RecyclerArrayAdapter;
@@ -25,7 +42,11 @@ import com.r0adkll.chipper.ui.player.MusicPlayer;
 import com.r0adkll.chipper.ui.player.MusicPlayerCallbacks;
 import com.r0adkll.chipper.ui.widget.StickyRecyclerHeadersElevationDecoration;
 import com.r0adkll.chipper.utils.UIUtils;
+import com.r0adkll.deadskunk.utils.Utils;
 import com.r0adkll.postoffice.PostOffice;
+import com.r0adkll.postoffice.styles.EditTextStyle;
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import java.util.List;
 
@@ -33,6 +54,7 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import hugo.weaving.DebugLog;
 
 /**
  * Created by r0adkll on 11/12/14.
@@ -58,6 +80,8 @@ public class ChiptunesActivity extends BaseDrawerActivity
     @Inject
     AllChiptuneAdapter adapter;
 
+    @Inject
+    Bus mBus;
 
     /***********************************************************************************************
      *
@@ -145,6 +169,18 @@ public class ChiptunesActivity extends BaseDrawerActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mBus.unregister(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mBus.register(this);
+    }
+
     /***********************************************************************************************
      *
      * Helper Methods
@@ -229,6 +265,11 @@ public class ChiptunesActivity extends BaseDrawerActivity
     }
 
     @Override
+    public void refreshContent() {
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
     public void setChiptunes(List<Chiptune> chiptunes) {
         adapter.clear();
         adapter.addAll(chiptunes);
@@ -249,6 +290,38 @@ public class ChiptunesActivity extends BaseDrawerActivity
         PostOffice.newMail(this)
                 .setMessage(msg)
                 .show(getSupportFragmentManager());
+    }
+
+    @Override
+    public void showSnackBar(String text) {
+        Snackbar.with(this)
+                .text(text)
+                .eventListener(new EventListener() {
+                    @DebugLog
+                    @Override
+                    public void onShow(int i) {
+                        float height = Utils.dpToPx(getActivity(), i);
+
+                        // Animate FAB
+                        mFABShufflePlay.animate()
+                                .translationY(-height)
+                                .setDuration(300)
+                                .setInterpolator(new DecelerateInterpolator(1.5f))
+                                .start();
+                    }
+
+                    @DebugLog
+                    @Override
+                    public void onDismiss(int i) {
+                        // Animate FAB
+                        mFABShufflePlay.animate()
+                                .translationY(0)
+                                .setDuration(300)
+                                .setInterpolator(new AccelerateInterpolator(1.5f))
+                                .start();
+                    }
+                })
+                .show(this);
     }
 
     @Override
@@ -289,4 +362,16 @@ public class ChiptunesActivity extends BaseDrawerActivity
             getSlidingLayout().hidePanel();
         }
     }
+
+    /***********************************************************************************************
+     *
+     * Otto Subscriptions
+     *
+     */
+
+    @Subscribe
+    public void answerOfflineRequestCompletedEvent(OfflineRequestCompletedEvent event){
+        adapter.notifyDataSetChanged();
+    }
+
 }

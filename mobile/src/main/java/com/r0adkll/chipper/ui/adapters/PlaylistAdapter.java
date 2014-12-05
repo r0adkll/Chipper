@@ -1,13 +1,17 @@
 package com.r0adkll.chipper.ui.adapters;
 
+import android.app.Application;
+import android.graphics.PorterDuff;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Playlist;
+import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 
 import java.text.SimpleDateFormat;
@@ -25,6 +29,12 @@ public class PlaylistAdapter extends RecyclerArrayAdapter<Playlist, PlaylistAdap
 
     @Inject
     ChiptuneProvider mChiptuneProvider;
+
+    @Inject
+    CashMachine mAtm;
+
+    @Inject
+    Application mApp;
 
     private final SimpleDateFormat mDateFormat = new SimpleDateFormat("M/d/yy 'at' HH:mm a");
 
@@ -60,6 +70,13 @@ public class PlaylistAdapter extends RecyclerArrayAdapter<Playlist, PlaylistAdap
         String description = String.format("Updated %s", mDateFormat.format(new Date(playlist.updated*1000)));
         holder.description.setText(description);
 
+        if(playlist.isOffline(mAtm)){
+            holder.offline.setVisibility(View.VISIBLE);
+            holder.offline.setColorFilter(mApp.getResources().getColor(R.color.primaryDark), PorterDuff.Mode.SRC_IN);
+        }else{
+            holder.offline.setVisibility(View.GONE);
+        }
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,6 +91,7 @@ public class PlaylistAdapter extends RecyclerArrayAdapter<Playlist, PlaylistAdap
         @InjectView(R.id.title) TextView title;
         @InjectView(R.id.description) TextView description;
         @InjectView(R.id.tune_count) TextView tuneCount;
+        @InjectView(R.id.playlist_offline) ImageView offline;
 
         public PlaylistViewHolder(View itemView) {
             super(itemView);

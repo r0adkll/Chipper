@@ -9,6 +9,7 @@ import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
 import com.google.gson.annotations.SerializedName;
+import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.utils.Tools;
 
@@ -298,17 +299,24 @@ public class Playlist extends Model implements Parcelable{
      * @param tune
      */
     @DebugLog
-    public void add(Chiptune tune){
-        // Generate ChiptuneReference and add it to this playlist
-        ChiptuneReference reference = new ChiptuneReference();
-        reference.chiptune_id = tune.id;
-        reference.playlist = this;
-        reference.sort_order = chiptuneReferences().size();
-        reference.save();
+    public boolean add(Chiptune tune){
+        if(!contains(tune)) {
 
-        // Update this playlists updated time
-        updated = Tools.time();
-        save();
+            // Generate ChiptuneReference and add it to this playlist
+            ChiptuneReference reference = new ChiptuneReference();
+            reference.chiptune_id = tune.id;
+            reference.playlist = this;
+            reference.sort_order = chiptuneReferences().size();
+            reference.save();
+
+            // Update this playlists updated time
+            updated = Tools.time();
+            save();
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -316,16 +324,27 @@ public class Playlist extends Model implements Parcelable{
      * @param tunes
      */
     @DebugLog
-    public void add(Chiptune... tunes){
+    public boolean add(Chiptune... tunes){
+        List<Chiptune> filteredTunes = new ArrayList<>();
+        for(Chiptune chiptune: tunes){
+            if(!contains(chiptune)){
+                filteredTunes.add(chiptune);
+            }
+        }
+
+        // All chiptunes already exist
+        if(filteredTunes.isEmpty()) return false;
 
         ActiveAndroid.beginTransaction();
         try{
-            for(Chiptune tune: tunes){
+            for(Chiptune tune: filteredTunes){
+
                 ChiptuneReference reference = new ChiptuneReference();
                 reference.chiptune_id = tune.id;
                 reference.playlist = this;
                 reference.sort_order = chiptuneReferences().size();
                 reference.save();
+
             }
             ActiveAndroid.setTransactionSuccessful();
         }finally {
@@ -335,6 +354,8 @@ public class Playlist extends Model implements Parcelable{
         // Save and update this playlist
         updated = Tools.time();
         save();
+
+        return true;
     }
 
     /**
@@ -442,6 +463,27 @@ public class Playlist extends Model implements Parcelable{
 
         map.put("tunes", tunes);
         return map;
+    }
+
+    /**
+     * Return whether or not this entire playlist is offlined. That is everyone of it's
+     * chiptunes are available offline for playback
+     *
+     * @param atm       the cache machine that handles all offline content
+     * @return          true if every chiptune in this playlist is offline, false otherwise
+     */
+    @DebugLog
+    public boolean isOffline(CashMachine atm){
+        List<ChiptuneReference> tunes = chiptuneReferences();
+        if(tunes == null || tunes.isEmpty()) return false;
+
+        for(ChiptuneReference tune: tunes){
+            if(!atm.isOffline(tune.chiptune_id)){
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /***********************************************************************************************

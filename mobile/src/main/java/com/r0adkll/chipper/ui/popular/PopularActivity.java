@@ -16,7 +16,10 @@ import android.widget.FrameLayout;
 
 import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
 import com.fortysevendeg.swipelistview.SwipeListView;
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.listeners.EventListener;
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.data.events.OfflineRequestCompletedEvent;
 import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
 import com.r0adkll.chipper.ui.adapters.PopularChiptuneAdapter;
 import com.r0adkll.chipper.ui.adapters.RecyclerArrayAdapter;
@@ -28,6 +31,8 @@ import com.r0adkll.chipper.ui.widget.DividerDecoration;
 import com.r0adkll.chipper.ui.widget.TightSwipeRefreshLayout;
 import com.r0adkll.chipper.utils.UIUtils;
 import com.r0adkll.postoffice.PostOffice;
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import java.util.List;
 import java.util.Map;
@@ -35,6 +40,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import butterknife.InjectView;
+import hugo.weaving.DebugLog;
 
 /**
  * Created by r0adkll on 11/15/14.
@@ -65,6 +71,9 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView,
 
     @Inject
     PopularChiptuneAdapter adapter;
+
+    @Inject
+    Bus mBus;
 
     /***********************************************************************************************
      *
@@ -108,7 +117,17 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView,
 
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mBus.unregister(this);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mBus.register(this);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -221,6 +240,11 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView,
     }
 
     @Override
+    public void refreshContent() {
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
     public void setChiptunes(List<Chiptune> chiptunes) {
         adapter.clear();
         adapter.addAll(chiptunes);
@@ -246,6 +270,32 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView,
         PostOffice.newMail(this)
                 .setMessage(msg)
                 .show(getFragmentManager());
+    }
+
+    @Override
+    public void showSnackBar(String text) {
+        Snackbar.with(this)
+                .text(text)
+                .eventListener(new EventListener() {
+                    @Override
+                    public void onShow(int i) {
+                        // Animate FAB
+                        mFABShufflePlay.animate()
+                                .translationY(-i)
+                                .setDuration(300)
+                                .start();
+                    }
+
+                    @Override
+                    public void onDismiss(int i) {
+                        // Animate FAB
+                        mFABShufflePlay.animate()
+                                .translationY(0)
+                                .setDuration(300)
+                                .start();
+                    }
+                })
+                .show(this);
     }
 
     @Override
@@ -306,5 +356,16 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView,
         return new Object[]{
                 new PopularModule(this)
         };
+    }
+
+    /***********************************************************************************************
+     *
+     * Otto Subscriptions
+     *
+     */
+
+    @Subscribe
+    public void answerOfflineRequestCompletedEvent(OfflineRequestCompletedEvent event){
+        adapter.notifyDataSetChanged();
     }
 }

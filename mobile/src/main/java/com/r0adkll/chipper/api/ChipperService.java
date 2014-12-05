@@ -236,7 +236,7 @@ public interface ChipperService {
     void sharePlaylist(@Path("id") String userId,
                        @Path("pid") String playlistId,
                        @Field("permission") String permission,
-                       Callback cb);
+                       Callback<Map<String, String>> cb);
 
     /**
      * Get a list of playlists that are shared with you

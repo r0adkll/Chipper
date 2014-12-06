@@ -75,11 +75,12 @@ public class Playlist extends Model implements Parcelable{
 
         // now save all the ones from the updated playlist
         p.tuneRefs = playlist.sanatizeChiptuneReferences();
-        p.saveChiptuneReferences();
 
-        // Save ourselves
-        long id = p.save();
-        Timber.i("Playlist Created: %d", id);
+        // Save the new playlist first so that the chiptune references have correct foreign keys
+        p.save();
+
+        // Now save our chiptune references
+        p.saveChiptuneReferences();
 
         return p;
     }
@@ -94,19 +95,20 @@ public class Playlist extends Model implements Parcelable{
     public String id;
 
     @Column(
-        name = "owner",
+        notNull = true,
         onUpdate = Column.ForeignKeyAction.CASCADE,
         onDelete = Column.ForeignKeyAction.CASCADE
     )
     public User owner;
 
-    @Column
+    @Column(index = true, notNull = true)
     public String name;
 
     @Column
     public long updated;
 
     @Column(
+        notNull = true,
         onUpdate = Column.ForeignKeyAction.CASCADE,
         onDelete = Column.ForeignKeyAction.SET_NULL
     )
@@ -274,7 +276,7 @@ public class Playlist extends Model implements Parcelable{
      * on UNDO actions after deletion
      */
     public void loadChiptuneReferences(){
-        this.tuneRefs = chiptuneReferences();
+        this.tuneRefs = new ArrayList<>(chiptuneReferences());
     }
 
     /**

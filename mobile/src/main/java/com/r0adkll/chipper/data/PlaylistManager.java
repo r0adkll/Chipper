@@ -115,7 +115,7 @@ public class PlaylistManager  {
             if(playlist.name.equalsIgnoreCase("favorites")) continue;
 
             // Load the playlists chiptune references from the database so those can be restored as welll
-            playlist.loadChiptuneReferences();
+            playlist.loadChiptuneReferences(); 
 
             // Attempt to delete the server version
             mService.deletePlaylist(mCurrentUser.id, playlist.id, new Callback<Map<String, String>>() {

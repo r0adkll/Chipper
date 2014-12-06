@@ -8,8 +8,10 @@
         <item name="colorAccent">@color/accentColor</item>
         <item name="colorControlHighlight">@color/controlHighlight</item>
 
+        <item name="windowActionModeOverlay">true</item>
         <item name="windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
+        <item name="actionModeStyle">@style/Widget.Chipper.ActionMode</item>
 
     </style>
 
@@ -52,6 +54,10 @@
     <style name="Widget.Chipper.HeaderBar" parent="">
         <item name="android:background">@drawable/actionbar_background</item>
         <item name="android:elevation" tools:ignore="NewApi">@dimen/headerbar_elevation</item>
+    </style>
+
+    <style name="Widget.Chipper.ActionMode" parent="Widget.AppCompat.ActionMode">
+        <item name="background">@drawable/cab_background_top_chipper</item>
     </style>
 
     <style name="Widget.Chipper.DrawerItem.Title" parent="">

@@ -59,7 +59,8 @@
 
                     swipe:swipeOffsetLeft="25dp"
 
-                    swipe:swipeDrawableChecked="@drawable/choice_selected"
+                    swipe:swipeDrawableChecked="@drawable/selected_list_item_background"
+                    swipe:swipeDrawableUnchecked="@drawable/list_item_background"
 
                     swipe:swipeCloseAllItemsWhenMoveList="true"
                     swipe:swipeMode="left"

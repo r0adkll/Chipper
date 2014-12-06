@@ -195,10 +195,11 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
         notifyDataSetChanged();
     }
 
-    public void remove(int index){
-        items.remove(index);
+    public M remove(int index){
+        M item = items.remove(index);
         filter();
         notifyDataSetChanged();
+        return item;
     }
 
     public M removeRaw(int index){

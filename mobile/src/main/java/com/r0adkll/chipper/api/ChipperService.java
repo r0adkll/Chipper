@@ -3,6 +3,7 @@ package com.r0adkll.chipper.api;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.Device;
 import com.r0adkll.chipper.api.model.Playlist;
+import com.r0adkll.chipper.api.model.ServerTime;
 import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.api.model.Vote;
 
@@ -24,6 +25,14 @@ import retrofit.http.Path;
  * Created by r0adkll on 11/1/14.
  */
 public interface ChipperService {
+
+    /**
+     * Get server's time endpoint that reports the servers time and version
+     *
+     * @param cb    the callback
+     */
+    @GET("/time")
+    void time(Callback<ServerTime> cb);
 
     /**
      * The Login/Create endpoint for authorizing the chipper api

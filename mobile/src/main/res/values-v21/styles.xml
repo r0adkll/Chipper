@@ -9,11 +9,13 @@
         <item name="colorAccent">@color/accentColor</item>
         <item name="colorControlHighlight">@color/controlHighlight</item>
 
+        <item name="windowActionModeOverlay">true</item>
         <item name="windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
 
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@color/statusBar</item>
+        <item name="actionModeStyle">@style/Widget.Chipper.ActionMode</item>
 
     </style>
 

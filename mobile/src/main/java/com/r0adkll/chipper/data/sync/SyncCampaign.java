@@ -156,6 +156,7 @@ public class SyncCampaign implements Runnable{
 
                         // Create a new playlist
                         Playlist newPlaylist = new Playlist();
+                        newPlaylist.save();
                         newPlaylist.update(remotePlaylist);
                         mSyncResult.stats.numUpdates++;
                     }

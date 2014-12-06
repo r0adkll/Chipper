@@ -32,18 +32,18 @@ public class ChiptuneReference extends Model implements Parcelable {
      *
      */
 
-    @Column(index = true)
+    @Column(index = true, notNull = true)
     @SerializedName("id")
     public String chiptune_id;
 
     @Column(
-        name = "playlist",
+        notNull = true,
         onDelete = Column.ForeignKeyAction.CASCADE,
         onUpdate = Column.ForeignKeyAction.CASCADE
     )
     public Playlist playlist;
 
-    @Column
+    @Column(notNull = true)
     public int sort_order;
 
     /**

@@ -13,10 +13,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.widget.FrameLayout;
@@ -70,6 +72,8 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
     @Inject
     Bus mBus;
 
+    private ActionMode mActionMode;
+
     /***********************************************************************************************
      *
      * Lifecycle Methods
@@ -96,7 +100,9 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
         mRecyclerView.setSwipeListViewListener(new BaseSwipeListViewListener(){
             @Override
             public int onChangeSwipeMode(int position) {
-                return position == 0 ? SwipeListView.SWIPE_MODE_NONE : SwipeListView.SWIPE_MODE_BOTH;
+                Playlist item = adapter.getItem(position);
+                return item.name.equalsIgnoreCase("favorites") ?
+                        SwipeListView.SWIPE_MODE_NONE : SwipeListView.SWIPE_MODE_BOTH;
             }
 
             @Override
@@ -107,6 +113,7 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
                     deletedPlaylists.add(removed);
                 }
                 adapter.reconcile();
+                mRecyclerView.invalidate(); // Force change to get touch controls back
 
                 if(!deletedPlaylists.isEmpty()){
                     presenter.deletePlaylist(deletedPlaylists);
@@ -133,6 +140,30 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
                         leftDel.setVisibility(View.INVISIBLE);
                         rightDel.setVisibility(View.VISIBLE);
                     }
+                }
+            }
+
+            @Override
+            public void onChoiceChanged(int position, boolean selected) {
+                if(mActionMode != null){
+                    // count item
+                }
+            }
+
+            @Override
+            public void onChoiceStarted() {
+                if(mActionMode != null){
+                    mActionMode.finish();
+                    mActionMode = null;
+                }
+
+                mActionMode = startSupportActionMode(mActionModeCallbacks);
+            }
+
+            @Override
+            public void onChoiceEnded() {
+                if(mActionMode != null){
+                    mActionMode.finish();
                 }
             }
         });
@@ -266,6 +297,38 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
                         }
                     })
                     .show(getFragmentManager());
+
+        }
+    };
+
+    private ActionMode.Callback mActionModeCallbacks = new ActionMode.Callback() {
+        @Override
+        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            actionMode.getMenuInflater().inflate(R.menu.menu_playlist_viewer, menu);
+            menu.findItem(R.id.action_search).setVisible(false);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+            switch (menuItem.getItemId()){
+                case R.id.action_offline:
+
+                    return true;
+                case R.id.action_share:
+
+                    return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode actionMode) {
 
         }
     };

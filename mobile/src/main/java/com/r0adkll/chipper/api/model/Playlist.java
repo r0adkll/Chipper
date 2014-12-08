@@ -128,6 +128,9 @@ public class Playlist extends Model implements Parcelable{
     @Column
     public String permissions;
 
+    @Column
+    public boolean deleted;
+
     /*
      * This is only used when GSON auto-deserializes the server response into this list.
      * The Playlist manager is then responsible for saving these references into the database

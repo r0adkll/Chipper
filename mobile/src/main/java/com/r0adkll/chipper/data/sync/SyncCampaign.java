@@ -89,7 +89,7 @@ public class SyncCampaign implements Runnable{
                         if(mIsCanceled) return;
 
                         // Check for similar playlists
-                        if(localPlaylist.id.equals(remotePlaylist.id)){
+                        if(localPlaylist.id.equals(remotePlaylist.id) && !remotePlaylist.deleted){
                             hasRemote = true;
                             // Ok, found a matching playlist for this local playlist, now determine which
                             // needs to be updated
@@ -117,6 +117,12 @@ public class SyncCampaign implements Runnable{
                             }
 
                             break;
+                        }else if(localPlaylist.id.equals(remotePlaylist.id) && remotePlaylist.deleted){
+
+                            // Remote playlist has been deleted, so delete the local reference too
+                            localPlaylist.delete();
+                            mSyncResult.stats.numDeletes++;
+                            Timber.i("Local playlist [%s] was deleted since the remote was marked as deleted");
                         }
 
                     }
@@ -143,14 +149,14 @@ public class SyncCampaign implements Runnable{
                     if(mIsCanceled) return;
 
                     boolean hasLocal = false;
-                    for(Playlist localPlaylist: local){
-                        if(localPlaylist.id.equals(remotePlaylist.id)){
+                    for(Playlist playlist: local){
+                        if(playlist.id.equals(remotePlaylist.id)){
                             hasLocal = true;
                             break;
                         }
                     }
 
-                    if(!hasLocal){
+                    if(!hasLocal && !remotePlaylist.deleted){
                         // Add remote playlist to local
                         Timber.i("Remote playlist found that doesn't exist locally, %s", remotePlaylist.name);
 

@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -127,6 +128,12 @@ public class PlaylistStyle implements Style {
         public void bindHolder(ViewHolder viewHolder, int i, Playlist playlist) {
             PlaylistViewHolder holder = (PlaylistViewHolder) viewHolder;
 
+            if(playlist.name.equalsIgnoreCase(Playlist.FAVORITES)){
+                holder.avatar.setImageResource(R.drawable.ic_action_favorite);
+            }else{
+                holder.avatar.setImageResource(R.drawable.ic_action_queue_music);
+            }
+
             // Bind data
             holder.title.setText(playlist.name);
 
@@ -141,6 +148,7 @@ public class PlaylistStyle implements Style {
 
             @InjectView(R.id.title)         TextView title;
             @InjectView(R.id.song_count)    TextView songCount;
+            @InjectView(R.id.avatar_icon)   ImageView avatar;
 
             public PlaylistViewHolder(View itemView){
                 ButterKnife.inject(this, itemView);

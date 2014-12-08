@@ -28,6 +28,7 @@ import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.listeners.EventListener;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.data.CashMachine;
+import com.r0adkll.chipper.data.events.OfflineModeChangeEvent;
 import com.r0adkll.chipper.data.events.OfflineRequestCompletedEvent;
 import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
 import com.r0adkll.chipper.ui.adapters.PlaylistChiptuneAdapter;
@@ -42,7 +43,6 @@ import com.r0adkll.chipper.ui.widget.EmptyView;
 import com.r0adkll.chipper.utils.CallbackHandler;
 import com.r0adkll.deadskunk.utils.Utils;
 import com.r0adkll.postoffice.PostOffice;
-import com.r0adkll.slidableactivity.SlidableAttacher;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
@@ -402,5 +402,10 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
     public void answerOfflineRequestCompletedEvent(OfflineRequestCompletedEvent event){
         adapter.notifyDataSetChanged();
         supportInvalidateOptionsMenu();
+    }
+
+    @Subscribe
+    public void answerOfflineModeChangeEvent(OfflineModeChangeEvent event){
+        adapter.reconcile();
     }
 }

@@ -1,6 +1,8 @@
 package com.r0adkll.chipper.ui.all;
 
 import com.r0adkll.chipper.data.CashMachine;
+import com.r0adkll.chipper.prefs.BooleanPreference;
+import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
 import com.r0adkll.chipper.ui.adapters.AllChiptuneAdapter;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.User;
@@ -43,14 +45,6 @@ public class ChiptunesModule {
                                         VoteManager voteManager,
                                         @CurrentUser User user){
         return new ChiptunesPresenterImpl(chiptunesView, provider, service, playlistManager, voteManager, user);
-    }
-
-    @Provides @Singleton
-    AllChiptuneAdapter provideAdapter(PlaylistManager playlistManager,
-                                      VoteManager voteManager,
-                                      CashMachine cashMachine){
-
-        return new AllChiptuneAdapter(playlistManager, voteManager, cashMachine);
     }
 
 }

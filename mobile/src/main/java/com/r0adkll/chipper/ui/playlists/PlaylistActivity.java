@@ -27,6 +27,7 @@ import android.widget.ImageView;
 import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
 import com.fortysevendeg.swipelistview.SwipeListView;
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.data.events.OfflineModeChangeEvent;
 import com.r0adkll.chipper.data.events.OfflineRequestCompletedEvent;
 import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
 import com.r0adkll.chipper.ui.adapters.PlaylistAdapter;
@@ -443,5 +444,10 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
     @Subscribe
     public void answerOfflineRequestCompletedEvent(OfflineRequestCompletedEvent event){
         adapter.notifyDataSetChanged();
+    }
+
+    @Subscribe
+    public void answerOfflineModeChangeEvent(OfflineModeChangeEvent event){
+        adapter.reconcile();
     }
 }

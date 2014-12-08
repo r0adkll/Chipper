@@ -13,6 +13,8 @@ import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
+import com.r0adkll.chipper.prefs.BooleanPreference;
+import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -27,14 +29,11 @@ import butterknife.InjectView;
  */
 public class PlaylistAdapter extends RecyclerArrayAdapter<Playlist, PlaylistAdapter.PlaylistViewHolder> {
 
-    @Inject
-    ChiptuneProvider mChiptuneProvider;
-
-    @Inject
-    CashMachine mAtm;
-
-    @Inject
-    Application mApp;
+    @Inject ChiptuneProvider mChiptuneProvider;
+    @Inject CashMachine mAtm;
+    @Inject Application mApp;
+    @Inject @OfflineSwitchPreference
+    BooleanPreference mOfflinePref;
 
     private final SimpleDateFormat mDateFormat = new SimpleDateFormat("M/d/yy 'at' HH:mm a");
 
@@ -55,6 +54,9 @@ public class PlaylistAdapter extends RecyclerArrayAdapter<Playlist, PlaylistAdap
 
     @Override
     public boolean onQuery(Playlist item, String query) {
+        if(mOfflinePref.get()){
+            if(!item.isPartiallyOffline(mAtm)) return false;
+        }
         return item.name.toLowerCase().contains(query.toLowerCase());
     }
 

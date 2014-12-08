@@ -54,7 +54,6 @@ public class Chipper extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chipper);
         ChipperApp.get(this).inject(this);
 
         // Apply switch logic here

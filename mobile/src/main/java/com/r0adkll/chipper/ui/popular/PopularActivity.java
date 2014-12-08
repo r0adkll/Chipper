@@ -19,6 +19,7 @@ import com.fortysevendeg.swipelistview.SwipeListView;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.listeners.EventListener;
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.data.events.OfflineModeChangeEvent;
 import com.r0adkll.chipper.data.events.OfflineRequestCompletedEvent;
 import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
 import com.r0adkll.chipper.ui.adapters.PopularChiptuneAdapter;
@@ -369,4 +370,10 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView,
     public void answerOfflineRequestCompletedEvent(OfflineRequestCompletedEvent event){
         adapter.notifyDataSetChanged();
     }
+
+    @Subscribe
+    public void answerOfflineModeChangeEvent(OfflineModeChangeEvent event){
+        adapter.reconcile();
+    }
+
 }

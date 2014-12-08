@@ -87,6 +87,14 @@ public class Playlist extends Model implements Parcelable{
 
     /***********************************************************************************************
      *
+     * Constants
+     *
+     */
+
+    public static final String FAVORITES = "Favorites";
+
+    /***********************************************************************************************
+     *
      * Variables
      *
      */
@@ -546,6 +554,20 @@ public class Playlist extends Model implements Parcelable{
 
         return true;
     }
+
+    public boolean isPartiallyOffline(CashMachine atm){
+        List<ChiptuneReference> tunes = chiptuneReferences();
+        if(tunes == null || tunes.isEmpty()) return false;
+
+        for(ChiptuneReference tune: tunes){
+            if(atm.isOffline(tune.chiptune_id)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     /***********************************************************************************************
      *

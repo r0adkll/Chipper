@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.View;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.account.GoogleAccountManager;
+import com.r0adkll.chipper.data.events.OfflineModeChangeEvent;
 import com.r0adkll.chipper.ui.player.MusicPlayer;
 import com.r0adkll.chipper.prefs.BooleanPreference;
 import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
@@ -25,6 +27,7 @@ import com.r0adkll.chipper.ui.playlists.PlaylistActivity;
 import com.r0adkll.chipper.ui.popular.PopularActivity;
 import com.r0adkll.chipper.ui.widget.ScrimInsetsScrollView;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.squareup.otto.Bus;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -95,6 +98,9 @@ public abstract class BaseDrawerActivity extends ActionBarActivity implements Go
 
     @Inject
     GoogleAccountManager mAccountManager;
+
+    @Inject
+    Bus mBus;
 
     private MusicPlayer mPlayer;
 
@@ -385,7 +391,13 @@ public abstract class BaseDrawerActivity extends ActionBarActivity implements Go
 
         mDrawerItems.add(new SeperatorDrawerItem());
 
-        mDrawerItems.add(new SwitchDrawerItem(NAVDRAWER_ITEM_OFFLINE_MODE, R.string.navdrawer_item_offline, mOfflineSwitchPreference));
+        mDrawerItems.add(new SwitchDrawerItem(NAVDRAWER_ITEM_OFFLINE_MODE, R.string.navdrawer_item_offline, mOfflineSwitchPreference, new SwitchDrawerItem.OnSwitchToggleListener() {
+            @Override
+            public void onToggled(boolean checked) {
+                // Post event to let UI know that it should alter it's content
+                mBus.post(new OfflineModeChangeEvent(checked));
+            }
+        }));
         mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_SETTINGS, R.string.navdrawer_item_settings, R.drawable.ic_settings));
         mDrawerItems.add(new IconDrawerItem(NAVDRAWER_ITEM_FEEDBACK, R.string.navdrawer_item_feedback, R.drawable.ic_forum));
 

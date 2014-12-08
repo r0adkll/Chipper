@@ -46,12 +46,4 @@ public class PopularModule {
         return new PopularPresenterImpl(view, provider, service, playlistManager, voteManager, user);
     }
 
-    @Provides
-    PopularChiptuneAdapter provideAdapter(PlaylistManager playlistManager,
-                                          VoteManager voteManager,
-                                          CashMachine cashMachine){
-
-        return new PopularChiptuneAdapter(playlistManager, voteManager, cashMachine);
-    }
-
 }

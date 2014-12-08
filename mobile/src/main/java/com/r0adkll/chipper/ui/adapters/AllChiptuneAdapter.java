@@ -13,11 +13,15 @@ import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.VoteManager;
+import com.r0adkll.chipper.prefs.BooleanPreference;
+import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -38,9 +42,10 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
      *
      */
 
-    private PlaylistManager mPlaylistManager;
-    private VoteManager mVoteManager;
-    private CashMachine mCache;
+
+    @Inject PlaylistManager mPlaylistManager;
+    @Inject VoteManager mVoteManager;
+    @Inject CashMachine mCache;
 
     private List<List<Chiptune>> mHeaders = new ArrayList<>();
     private List<String> mTitles = new ArrayList<>();
@@ -49,18 +54,17 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
      * Constructor
      *
      */
-    public AllChiptuneAdapter(PlaylistManager playlistManager,
-                              VoteManager voteManager,
-                              CashMachine cashMachine){
+    @Inject
+    public AllChiptuneAdapter(){
         super();
         registerAdapterDataObserver(mChiptunesObserver);
-        mPlaylistManager = playlistManager;
-        mVoteManager = voteManager;
-        mCache = cashMachine;
     }
 
     @Override
     public boolean onQuery(Chiptune item, String query) {
+        if(mOfflinePref.get()){
+            if(!mCache.isOffline(item)) return false;
+        }
         return item.artist.toLowerCase().contains(query.toLowerCase()) ||
                 item.title.toLowerCase().contains(query.toLowerCase());
     }

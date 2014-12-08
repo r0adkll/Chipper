@@ -10,7 +10,10 @@ import android.widget.TextView;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.ChiptuneReference;
+import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
+import com.r0adkll.chipper.prefs.BooleanPreference;
+import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
 
 import javax.inject.Inject;
 
@@ -26,6 +29,12 @@ public class PlaylistChiptuneAdapter extends RecyclerArrayAdapter<ChiptuneRefere
 
     @Inject
     ChiptuneProvider mChiptuneProvider;
+
+    @Inject
+    CashMachine mAtm;
+
+    @Inject @OfflineSwitchPreference
+    BooleanPreference mOfflinePref;
 
     /**
      * Constructor
@@ -46,6 +55,10 @@ public class PlaylistChiptuneAdapter extends RecyclerArrayAdapter<ChiptuneRefere
     @Override
     public boolean onQuery(ChiptuneReference item, String query) {
         Chiptune chiptune = mChiptuneProvider.getChiptune(item.chiptune_id);
+        if(mOfflinePref.get()) {
+            if(!mAtm.isOffline(chiptune)) return false;
+        }
+
         return chiptune.artist.toLowerCase().contains(query.toLowerCase()) ||
                 chiptune.title.toLowerCase().contains(query.toLowerCase());
     }

@@ -16,6 +16,7 @@ import com.r0adkll.chipper.push.PushModule;
 import com.r0adkll.chipper.qualifiers.AppVersion;
 import com.r0adkll.chipper.qualifiers.DefaultPrefs;
 import com.r0adkll.chipper.qualifiers.GenericPrefs;
+import com.r0adkll.chipper.tv.TVModule;
 import com.r0adkll.chipper.ui.UIModule;
 import com.r0adkll.deadskunk.utils.SecurePreferences;
 import com.squareup.okhttp.OkHttpClient;
@@ -40,7 +41,8 @@ import static android.content.Context.MODE_PRIVATE;
         DataModule.class,
         PushModule.class,
         UIModule.class,
-        PlaybackModule.class
+        PlaybackModule.class,
+        TVModule.class
     },
     injects = {
         ChipperApp.class

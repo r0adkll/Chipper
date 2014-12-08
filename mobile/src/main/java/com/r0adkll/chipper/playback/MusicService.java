@@ -12,8 +12,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
@@ -28,7 +26,6 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.RatingCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 
 import com.activeandroid.Model;
@@ -55,8 +52,6 @@ import com.r0adkll.chipper.utils.CallbackHandler;
 import com.r0adkll.deadskunk.utils.Utils;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Produce;
-
-import java.util.concurrent.ConcurrentLinkedDeque;
 
 import javax.inject.Inject;
 
@@ -151,7 +146,7 @@ public class MusicService extends Service {
         ChipperApp.get(this).inject(this);
 
         // Load art
-        mArt = BitmapFactory.decodeResource(getResources(), R.drawable.dr_login_background);
+        mArt = BitmapFactory.decodeResource(getResources(), R.drawable.login_background);
         mArtAlbum = BitmapFactory.decodeResource(getResources(), R.drawable.chipper_round_watch_bg);
 
         // Register for the Otto bus

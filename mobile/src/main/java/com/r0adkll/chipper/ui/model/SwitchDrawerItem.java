@@ -20,16 +20,25 @@ public class SwitchDrawerItem extends DrawerItem implements CompoundButton.OnChe
     private int mText;
     private SwitchCompat mSwitch;
     private BooleanPreference mPreference;
+    private OnSwitchToggleListener mListener;
 
     /**
      * Constructor
-     * @param id
-     * @param text
      */
     public SwitchDrawerItem(int id, int text, BooleanPreference preference) {
         super(id);
         mText = text;
         mPreference = preference;
+    }
+
+    /**
+     * Constructor
+     */
+    public SwitchDrawerItem(int id, int text, BooleanPreference preference, OnSwitchToggleListener listener) {
+        super(id);
+        mText = text;
+        mPreference = preference;
+        mListener = listener;
     }
 
     public SwitchCompat getSwitch(){
@@ -59,10 +68,15 @@ public class SwitchDrawerItem extends DrawerItem implements CompoundButton.OnChe
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         mPreference.set(isChecked);
+        if(mListener != null) mListener.onToggled(isChecked);
     }
 
     @Override
     public void onClick(View v) {
         mSwitch.setChecked(!mSwitch.isChecked());
+    }
+
+    public interface OnSwitchToggleListener{
+        public void onToggled(boolean checked);
     }
 }

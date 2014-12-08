@@ -3,11 +3,16 @@ package com.r0adkll.chipper.ui.adapters;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.r0adkll.chipper.prefs.BooleanPreference;
+import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+
+import javax.inject.Inject;
 
 import hugo.weaving.DebugLog;
 
@@ -21,11 +26,16 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
      *
      */
 
+    @Inject
+    @OfflineSwitchPreference
+    BooleanPreference mOfflinePref;
+
     private OnItemOptionSelectedListener<M> itemOptionSelectedListener;
     private OnItemClickListener<M> itemClickListener;
+
     protected ArrayList<M> items = new ArrayList<>();
     protected ArrayList<M> filteredItems = new ArrayList<>();
-    protected String filter;
+    protected String filter = "";
 
     /**
      * Default Constructor
@@ -90,7 +100,7 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
      * Clear out the current query
      */
     public void clearQuery(){
-        filter = null;
+        filter = "";
         filter();
         notifyDataSetChanged();
     }
@@ -99,13 +109,17 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
      * Apply a filter to this adapters subset of content
      */
     private void filter(){
-        if(filter != null && !filter.isEmpty()){
+        if((filter != null && !filter.isEmpty()) || (mOfflinePref != null && mOfflinePref.get())){
+            if(filter == null) filter = "";
+
+
             filteredItems.clear();
             for(M item: items){
                 if(onQuery(item, filter)){
                     filteredItems.add(item);
                 }
             }
+
         }else{
             filteredItems.clear();
             filteredItems.addAll(items);

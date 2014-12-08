@@ -33,5 +33,6 @@
     <string name="default_current_tune_description">to play a random tune</string>
     <string name="action_offline">Offline</string>
     <string name="action_share">Share</string>
+    <string name="app_name_tv">Chipper for TV</string>
 
 </resources>

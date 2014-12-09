@@ -43,6 +43,7 @@ import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
 import com.r0adkll.chipper.ui.player.MusicPlayer;
 import com.r0adkll.chipper.ui.player.MusicPlayerCallbacks;
+import com.r0adkll.chipper.ui.widget.EmptyView;
 import com.r0adkll.chipper.ui.widget.StickyRecyclerHeadersElevationDecoration;
 import com.r0adkll.chipper.utils.UIUtils;
 import com.r0adkll.deadskunk.utils.Utils;
@@ -77,6 +78,9 @@ public class ChiptunesActivity extends BaseDrawerActivity
     @InjectView(R.id.fab_shuffle_play)
     FrameLayout mFABShufflePlay;
 
+    @InjectView(R.id.empty_layout)
+    EmptyView mEmptyView;
+
     @Inject
     ChiptunesPresenter presenter;
 
@@ -108,6 +112,7 @@ public class ChiptunesActivity extends BaseDrawerActivity
         getPlayer().setCallbacks(this);
 
         // Setup the adapter with the recycler view
+        adapter.setEmptyView(mEmptyView);
         mChiptuneRecycler.setAdapter(adapter);
         mChiptuneRecycler.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         StickyRecyclerHeadersElevationDecoration headersDecor = new StickyRecyclerHeadersElevationDecoration(adapter);
@@ -276,6 +281,15 @@ public class ChiptunesActivity extends BaseDrawerActivity
     public void setChiptunes(List<Chiptune> chiptunes) {
         adapter.clear();
         adapter.addAll(chiptunes);
+
+        if(!chiptunes.isEmpty()){
+            mChiptuneRecycler.setVisibility(View.VISIBLE);
+            mEmptyView.setVisibility(View.GONE);
+        }else{
+            mChiptuneRecycler.setVisibility(View.GONE);
+            mEmptyView.setVisibility(View.VISIBLE);
+        }
+
     }
 
     @Override

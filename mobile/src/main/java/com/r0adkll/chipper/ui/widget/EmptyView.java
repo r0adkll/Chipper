@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.ftinc.fontloader.FontLoader;
 import com.ftinc.fontloader.Types;
 import com.r0adkll.chipper.R;
+import com.r0adkll.deadskunk.utils.Utils;
 
 /**
  * Project: Chipper
@@ -110,7 +111,8 @@ public class EmptyView extends RelativeLayout {
         containerParams.addRule(RelativeLayout.CENTER_IN_PARENT);
 
         // Setup the Icon
-        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        int size = (int) Utils.dpToPx(getContext(), 64 );
+        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(size, size);
         int padding = getResources().getDimensionPixelSize(R.dimen.half_padding);
         mIcon.setPadding(0, 0, 0, padding);
         mIcon.setColorFilter(mAccentColor, PorterDuff.Mode.SRC_IN);

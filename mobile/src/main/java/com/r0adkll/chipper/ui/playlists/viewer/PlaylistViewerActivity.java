@@ -238,7 +238,7 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
      */
 
     private void setupRecyclerView(){
-
+        adapter.setEmptyView(mEmptyView);
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mRecyclerView.addItemDecoration(new DividerDecoration(this));
@@ -317,19 +317,12 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
 
     @Override
     public void onLoadFinished(Loader<List<ChiptuneReference>> objectLoader, List<ChiptuneReference> chiptunes) {
-        if(!chiptunes.isEmpty()){
-            mEmptyView.setVisibility(View.GONE);
-        }else{
-            mEmptyView.setVisibility(View.VISIBLE);
-        }
-
         adapter.clear();
         adapter.addAll(chiptunes);
     }
 
     @Override
     public void onLoaderReset(Loader<List<ChiptuneReference>> objectLoader) {
-        mEmptyView.setVisibility(View.GONE);
         adapter.clear();
     }
 

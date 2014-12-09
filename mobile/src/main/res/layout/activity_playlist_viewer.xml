@@ -60,7 +60,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
 
-                app:emptyIcon="@drawable/ic_launcher"
+                app:emptyIcon="@drawable/ic_chipper"
                 app:emptyMessage="@string/playlist_viewer_message"
                 />
 

@@ -29,6 +29,7 @@ import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
 import com.r0adkll.chipper.ui.player.MusicPlayer;
 import com.r0adkll.chipper.ui.player.MusicPlayerCallbacks;
 import com.r0adkll.chipper.ui.widget.DividerDecoration;
+import com.r0adkll.chipper.ui.widget.EmptyView;
 import com.r0adkll.chipper.ui.widget.TightSwipeRefreshLayout;
 import com.r0adkll.chipper.utils.UIUtils;
 import com.r0adkll.postoffice.PostOffice;
@@ -67,6 +68,9 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView,
     @InjectView(R.id.fab_shuffle_play)
     FrameLayout mFABShufflePlay;
 
+    @InjectView(R.id.empty_layout)
+    EmptyView mEmptyView;
+
     @Inject
     PopularPresenter presenter;
 
@@ -101,6 +105,7 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView,
         mSwipeLayout.setOnRefreshListener(this);
 
         // Setup the recycler view
+        adapter.setEmptyView(mEmptyView);
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mRecyclerView.addItemDecoration(new DividerDecoration(this));

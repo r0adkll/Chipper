@@ -34,5 +34,6 @@
     <string name="action_offline">Offline</string>
     <string name="action_share">Share</string>
     <string name="app_name_tv">Chipper for TV</string>
+    <string name="empty_msg_chiptunes">There are no\nchiptunes to display</string>
 
 </resources>

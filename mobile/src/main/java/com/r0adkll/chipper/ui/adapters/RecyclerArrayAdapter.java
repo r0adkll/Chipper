@@ -37,6 +37,8 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
     protected ArrayList<M> filteredItems = new ArrayList<>();
     protected String filter = "";
 
+    private View mEmptyView;
+
     /**
      * Default Constructor
      */
@@ -49,6 +51,38 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
      * Helper Methods
      *
      */
+
+    /**
+     * Set the empty view to be used so that
+     * @param emptyView
+     */
+    public void setEmptyView(View emptyView){
+        if(mEmptyView != null){
+            unregisterAdapterDataObserver(mEmptyObserver);
+        }
+        mEmptyView = emptyView;
+        registerAdapterDataObserver(mEmptyObserver);
+    }
+
+    /**
+     * Check if we should show the empty view
+     */
+    private void checkIfEmpty(){
+        if(mEmptyView != null){
+            mEmptyView.setVisibility(getItemCount() > 0 ? View.GONE : View.VISIBLE);
+        }
+    }
+
+    /**
+     * Data change observer
+     */
+    private RecyclerView.AdapterDataObserver mEmptyObserver = new RecyclerView.AdapterDataObserver() {
+        @Override
+        public void onChanged() {
+            super.onChanged();
+            checkIfEmpty();
+        }
+    };
 
     /**
      * Set the item click listener for this adapter

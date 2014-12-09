@@ -47,7 +47,6 @@
                 android:layout_below="@+id/toolbar_actionbar"
                 >
 
-
                 <com.r0adkll.chipper.ui.widget.TightSwipeRefreshLayout
                     android:id="@+id/swipe_refresh_layout"
                     android:layout_width="match_parent"
@@ -72,6 +71,16 @@
                         />
 
                 </com.r0adkll.chipper.ui.widget.TightSwipeRefreshLayout>
+
+                <com.r0adkll.chipper.ui.widget.EmptyView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/empty_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+
+                    app:emptyIcon="@drawable/ic_chipper"
+                    app:emptyMessage="@string/empty_msg_chiptunes"
+                    />
 
             </FrameLayout>
 

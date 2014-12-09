@@ -1,11 +1,14 @@
 package com.r0adkll.chipper.tv.ui.leanback.browse;
 
+import android.content.Intent;
 import android.content.Loader;
 
 import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.data.PlaylistManager;
+import com.r0adkll.chipper.tv.ui.leanback.playlist.TVPlaylistActivity;
 import com.r0adkll.chipper.utils.ChiptuneComparator;
 
 import java.util.Collections;
@@ -61,6 +64,18 @@ public class BrowsePresenterImpl implements BrowsePresenter {
     @Override
     public void loadPlaylists() {
         mView.setPlaylists(mCurrentUser.getPlaylists());
+    }
+
+    @Override
+    public void onChiptuneClicked(Chiptune chiptune) {
+
+    }
+
+    @Override
+    public void onPlaylistClicked(Playlist playlist) {
+        Intent playlistDetails = new Intent(mView.getActivity(), TVPlaylistActivity.class);
+        playlistDetails.putExtra(TVPlaylistActivity.EXTRA_PLAYLIST, playlist.getId());
+        mView.getActivity().startActivity(playlistDetails);
     }
 
     /**

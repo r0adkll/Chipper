@@ -27,6 +27,7 @@ import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.ChiptuneReference;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.ChiptuneProvider;
+import com.r0adkll.chipper.playback.MusicBrowserService;
 import com.r0adkll.chipper.playback.MusicService;
 import com.r0adkll.chipper.api.model.Vote;
 import com.r0adkll.chipper.playback.events.MediaSessionEvent;
@@ -59,7 +60,56 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView, OnItem
 
     /**********************************************************************************************
      *
-     * Static Methods
+     * TV Static Methods
+     *
+     */
+
+    /**
+     * Create a playback intent that will start playing a chiptune on the master list of chiptunes
+     * (aka all of them)
+     *
+     * @param ctx           the context reference
+     * @param chiptune      the chiptune to play
+     * @return              the intent to send to the service
+     */
+    public static void createTVPlayback(Context ctx, Chiptune chiptune){
+        Intent intent = new Intent(ctx, MusicBrowserService.class);
+        intent.setAction(MusicBrowserService.INTENT_ACTION_PLAY);
+        intent.putExtra(MusicBrowserService.EXTRA_CHIPTUNE, chiptune.getId());
+        ctx.startService(intent);
+    }
+
+    /**
+     * Create a playback intent to send to the MusicService to start playback
+     *
+     * @param ctx           the context reference
+     * @param chiptune      the chiptune to play
+     * @param playlist      the playlist the chiptune belongs to
+     * @return              the intent to send to the service
+     */
+    public static void createTVPlayback(Context ctx, Chiptune chiptune, Playlist playlist){
+        Intent intent = new Intent(ctx, MusicBrowserService.class);
+        intent.setAction(MusicBrowserService.INTENT_ACTION_PLAY);
+        intent.putExtra(MusicBrowserService.EXTRA_CHIPTUNE, chiptune.getId());
+        intent.putExtra(MusicBrowserService.EXTRA_PLAYLIST, playlist.getId());
+        ctx.startService(intent);
+    }
+
+    /**
+     * Create an intent to start the coldstart shuffle play
+     *
+     * @param ctx       the context reference
+     * @return          the intent to send to the service
+     */
+    public static void createTVShufflePlayback(Context ctx){
+        Intent intent = new Intent(ctx, MusicBrowserService.class);
+        intent.setAction(MusicBrowserService.INTENT_ACTION_COLDSTART);
+        ctx.startService(intent);
+    }
+
+    /**********************************************************************************************
+     *
+     * Mobile Static Methods
      *
      */
 

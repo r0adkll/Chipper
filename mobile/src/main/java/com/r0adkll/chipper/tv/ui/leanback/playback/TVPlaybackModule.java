@@ -13,7 +13,7 @@ import dagger.Provides;
  * Created by drew.heavner on 12/8/14.
  */
 @Module(
-    injects = TVPlaybackActivity.class,
+    injects = TVPlaybackFragment.class,
     addsTo = TVUiModule.class,
     complete = false
 )

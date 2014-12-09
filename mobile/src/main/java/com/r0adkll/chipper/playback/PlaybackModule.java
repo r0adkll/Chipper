@@ -24,7 +24,8 @@ import dagger.Provides;
  */
 @Module(
     injects = {
-        MusicService.class
+        MusicService.class,
+        MusicBrowserService.class
     },
     complete = false,
     library = true

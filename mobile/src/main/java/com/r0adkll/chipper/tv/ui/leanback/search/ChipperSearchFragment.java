@@ -1,5 +1,6 @@
 package com.r0adkll.chipper.tv.ui.leanback.search;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -8,11 +9,18 @@ import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.ListRow;
 import android.support.v17.leanback.widget.ListRowPresenter;
 import android.support.v17.leanback.widget.ObjectAdapter;
+import android.support.v17.leanback.widget.OnItemViewClickedListener;
+import android.support.v17.leanback.widget.Presenter;
+import android.support.v17.leanback.widget.Row;
+import android.support.v17.leanback.widget.RowPresenter;
 import android.text.TextUtils;
 
 import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.tv.ui.leanback.playback.TVPlaybackActivity;
+import com.r0adkll.chipper.tv.ui.leanback.playlist.TVPlaylistActivity;
 import com.r0adkll.chipper.tv.ui.model.BaseSearchFragment;
 import com.r0adkll.chipper.tv.ui.model.ChiptunePresenter;
+import com.r0adkll.chipper.ui.player.MusicPlayer;
 
 import java.util.List;
 
@@ -21,7 +29,7 @@ import javax.inject.Inject;
 /**
  * Created by r0adkll on 12/8/14.
  */
-public class ChipperSearchFragment extends BaseSearchFragment implements ChipperSearchView, SearchFragment.SearchResultProvider {
+public class ChipperSearchFragment extends BaseSearchFragment implements ChipperSearchView, SearchFragment.SearchResultProvider, OnItemViewClickedListener {
 
     /***********************************************************************************************
      *
@@ -49,7 +57,7 @@ public class ChipperSearchFragment extends BaseSearchFragment implements Chipper
         mChiptunePresenter = new ChiptunePresenter();
 
         setSearchResultProvider(this);
-        //setOnItemViewClickedListener(getDefaultItemClickedListener());
+        setOnItemViewClickedListener(this);
 
     }
 
@@ -131,5 +139,14 @@ public class ChipperSearchFragment extends BaseSearchFragment implements Chipper
     @Override
     public void showSnackBar(String text) {
 
+    }
+
+    @Override
+    public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item, RowPresenter.ViewHolder rowViewHolder, Row row) {
+        Chiptune chiptune = (Chiptune) item;
+
+        MusicPlayer.createTVPlayback(getActivity(), chiptune);
+        Intent player = new Intent(getActivity(), TVPlaybackActivity.class);
+        startActivity(player);
     }
 }

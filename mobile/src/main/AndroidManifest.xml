@@ -69,12 +69,19 @@
         <!-- The Main Leanback View -->
         <activity android:name=".tv.ui.leanback.ChipperLeanback"
             android:label="@string/app_name_tv"
-            android:theme="@style/Theme.Leanback" />
+            android:theme="@style/Theme.Chipper.TV" />
 
         <activity android:name=".tv.ui.leanback.search.SearchActivity"
             android:label="@string/app_name_tv"
-            android:theme="@style/Theme.Leanback" />
+            android:theme="@style/Theme.Chipper.TV" />
 
+        <activity android:name=".tv.ui.leanback.playlist.TVPlaylistActivity"
+            android:label="@string/app_name_tv"
+            android:theme="@style/Theme.Chipper.TV" />
+
+        <activity android:name=".tv.ui.leanback.playback.TVPlaybackActivity"
+            android:label="@string/app_name_tv"
+            android:theme="@style/Theme.Chipper.TV" />
 
         <!--========================================================================================
 
@@ -109,6 +116,13 @@
         <!-- The Playlist Viewing Activity -->
         <activity android:name=".ui.playlists.viewer.PlaylistViewerActivity" />
 
+        <!-- TV Playback Service -->
+        <service android:name=".playback.MusicBrowserService"
+            android:label="@string/service_name">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
 
         <!--========================================================================================
 
@@ -120,7 +134,8 @@
         <service android:name=".data.OfflineIntentService" />
 
         <!-- The music playback service -->
-        <service android:name=".playback.MusicService" />
+        <service android:name=".playback.MusicService"
+            android:label="@string/service_name"/>
 
         <!-- This is the Account/Authenticator stub definition for the sync adapter -->
         <service android:name=".data.sync.AuthenticatorService">

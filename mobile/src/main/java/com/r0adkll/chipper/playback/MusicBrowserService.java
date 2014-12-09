@@ -14,11 +14,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.browse.MediaBrowser;
+import android.media.session.MediaSession;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.ResultReceiver;
+import android.service.media.MediaBrowserService;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Action;
 import android.support.v4.app.NotificationManagerCompat;
@@ -47,11 +50,14 @@ import com.r0adkll.chipper.prefs.BooleanPreference;
 import com.r0adkll.chipper.prefs.IntPreference;
 import com.r0adkll.chipper.qualifiers.SessionRepeatPreference;
 import com.r0adkll.chipper.qualifiers.SessionShufflePreference;
+import com.r0adkll.chipper.tv.ui.leanback.playback.TVPlaybackActivity;
 import com.r0adkll.chipper.ui.Chipper;
 import com.r0adkll.chipper.utils.CallbackHandler;
 import com.r0adkll.deadskunk.utils.Utils;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Produce;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -61,7 +67,8 @@ import timber.log.Timber;
 /**
  * Created by r0adkll on 11/25/14.
  */
-public class MusicService extends Service {
+@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+public class MusicBrowserService extends MediaBrowserService {
 
     /***********************************************************************************************
      *
@@ -140,6 +147,7 @@ public class MusicService extends Service {
      *
      */
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onCreate() {
         super.onCreate();
@@ -171,12 +179,21 @@ public class MusicService extends Service {
         // Initialize the Session State
         mCurrentState = new SessionState(mShufflePref, mRepeatPref);
 
+        Intent main = new Intent(this, TVPlaybackActivity.class);
+        PendingIntent mainPI = PendingIntent.getActivity(this, 0, main, PendingIntent.FLAG_UPDATE_CURRENT);
+
         // Initialize the Media Session
         mCurrentSession = new MediaSessionCompat(this, MEDIA_SESSION_TAG);
         mCurrentSession.setCallback(mMediaSessionCallbacks);
         mCurrentSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
         mCurrentSession.setPlaybackToLocal(AudioManager.STREAM_MUSIC);
+
+        MediaSession session = (MediaSession) mCurrentSession.getMediaSession();
+        session.setSessionActivity(mainPI);
+
+        // Set teh session token
+        setSessionToken((android.media.session.MediaSession.Token) mCurrentSession.getSessionToken().getToken());
 
         // Post the session
         mBus.post(new MediaSessionEvent(mCurrentSession));
@@ -240,6 +257,16 @@ public class MusicService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @Override
+    public BrowserRoot onGetRoot(String clientPackageName, int clientUid, Bundle rootHints) {
+        return null;
+    }
+
+    @Override
+    public void onLoadChildren(String parentId, Result<List<MediaBrowser.MediaItem>> result) {
+
     }
 
     @Override

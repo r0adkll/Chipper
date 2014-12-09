@@ -24,6 +24,11 @@ A keygen jukebox with over 1400 chiptunes sourced from key generators to play fr
 3.  **Subscription - $0.99/year**  
   - Everything!
 
+## Android TV
+
+This will support AndroidTV  
+__INDEV - Demo 1__ is ready for GDG
+
 ## Web (Coming Soon!)
 
 There will be a web interface where user's can sign-in with G+ or Chipper Creds and manage their account information, devices, playlists, and more. This is also where a user can redeem shared playlists (if not on a mobile device).

@@ -6,6 +6,7 @@ import android.content.Context;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Configuration;
+import com.crashlytics.android.Crashlytics;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.ChiptuneReference;
 import com.r0adkll.chipper.api.model.Device;
@@ -18,6 +19,7 @@ import com.r0adkll.postoffice.PostOffice;
 import com.r0adkll.postoffice.model.Design;
 import com.r0adkll.postoffice.model.Stamp;
 
+import io.fabric.sdk.android.Fabric;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -36,6 +38,7 @@ public class ChipperApp extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
 
         // Initialize ActiveAndroid
         Configuration.Builder builder = new Configuration.Builder(this)

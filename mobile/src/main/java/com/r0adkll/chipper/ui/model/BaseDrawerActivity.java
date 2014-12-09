@@ -25,6 +25,7 @@ import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
 import com.r0adkll.chipper.ui.all.ChiptunesActivity;
 import com.r0adkll.chipper.ui.playlists.PlaylistActivity;
 import com.r0adkll.chipper.ui.popular.PopularActivity;
+import com.r0adkll.chipper.ui.settings.SettingsActivity;
 import com.r0adkll.chipper.ui.widget.ScrimInsetsScrollView;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.otto.Bus;
@@ -538,8 +539,8 @@ public abstract class BaseDrawerActivity extends ActionBarActivity implements Go
 //                finish();
                 break;
             case NAVDRAWER_ITEM_SETTINGS:
-//                intent = new Intent(this, SettingsActivity.class);
-//                startActivity(intent);
+                intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
                 break;
             case NAVDRAWER_ITEM_FEEDBACK:
 //                intent = new Intent(this, VideoLibraryActivity.class);

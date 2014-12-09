@@ -37,4 +37,32 @@
     <string name="service_name">ChipperPlaybackService</string>
     <string name="empty_msg_chiptunes">There are no\nchiptunes to display</string>
 
+    <string name="setting_auto_upvote">Auto Upvote</string>
+    <string name="setting_auto_upvote_summary">Automatically upvote when you favorite a chiptune</string>
+    <string name="setting_auto_skip">Auto Skip</string>
+    <string name="setting_auto_skip_summary">Skip to the next song when you downvote</string>
+    <string name="setting_show_only_voted">Only show voted chiptunes</string>
+    <string name="setting_show_only_voted_summary">Only show voted chiptunes in \'Popular\'</string>
+    <string name="setting_auto_scroll">Auto scrolling</string>
+    <string name="setting_auto_scroll_summary">Automatically scroll the list to the current playing chiptune</string>
+    <string name="setting_category_style">Style</string>
+    <string name="setting_theme_picker_dialog_title">Choose a theme</string>
+    <string name="setting_category_offline">Offline</string>
+    <string name="setting_offline_size">Offline size on disk</string>
+    <string name="setting_category_general">General</string>
+    <string name="setting_offline_wifi_only">Download via Wi-Fi only</string>
+    <string name="setting_offline_wifi_only_summary">To reduce carrier data charges, don\'t download over mobile networks</string>
+    <string name="setting_clear_offline_cache">Clear offline data</string>
+    <string name="setting_clear_offline_cache_summary">Clear downloaded chiptunes</string>
+    <string name="setting_clear_cache">Clear Cache</string>
+    <string name="setting_clear_cache_summary">Clear cached chiptunes</string>
+    <string name="setting_category_cache">Cache</string>
+    <string name="setting_cache_size">Cache size on disk</string>
+    <string name="setting_cache_playback">Cache during playback</string>
+    <string name="setting_cache_playback_summary">Temporarily store music while streaming</string>
+    <string name="settings">Settings</string>
+    <string name="settings_downloading">Downloading</string>
+    <string name="settings_general">General settings</string>
+    <string name="settings_about">About</string>
+
 </resources>

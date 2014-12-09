@@ -79,13 +79,11 @@
         <!-- The Playlist Viewing Activity -->
         <activity android:name=".ui.playlists.viewer.PlaylistViewerActivity" />
 
-        <!-- TV Playback Service -->
-        <service android:name=".playback.MusicBrowserService"
-            android:label="@string/service_name">
-            <intent-filter>
-                <action android:name="android.media.browse.MediaBrowserService" />
-            </intent-filter>
-        </service>
+        <!-- Settings Activity -->
+        <activity android:name=".ui.settings.SettingsActivity"
+            android:label="@string/settings"
+            android:theme="@style/Theme.Chipper.Settings"
+            />
 
         <!--========================================================================================
 
@@ -181,6 +179,14 @@
             android:label="@string/app_name_tv"
             android:theme="@style/Theme.Chipper.TV" />
 
+        <!-- TV Playback Service -->
+        <service android:name=".playback.MusicBrowserService"
+            android:label="@string/service_name">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
+
         <!--========================================================================================
 
             Meta-Data
@@ -199,6 +205,7 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+        <meta-data android:name="com.crashlytics.ApiKey" android:value="7b1875458d267befd0938d565c22df19a3a7c047"/>
 
     </application>
 

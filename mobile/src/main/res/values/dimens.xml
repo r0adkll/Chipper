@@ -8,6 +8,7 @@
     <dimen name="headerbar_elevation">4dp</dimen>
 
     <dimen name="keyline_1">16dp</dimen>
+    <dimen name="keyline_2">24dp</dimen>
     <dimen name="navigation_drawer_width">260dp</dimen>
     <dimen name="navdrawer_chosen_account_height">140dp</dimen>
     <dimen name="navdrawer_profile_image_size">40dp</dimen>

@@ -1,4 +1,19 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
+
 apply plugin: 'hugo'
 
 android {
@@ -83,4 +98,7 @@ dependencies {
     compile 'com.fortysevendeg:swipelistview:1.0.+'
     compile 'com.nispok:snackbar:2.3.0'
     compile 'com.sothree.slidinguppanel:library:2.0.+'
+    compile('com.crashlytics.sdk.android:crashlytics:2.1.0@aar') {
+        transitive = true;
+    }
 }

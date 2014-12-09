@@ -1,12 +1,11 @@
 package com.r0adkll.chipper.ui;
 
-import android.app.Application;
 import android.content.SharedPreferences;
 
-import com.r0adkll.chipper.account.GoogleAccountManager;
 import com.r0adkll.chipper.prefs.BooleanPreference;
 import com.r0adkll.chipper.qualifiers.GenericPrefs;
 import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
+import com.r0adkll.chipper.ui.settings.SettingsModule;
 
 import javax.inject.Singleton;
 
@@ -19,6 +18,7 @@ import dagger.Provides;
  * Created by drew.heavner on 11/12/14.
  */
 @Module(
+    includes = SettingsModule.class,
     injects = {
         Chipper.class
     },

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/setting_category_cache">
+
+        <Preference
+            android:key="pref_cache_size"
+            android:title="@string/setting_cache_size"
+            android:summary="1.3 GB"
+            android:selectable="false"
+            />
+
+        <CheckBoxPreference
+            android:key="pref_cache_during_playback"
+            android:title="@string/setting_cache_playback"
+            android:summary="@string/setting_cache_playback_summary"
+            android:defaultValue="true" />
+
+        <Preference
+            android:key="pref_clear_cache"
+            android:title="@string/setting_clear_cache"
+            android:summary="@string/setting_clear_offline_cache_summary"
+            />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/setting_category_offline">
+
+        <Preference
+            android:key="pref_offline_size"
+            android:title="@string/setting_offline_size"
+            android:summary="2.3 GB"
+            android:selectable="false"
+            />
+
+        <CheckBoxPreference
+            android:key="pref_offline_wifi_only"
+            android:title="@string/setting_offline_wifi_only"
+            android:summary="@string/setting_offline_wifi_only_summary"
+            android:defaultValue="true" />
+
+        <Preference
+            android:key="pref_clear_offline_cache"
+            android:title="@string/setting_clear_offline_cache"
+            android:summary="@string/setting_clear_offline_cache_summary"
+            />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

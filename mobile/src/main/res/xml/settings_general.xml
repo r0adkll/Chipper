@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/setting_category_general">
+
+        <SwitchPreference
+            android:key="pref_auto_upvote"
+            android:title="@string/setting_auto_upvote"
+            android:summary="@string/setting_auto_upvote_summary"
+            android:defaultValue="false" />
+
+        <SwitchPreference
+            android:key="pref_auto_skip"
+            android:title="@string/setting_auto_skip"
+            android:summary="@string/setting_auto_skip_summary"
+            android:defaultValue="false" />
+
+        <SwitchPreference
+            android:key="pref_show_only_voted"
+            android:title="@string/setting_show_only_voted"
+            android:summary="@string/setting_show_only_voted_summary"
+            android:defaultValue="false" />
+
+        <SwitchPreference
+            android:key="pref_auto_scroll"
+            android:title="@string/setting_auto_scroll"
+            android:summary="@string/setting_auto_scroll_summary"
+            android:defaultValue="false" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/setting_category_style">
+
+        <ListPreference
+            android:key="pref_theme_picker"
+            android:title="Theme"
+            android:entries="@array/theme_choices"
+            android:entryValues="@array/theme_values"
+            android:defaultValue="0"
+            android:dialogTitle="@string/setting_theme_picker_dialog_title" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

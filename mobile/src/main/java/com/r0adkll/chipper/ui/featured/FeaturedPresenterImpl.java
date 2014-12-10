@@ -1,23 +1,22 @@
-package com.r0adkll.chipper.ui.all;
-
+package com.r0adkll.chipper.ui.featured;
 
 import android.content.Intent;
 
-import com.nispok.snackbar.Snackbar;
-import com.nispok.snackbar.listeners.EventListener;
+import com.activeandroid.query.From;
+import com.activeandroid.query.Select;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.ChiptuneReference;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.VoteManager;
+import com.r0adkll.chipper.data.model.ModelLoader;
 import com.r0adkll.chipper.ui.player.MusicPlayer;
 import com.r0adkll.chipper.utils.CallbackHandler;
-import com.r0adkll.chipper.utils.ChiptuneComparator;
 
-import java.util.Collections;
 import java.util.List;
 
 import retrofit.Callback;
@@ -26,60 +25,81 @@ import retrofit.client.Response;
 import timber.log.Timber;
 
 /**
- * Created by r0adkll on 11/13/14.
+ * Created by r0adkll on 11/16/14.
  */
-public class ChiptunesPresenterImpl implements ChiptunesPresenter {
+public class FeaturedPresenterImpl implements FeaturedPresenter {
 
-    private User mCurrentUser;
-    private ChiptunesView mView;
+    private FeaturedView mView;
     private ChipperService mService;
-    private ChiptuneProvider mProvider;
-    private PlaylistManager mPlaylistManager;
     private VoteManager mVoteManager;
+    private PlaylistManager mPlaylistManager;
+    private ChiptuneProvider mProvider;
+    private User mUser;
 
     /**
      * Constructor
      *
-     * @param view          the chipper view interface
-     * @param service       the chipper API service
+     * @param view
+     * @param service
+     * @param user
      */
-    public ChiptunesPresenterImpl(ChiptunesView view,
-                                  ChiptuneProvider provider,
-                                  ChipperService service,
-                                  PlaylistManager playlistManager,
-                                  VoteManager voteManager,
-                                  User user){
-        mCurrentUser = user;
+    public FeaturedPresenterImpl(FeaturedView view,
+                                 ChipperService service,
+                                 PlaylistManager playlistManager,
+                                 VoteManager voteManager,
+                                 ChiptuneProvider provider,
+                                 User user) {
         mView = view;
         mService = service;
-        mProvider = provider;
+        mUser = user;
         mPlaylistManager = playlistManager;
         mVoteManager = voteManager;
+        mProvider = provider;
     }
 
     @Override
-    public void loadAllChiptunes() {
-        mView.showProgress();
-        mProvider.loadChiptunes(new Callback<List<Chiptune>>() {
+    public void loadFromServer() {
+        mService.getFeaturedPlaylist(new Callback<Playlist>() {
             @Override
-            public void success(List<Chiptune> chiptunes, Response response) {
-                mView.hideProgress();
-                setChiptunes(chiptunes);
+            public void success(Playlist playlist, Response response) {
+                // Update the local reference in the database
+                Playlist featured = new Select()
+                        .from(Playlist.class)
+                        .where("name=?", Playlist.FEATURED)
+                        .limit(1)
+                        .executeSingle();
+
+                if(featured != null){
+                    featured.update(playlist);
+                }else{
+                    featured = playlist;
+                    featured.save();
+                }
+
+                // Initialize the loader in the ui
+                mView.initializeLoader(featured);
             }
 
             @Override
             public void failure(RetrofitError error) {
-                mView.hideProgress();
                 handleRetrofitError(error);
             }
         });
     }
 
     @Override
+    public void onPlaySelected(Playlist playlist) {
+        List<Chiptune> chiptunes = playlist.getChiptunes(mProvider);
+        if(chiptunes != null && !chiptunes.isEmpty()){
+            Chiptune chiptune = chiptunes.get(0);
+            Intent playback = MusicPlayer.createPlayback(mView.getActivity(), chiptune, playlist);
+            MusicPlayer.startPlayback(mView.getActivity(), playback);
+        }
+    }
+
+    @Override
     public void onChiptuneSelected(Chiptune chiptune) {
-        // Send Otto Event to start playing this selected chiptune
-        Timber.i("Chiptune selected[%s]: %s-%s", chiptune.id, chiptune.artist, chiptune.title);
-        Intent playback = MusicPlayer.createPlayback(mView.getActivity(), chiptune);
+        Intent playback = MusicPlayer.createPlayback(mView.getActivity(), chiptune, mView.getFeaturedPlaylist());
         MusicPlayer.startPlayback(mView.getActivity(), playback);
     }
 
@@ -119,10 +139,6 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
     public void favoriteChiptunes(Chiptune... chiptunes) {
         if(mPlaylistManager.addToFavorites(chiptunes)){
             mView.refreshContent();
-            String text = chiptunes.length == 1 ?
-                    String.format("%s was added to %s", chiptunes[0].title, Playlist.FAVORITES) :
-                    String.format("%d tunes were added to %s", chiptunes.length, Playlist.FAVORITES);
-            mView.showSnackBar(text);
         }
     }
 
@@ -136,14 +152,13 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
                         String.format("%s was added to %s", chiptunes[0].title, value.name) :
                         String.format("%d tunes were added to %s", chiptunes.length, value.name);
 
+                // Show snackbar
                 mView.showSnackBar(text);
             }
 
             @Override
             public void onFailure(String msg) {
-                if (msg != null) {
-                    Timber.w("Unable to add chiptunes to playlist: %s", msg);
-                }
+
             }
         }, chiptunes);
     }
@@ -153,19 +168,23 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
         CashMachine.offline(mView.getActivity(), chiptunes);
     }
 
-    /**
-     * Sort and Send the chiptune list to the view
-     *
-     * @param chiptunes     the list of chiptunes to display
-     */
-    private void setChiptunes(List<Chiptune> chiptunes){
+    @Override
+    public void offlinePlaylist(Playlist playlist) {
+        CashMachine.offline(mView.getActivity(), playlist);
+    }
 
-        // 1. Sort
-        Collections.sort(chiptunes, new ChiptuneComparator());
+    @Override
+    public void sharePlaylist(Playlist playlist) {
 
-        // 2. Send to view
-        mView.setChiptunes(chiptunes);
+    }
 
+    @Override
+    public ModelLoader<ChiptuneReference> getLoader(Playlist playlist) {
+        From query = new Select()
+                .from(ChiptuneReference.class)
+                .where("playlist=?", playlist.getId());
+
+        return new ModelLoader<>(mView.getActivity(), ChiptuneReference.class, query, true);
     }
 
 
@@ -176,6 +195,4 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
     private void handleRetrofitError(RetrofitError error){
         mView.showErrorMessage(error.getLocalizedMessage());
     }
-
-
 }

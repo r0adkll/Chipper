@@ -58,7 +58,7 @@ public class PlaylistManager  {
     public Playlist getFavorites(){
         return new Select()
                 .from(Playlist.class)
-                .where("name=?", "Favorites")
+                .where("name=?", Playlist.FAVORITES)
                 .limit(1)
                 .executeSingle();
     }

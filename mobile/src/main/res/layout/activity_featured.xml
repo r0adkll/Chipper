@@ -61,7 +61,7 @@
                 android:layout_height="match_parent"
 
                 app:emptyIcon="@drawable/ic_chipper"
-                app:emptyMessage="@string/empty_msg_playlist_viewer"
+                app:emptyMessage="@string/empty_msg_featured"
                 />
 
         </FrameLayout>

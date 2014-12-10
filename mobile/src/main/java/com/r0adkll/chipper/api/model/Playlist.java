@@ -92,6 +92,7 @@ public class Playlist extends Model implements Parcelable{
      */
 
     public static final String FAVORITES = "Favorites";
+    public static final String FEATURED = "Featured";
 
     /***********************************************************************************************
      *
@@ -111,6 +112,13 @@ public class Playlist extends Model implements Parcelable{
 
     @Column(index = true, notNull = true)
     public String name;
+
+    /**
+     * This variable is ONLY sent down when requesting the Featured playlist
+     * it is otherwise null with every other playlist
+     */
+    @Column
+    public String feature_title;
 
     @Column
     public long updated;
@@ -225,10 +233,16 @@ public class Playlist extends Model implements Parcelable{
             updated_by_user = _updatedByUser;
         }
 
-        // 3) Delete all the Chiptune references from the database
+        // 3) Batch delete all the Chiptune references from the database
         List<ChiptuneReference> references = chiptuneReferences();
-        for(ChiptuneReference reference: references){
-            reference.delete();
+        ActiveAndroid.beginTransaction();
+        try {
+            for (ChiptuneReference reference : references) {
+                reference.delete();
+            }
+            ActiveAndroid.setTransactionSuccessful();
+        }finally {
+            ActiveAndroid.endTransaction();
         }
 
         // now save all the ones from the updated playlist

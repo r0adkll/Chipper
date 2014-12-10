@@ -1,0 +1,21 @@
+package com.r0adkll.chipper.ui.featured;
+
+import com.r0adkll.chipper.api.model.Playlist;
+import com.r0adkll.chipper.ui.model.IView;
+
+/**
+ * Created by r0adkll on 11/16/14.
+ */
+public interface FeaturedView extends IView {
+
+    public void showProgress();
+
+    public void hideProgress();
+
+    public void showErrorMessage(String msg);
+
+    public void initializeLoader(Playlist featured);
+
+    public Playlist getFeaturedPlaylist();
+
+}

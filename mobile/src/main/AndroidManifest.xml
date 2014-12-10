@@ -79,6 +79,9 @@
         <!-- The Playlist Viewing Activity -->
         <activity android:name=".ui.playlists.viewer.PlaylistViewerActivity" />
 
+        <!-- The Featured Playlist Activity -->
+        <activity android:name=".ui.featured.FeaturedActivity" />
+
         <!-- Settings Activity -->
         <activity android:name=".ui.settings.SettingsActivity"
             android:label="@string/settings"

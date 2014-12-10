@@ -18,6 +18,7 @@ import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.account.GoogleAccountManager;
 import com.r0adkll.chipper.data.events.OfflineModeChangeEvent;
+import com.r0adkll.chipper.ui.featured.FeaturedActivity;
 import com.r0adkll.chipper.ui.player.MusicPlayer;
 import com.r0adkll.chipper.utils.prefs.BooleanPreference;
 import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
@@ -523,9 +524,9 @@ public abstract class BaseDrawerActivity extends ActionBarActivity implements Go
                 finish();
                 break;
             case NAVDRAWER_ITEM_FEATURED:
-//                intent = new Intent(this, SocialActivity.class);
-//                startActivity(intent);
-//                finish();
+                intent = new Intent(this, FeaturedActivity.class);
+                startActivity(intent);
+                finish();
                 break;
             case NAVDRAWER_ITEM_PLAYLISTS:
                 intent = new Intent(this, PlaylistActivity.class);

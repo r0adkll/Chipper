@@ -75,6 +75,8 @@ public class ChiptunesActivity extends BaseDrawerActivity
     @Inject
     Bus mBus;
 
+    private Snackbar mCurrentSnackbar;
+
     /***********************************************************************************************
      *
      *  Lifecycle Methods
@@ -296,7 +298,9 @@ public class ChiptunesActivity extends BaseDrawerActivity
 
     @Override
     public void showSnackBar(String text) {
-        Snackbar.with(this)
+        if(mCurrentSnackbar != null) mCurrentSnackbar.dismiss();
+
+        mCurrentSnackbar = Snackbar.with(this)
                 .text(text)
                 .eventListener(new EventListener() {
                     @DebugLog
@@ -323,7 +327,9 @@ public class ChiptunesActivity extends BaseDrawerActivity
                                 .start();
                     }
                 })
-                .show(this);
+                .attachToRecyclerView(mChiptuneRecycler);
+
+        mCurrentSnackbar.show(this);
     }
 
     @Override

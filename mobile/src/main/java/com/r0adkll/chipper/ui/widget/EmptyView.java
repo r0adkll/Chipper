@@ -8,9 +8,12 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ActionMenuView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -34,6 +37,8 @@ public class EmptyView extends RelativeLayout {
 
     private ImageView mIcon;
     private TextView mMessage;
+    private ProgressBar mLoading;
+    private LinearLayout mContainer;
 
     private int mEmptyIcon = R.drawable.ic_launcher;
     private int mAccentColor;
@@ -100,18 +105,18 @@ public class EmptyView extends RelativeLayout {
     private void init(){
 
         // Create the Empty Layout
-        LinearLayout container = new LinearLayout(getContext());
+        mContainer = new LinearLayout(getContext());
         mIcon = new ImageView(getContext());
         mMessage = new TextView(getContext());
 
         // Setup the layout
         RelativeLayout.LayoutParams containerParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        container.setGravity(Gravity.CENTER);
-        container.setOrientation(LinearLayout.VERTICAL);
+        mContainer.setGravity(Gravity.CENTER);
+        mContainer.setOrientation(LinearLayout.VERTICAL);
         containerParams.addRule(RelativeLayout.CENTER_IN_PARENT);
 
         // Setup the Icon
-        int size = (int) Utils.dpToPx(getContext(), 64 );
+        int size = (int) Utils.dpToPx(getContext(), 64);
         LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(size, size);
         int padding = getResources().getDimensionPixelSize(R.dimen.half_padding);
         mIcon.setPadding(0, 0, 0, padding);
@@ -127,11 +132,19 @@ public class EmptyView extends RelativeLayout {
         FontLoader.applyTypeface(mMessage, Types.ROBOTO_MEDIUM);
 
         // Add to the layout
-        container.addView(mIcon, iconParams);
-        container.addView(mMessage, msgParams);
+        mContainer.addView(mIcon, iconParams);
+        mContainer.addView(mMessage, msgParams);
+
+        // Setup loading indicator
+        RelativeLayout.LayoutParams loadParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        loadParams.addRule(RelativeLayout.CENTER_IN_PARENT);
+        mLoading = new ProgressBar(getContext());
+        mLoading.setIndeterminate(true);
+        mLoading.setVisibility(View.GONE);
 
         // Add to view
-        addView(container, containerParams);
+        addView(mContainer, containerParams);
+        addView(mLoading, loadParams);
     }
 
     public void setAccentColor(int colorResId){
@@ -146,6 +159,11 @@ public class EmptyView extends RelativeLayout {
 
     public void setEmptyMessage(CharSequence message){
         mMessage.setText(message);
+    }
+
+    public void setLoading(boolean val){
+        mLoading.setVisibility(val ? View.VISIBLE : View.GONE);
+        mContainer.setVisibility(val ? View.GONE : View.VISIBLE);
     }
 
 }

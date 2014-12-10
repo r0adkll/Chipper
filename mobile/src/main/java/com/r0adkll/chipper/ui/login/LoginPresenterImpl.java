@@ -2,13 +2,7 @@ package com.r0adkll.chipper.ui.login;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.accounts.AccountManagerCallback;
-import android.accounts.AccountManagerFuture;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.app.Activity;
-import android.app.Application;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -16,17 +10,13 @@ import android.os.Build;
 import com.activeandroid.query.Select;
 import com.r0adkll.chipper.account.GoogleAccountManager;
 import com.r0adkll.chipper.api.ChipperService;
-import com.r0adkll.chipper.api.model.ChipperError;
 import com.r0adkll.chipper.api.model.Device;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
-import com.r0adkll.chipper.prefs.StringPreference;
-import com.r0adkll.chipper.qualifiers.GenericPrefs;
+import com.r0adkll.chipper.utils.prefs.StringPreference;
 import com.r0adkll.chipper.utils.Tools;
 import com.r0adkll.chipper.ui.all.ChiptunesActivity;
 import com.r0adkll.deadskunk.utils.Utils;
-
-import java.io.IOException;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;

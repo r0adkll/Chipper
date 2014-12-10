@@ -1,6 +1,5 @@
 package com.r0adkll.chipper.tv.ui.leanback.playlist;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -23,7 +22,7 @@ import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.ChiptuneProvider;
-import com.r0adkll.chipper.prefs.BooleanPreference;
+import com.r0adkll.chipper.utils.prefs.BooleanPreference;
 import com.r0adkll.chipper.qualifiers.SessionShufflePreference;
 import com.r0adkll.chipper.tv.ui.leanback.playback.TVPlaybackActivity;
 import com.r0adkll.chipper.tv.ui.model.BaseDetailsFragment;

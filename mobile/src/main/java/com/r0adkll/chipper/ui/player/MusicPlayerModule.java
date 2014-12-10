@@ -2,8 +2,8 @@ package com.r0adkll.chipper.ui.player;
 
 import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.VoteManager;
-import com.r0adkll.chipper.prefs.BooleanPreference;
-import com.r0adkll.chipper.prefs.IntPreference;
+import com.r0adkll.chipper.utils.prefs.BooleanPreference;
+import com.r0adkll.chipper.utils.prefs.IntPreference;
 import com.r0adkll.chipper.qualifiers.SessionRepeatPreference;
 import com.r0adkll.chipper.qualifiers.SessionShufflePreference;
 import com.r0adkll.chipper.ui.UIModule;

@@ -6,10 +6,9 @@ import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.session.MediaSessionManager;
 
-import com.r0adkll.chipper.ChipperModule;
 import com.r0adkll.chipper.playback.model.SessionState;
-import com.r0adkll.chipper.prefs.BooleanPreference;
-import com.r0adkll.chipper.prefs.IntPreference;
+import com.r0adkll.chipper.utils.prefs.BooleanPreference;
+import com.r0adkll.chipper.utils.prefs.IntPreference;
 import com.r0adkll.chipper.qualifiers.GenericPrefs;
 import com.r0adkll.chipper.qualifiers.SessionRepeatPreference;
 import com.r0adkll.chipper.qualifiers.SessionShufflePreference;

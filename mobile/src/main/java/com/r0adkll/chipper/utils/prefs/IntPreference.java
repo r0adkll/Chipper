@@ -1,4 +1,4 @@
-package com.r0adkll.chipper.prefs;
+package com.r0adkll.chipper.utils.prefs;
 
 import android.content.SharedPreferences;
 

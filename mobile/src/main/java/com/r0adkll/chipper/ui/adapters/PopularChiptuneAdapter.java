@@ -13,10 +13,11 @@ import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.VoteManager;
-import com.r0adkll.chipper.prefs.BooleanPreference;
+import com.r0adkll.chipper.utils.ChiptuneComparator;
+import com.r0adkll.chipper.utils.prefs.BooleanPreference;
 import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -72,6 +73,15 @@ public class PopularChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, Popul
         }
         return item.artist.toLowerCase().contains(query.toLowerCase()) ||
                 item.title.toLowerCase().contains(query.toLowerCase());
+    }
+
+    @Override
+    public void onSort(List<Chiptune> items) {
+        if(voteData != null) {
+            Collections.sort(items, new PopularComparator(voteData));
+        }else{
+            Collections.sort(items, new ChiptuneComparator());
+        }
     }
 
     /***********************************************************************************************

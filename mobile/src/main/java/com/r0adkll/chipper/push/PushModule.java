@@ -4,7 +4,7 @@ import android.app.Application;
 import android.content.SharedPreferences;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.r0adkll.chipper.prefs.StringPreference;
+import com.r0adkll.chipper.utils.prefs.StringPreference;
 import com.r0adkll.chipper.qualifiers.GenericPrefs;
 import com.r0adkll.chipper.qualifiers.PushToken;
 

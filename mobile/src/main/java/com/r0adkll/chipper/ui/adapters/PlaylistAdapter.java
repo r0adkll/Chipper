@@ -13,11 +13,12 @@ import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
-import com.r0adkll.chipper.prefs.BooleanPreference;
+import com.r0adkll.chipper.utils.prefs.BooleanPreference;
 import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -58,6 +59,11 @@ public class PlaylistAdapter extends RecyclerArrayAdapter<Playlist, PlaylistAdap
             if(!item.isPartiallyOffline(mAtm)) return false;
         }
         return item.name.toLowerCase().contains(query.toLowerCase());
+    }
+
+    @Override
+    public void onSort(List<Playlist> items) {
+        // Do nothing
     }
 
     @Override

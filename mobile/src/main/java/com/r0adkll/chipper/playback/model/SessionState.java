@@ -1,9 +1,7 @@
 package com.r0adkll.chipper.playback.model;
 
-import com.r0adkll.chipper.api.model.Chiptune;
-import com.r0adkll.chipper.api.model.Playlist;
-import com.r0adkll.chipper.prefs.BooleanPreference;
-import com.r0adkll.chipper.prefs.IntPreference;
+import com.r0adkll.chipper.utils.prefs.BooleanPreference;
+import com.r0adkll.chipper.utils.prefs.IntPreference;
 
 /**
  * This class will contain the entire state of the play session operated by the

@@ -14,6 +14,8 @@ import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.ChiptuneReference;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
@@ -50,6 +52,9 @@ public class QueueChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, QueueCh
     public boolean onQuery(Chiptune item, String query) {
         return true;
     }
+
+    @Override
+    public void onSort(List<Chiptune> items) {}
 
     @Override
     public void onBindViewHolder(final PlaylistChiptuneViewHolder holder, int i) {

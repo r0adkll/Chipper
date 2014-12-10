@@ -1,7 +1,6 @@
 package com.r0adkll.chipper.tv.ui.leanback.playback;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.media.MediaMetadata;
@@ -22,14 +21,10 @@ import android.support.v17.leanback.widget.OnActionClickedListener;
 import android.support.v17.leanback.widget.PlaybackControlsRow;
 import android.support.v17.leanback.widget.PlaybackControlsRow.*;
 import android.support.v17.leanback.widget.PlaybackControlsRowPresenter;
-import android.support.v4.media.session.MediaControllerCompat;
-import android.support.v4.media.session.MediaSessionCompat;
-import android.util.DisplayMetrics;
 
 import com.nispok.snackbar.Snackbar;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
-import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.playback.MusicService;
 import com.r0adkll.chipper.playback.events.MediaSessionEvent;
@@ -37,14 +32,13 @@ import com.r0adkll.chipper.playback.events.PlayProgressEvent;
 import com.r0adkll.chipper.playback.events.PlayQueueEvent;
 import com.r0adkll.chipper.playback.model.PlayQueue;
 import com.r0adkll.chipper.playback.model.SessionState;
-import com.r0adkll.chipper.prefs.BooleanPreference;
-import com.r0adkll.chipper.prefs.IntPreference;
+import com.r0adkll.chipper.utils.prefs.BooleanPreference;
+import com.r0adkll.chipper.utils.prefs.IntPreference;
 import com.r0adkll.chipper.qualifiers.SessionRepeatPreference;
 import com.r0adkll.chipper.qualifiers.SessionShufflePreference;
 import com.r0adkll.chipper.tv.ui.model.BasePlaybackOverlayFragment;
 import com.r0adkll.chipper.tv.ui.model.ChiptuneDescriptionPresenter;
 import com.r0adkll.chipper.tv.ui.model.ChiptunePresenter;
-import com.r0adkll.chipper.utils.CallbackHandler;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 

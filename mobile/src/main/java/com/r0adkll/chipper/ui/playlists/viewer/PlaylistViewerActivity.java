@@ -41,6 +41,7 @@ import com.r0adkll.chipper.ui.player.MusicPlayerCallbacks;
 import com.r0adkll.chipper.ui.widget.DividerDecoration;
 import com.r0adkll.chipper.ui.widget.EmptyView;
 import com.r0adkll.chipper.utils.CallbackHandler;
+import com.r0adkll.chipper.utils.UIUtils;
 import com.r0adkll.deadskunk.utils.Utils;
 import com.r0adkll.postoffice.PostOffice;
 import com.squareup.otto.Bus;
@@ -122,7 +123,8 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Now present the layout
-        setupFab();
+        UIUtils.setupFAB(this, mFabPlay);
+        mFabPlay.setOnClickListener(mFABClickListener);
         setupRecyclerView();
 
         // Set the player callbacks
@@ -246,37 +248,6 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
 
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private void setupFab(){
-        // Setup the FAB
-        if(!Utils.isLollipop()) {
-            ImageView shadow = ButterKnife.findById(mFabPlay, R.id.shadow);
-            int dimen = getResources().getDimensionPixelSize(R.dimen.fab_shadow_radius);
-            Bitmap blur = Bitmap.createBitmap(dimen, dimen, Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(blur);
-            Paint p = new Paint();
-            p.setColor(Color.BLACK);
-            canvas.drawCircle(dimen / 2f, dimen / 2f, dimen / 2f - Utils.dpToPx(this, 6), p);
-            shadow.setImageBitmap(Utils.blurImage(this, blur, 16));
-            mFabPlay.setOnClickListener(mFABClickListener);
-        }else{
-
-            ViewOutlineProvider vop = new ViewOutlineProvider() {
-                @Override
-                public void getOutline(View view, Outline outline) {
-                    int size = (int) Utils.dpToPx(PlaylistViewerActivity.this, 56);
-                    outline.setOval(0, 0, size, size);
-                }
-            };
-
-            //Button btn = ButterKnife.findById(mFabAdd, R.id.button);
-            mFabPlay.setOutlineProvider(vop);
-            mFabPlay.setClipToOutline(true);
-            mFabPlay.setOnClickListener(mFABClickListener);
-        }
-    }
-
-
     /**
      * The floating action button click listener
      */
@@ -286,7 +257,6 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
             presenter.onPlaySelected(mPlaylist);
         }
     };
-
 
     @Override
     public void onItemClick(View v, ChiptuneReference item, int position) {

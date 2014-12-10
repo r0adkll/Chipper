@@ -2,7 +2,6 @@ package com.r0adkll.chipper.account;
 
 import android.accounts.Account;
 import android.app.Application;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,9 +14,8 @@ import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
-import com.r0adkll.chipper.prefs.StringPreference;
+import com.r0adkll.chipper.utils.prefs.StringPreference;
 import com.r0adkll.chipper.qualifiers.GenericPrefs;
-import com.r0adkll.chipper.utils.CallbackHandler;
 
 import javax.inject.Inject;
 

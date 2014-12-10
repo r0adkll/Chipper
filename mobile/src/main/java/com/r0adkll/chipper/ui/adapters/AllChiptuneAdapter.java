@@ -8,16 +8,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.common.collect.Collections2;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.VoteManager;
-import com.r0adkll.chipper.prefs.BooleanPreference;
-import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
+import com.r0adkll.chipper.utils.ChiptuneComparator;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -25,7 +27,6 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import hugo.weaving.DebugLog;
 import timber.log.Timber;
 
 /**
@@ -57,7 +58,7 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
     @Inject
     public AllChiptuneAdapter(){
         super();
-        registerAdapterDataObserver(mChiptunesObserver);
+//        registerAdapterDataObserver(mChiptunesObserver);
     }
 
     @Override
@@ -67,6 +68,16 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
         }
         return item.artist.toLowerCase().contains(query.toLowerCase()) ||
                 item.title.toLowerCase().contains(query.toLowerCase());
+    }
+
+    @Override
+    public void onSort(List<Chiptune> items) {
+        Collections.sort(items, new ChiptuneComparator());
+    }
+
+    @Override
+    public void onFiltered() {
+        buildSectionHeaders();
     }
 
     /***********************************************************************************************
@@ -150,15 +161,18 @@ public class AllChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, AllChiptu
 
     @Override
     public long getHeaderId(int i) {
-        Chiptune data = getItem(i);
+        if(i < getItemCount()) {
 
-        for(List<Chiptune> items: mHeaders){
-            if(items.contains(data)){
-                return mHeaders.indexOf(items);
+            Chiptune data = getItem(i);
+
+            for (List<Chiptune> items : mHeaders) {
+                if (items.contains(data)) {
+                    return mHeaders.indexOf(items);
+                }
             }
         }
 
-        return 0;
+        return -1;
     }
 
     @Override

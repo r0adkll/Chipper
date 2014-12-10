@@ -11,7 +11,7 @@ import com.google.gson.Gson;
 import com.r0adkll.chipper.api.ApiModule;
 import com.r0adkll.chipper.data.DataModule;
 import com.r0adkll.chipper.playback.PlaybackModule;
-import com.r0adkll.chipper.prefs.IntPreference;
+import com.r0adkll.chipper.utils.prefs.IntPreference;
 import com.r0adkll.chipper.push.PushModule;
 import com.r0adkll.chipper.qualifiers.AppVersion;
 import com.r0adkll.chipper.qualifiers.DefaultPrefs;

@@ -12,8 +12,12 @@ import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.ChiptuneReference;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
-import com.r0adkll.chipper.prefs.BooleanPreference;
+import com.r0adkll.chipper.utils.prefs.BooleanPreference;
 import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -61,6 +65,18 @@ public class PlaylistChiptuneAdapter extends RecyclerArrayAdapter<ChiptuneRefere
 
         return chiptune.artist.toLowerCase().contains(query.toLowerCase()) ||
                 chiptune.title.toLowerCase().contains(query.toLowerCase());
+    }
+
+    @Override
+    public void onSort(List<ChiptuneReference> items) {
+        Collections.sort(items, new Comparator<ChiptuneReference>() {
+            @Override
+            public int compare(ChiptuneReference lhs, ChiptuneReference rhs) {
+                int lhsSO = lhs.sort_order;
+                int rhsSO = rhs.sort_order;
+                return lhsSO < rhsSO ? -1 : (lhsSO == rhsSO ? 0 : 1);
+            }
+        });
     }
 
     @Override

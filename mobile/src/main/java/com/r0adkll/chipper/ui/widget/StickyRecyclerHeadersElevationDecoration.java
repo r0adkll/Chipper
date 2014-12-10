@@ -29,7 +29,7 @@ import timber.log.Timber;
 
 public class StickyRecyclerHeadersElevationDecoration extends RecyclerView.ItemDecoration {
     private final StickyRecyclerHeadersAdapter mAdapter;
-    private final LongSparseArray<View> mHeaderViews = new LongSparseArray<>();
+    private final LongSparseArray<RecyclerView.ViewHolder> mHeaderViews = new LongSparseArray<>();
     private final SparseArray<Rect> mHeaderRects = new SparseArray<>();
 
     public StickyRecyclerHeadersElevationDecoration(StickyRecyclerHeadersAdapter adapter) {
@@ -64,7 +64,7 @@ public class StickyRecyclerHeadersElevationDecoration extends RecyclerView.ItemD
             View firstView = parent.getChildAt(0);
             int firstPosition = parent.getChildPosition(firstView);
 
-            if (mAdapter.getHeaderId(firstPosition) > 0) {
+            if (mAdapter.getHeaderId(firstPosition) > -1) {
 
                 View firstHeader = getHeaderView(parent, firstPosition);
                 View nextView = getNextView(parent);
@@ -224,13 +224,12 @@ public class StickyRecyclerHeadersElevationDecoration extends RecyclerView.ItemD
     public View getHeaderView(RecyclerView parent, int position) {
         long headerId = mAdapter.getHeaderId(position);
 
-        View header = mHeaderViews.get(headerId);
-        if (header == null) {
+        RecyclerView.ViewHolder viewHolder = mHeaderViews.get(headerId);
+        if (viewHolder == null) {
 
-            //TODO - recycle views
-            RecyclerView.ViewHolder viewHolder = mAdapter.onCreateHeaderViewHolder(parent);
-            mAdapter.onBindHeaderViewHolder(viewHolder, position);
-            header = viewHolder.itemView;
+            viewHolder = mAdapter.onCreateHeaderViewHolder(parent);
+            View header = viewHolder.itemView;
+            header.setTag(viewHolder);
 
             if (header.getLayoutParams() == null) {
 
@@ -256,9 +255,13 @@ public class StickyRecyclerHeadersElevationDecoration extends RecyclerView.ItemD
                     parent.getPaddingTop() + parent.getPaddingBottom(), header.getLayoutParams().height);
             header.measure(childWidth, childHeight);
             header.layout(0, 0, header.getMeasuredWidth(), header.getMeasuredHeight());
-            mHeaderViews.put(headerId, header);
+            mHeaderViews.put(headerId, viewHolder);
         }
-        return header;
+
+        // Rebind content to the view holder
+        mAdapter.onBindHeaderViewHolder(viewHolder, position);
+
+        return viewHolder.itemView;
     }
 
     private boolean hasNewHeader(int position) {

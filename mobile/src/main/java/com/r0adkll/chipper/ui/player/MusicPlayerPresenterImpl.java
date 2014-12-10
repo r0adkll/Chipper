@@ -16,12 +16,10 @@ import com.r0adkll.chipper.playback.events.PlayProgressEvent;
 import com.r0adkll.chipper.playback.events.PlayQueueEvent;
 import com.r0adkll.chipper.playback.model.PlayQueue;
 import com.r0adkll.chipper.playback.model.SessionState;
-import com.r0adkll.chipper.prefs.BooleanPreference;
-import com.r0adkll.chipper.prefs.IntPreference;
-import com.r0adkll.chipper.qualifiers.SessionRepeatPreference;
+import com.r0adkll.chipper.utils.prefs.BooleanPreference;
+import com.r0adkll.chipper.utils.prefs.IntPreference;
 import com.r0adkll.chipper.utils.CallbackHandler;
 
-import hugo.weaving.DebugLog;
 import timber.log.Timber;
 
 import static android.support.v4.media.session.PlaybackStateCompat.*;

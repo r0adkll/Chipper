@@ -3,7 +3,7 @@ package com.r0adkll.chipper.ui.adapters;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.r0adkll.chipper.prefs.BooleanPreference;
+import com.r0adkll.chipper.utils.prefs.BooleanPreference;
 import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
 
 import java.util.ArrayList;
@@ -11,10 +11,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import javax.inject.Inject;
-
-import hugo.weaving.DebugLog;
 
 
 public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder>
@@ -146,7 +145,7 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
         if((filter != null && !filter.isEmpty()) || (mOfflinePref != null && mOfflinePref.get())){
             if(filter == null) filter = "";
 
-
+            // Filter out the items
             filteredItems.clear();
             for(M item: items){
                 if(onQuery(item, filter)){
@@ -158,6 +157,9 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
             filteredItems.clear();
             filteredItems.addAll(items);
         }
+
+        // Notify of filtration
+        onFiltered();
     }
 
     /**
@@ -170,6 +172,20 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
      * @return          true if the item matches the query in any way
      */
     public abstract boolean onQuery(M item, String query);
+
+    /**
+     * Override so you can sort the items in the array according
+     * to your specification. Do nothing if you choose not to sort, or
+     * plan to on your own accord.
+     *
+     * @param items     the list of items needing sorting
+     */
+    public abstract void onSort(List<M> items);
+
+    /**
+     * Override this method to be notified when the adapter is filtered
+     */
+    public void onFiltered(){}
 
     /***********************************************************************************************
      *

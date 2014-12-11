@@ -66,5 +66,10 @@
     <string name="settings_downloading">Downloading</string>
     <string name="settings_general">General settings</string>
     <string name="settings_about">About</string>
+    <string name="action_submit_feature">Submit as Feature</string>
+    <string name="action_submit_feature_condensed">Feature this</string>
+    <string name="dialog_submit_feature_title">Enter a feature title</string>
+    <string name="dialog_submit_feature_msg">Choose a display title for this feature playlist.</string>
+    <string name="dialog_button_submit">Submit</string>
 
 </resources>

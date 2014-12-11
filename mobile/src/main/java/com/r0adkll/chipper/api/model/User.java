@@ -25,6 +25,9 @@ public class User extends Model implements Parcelable{
     @Column
     public boolean premium;
 
+    @Column
+    public boolean admin;
+
     /**
      * Do note that this is only valid for registering a new device, after the device is created
      * these tokens are invalidated

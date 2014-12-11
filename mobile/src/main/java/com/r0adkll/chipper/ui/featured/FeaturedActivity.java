@@ -27,6 +27,7 @@ import com.r0adkll.chipper.data.events.OfflineRequestCompletedEvent;
 import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
 import com.r0adkll.chipper.ui.adapters.PlaylistChiptuneAdapter;
 import com.r0adkll.chipper.ui.model.BaseActivity;
+import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
 import com.r0adkll.chipper.ui.player.MusicPlayerCallbacks;
 import com.r0adkll.chipper.ui.widget.DividerDecoration;
 import com.r0adkll.chipper.ui.widget.EmptyView;
@@ -48,7 +49,7 @@ import icepick.Icicle;
 /**
  * Created by r0adkll on 11/16/14.
  */
-public class FeaturedActivity extends BaseActivity implements FeaturedView, LoaderManager.LoaderCallbacks<List<ChiptuneReference>>,OnItemClickListener<ChiptuneReference>,MusicPlayerCallbacks {
+public class FeaturedActivity extends BaseDrawerActivity implements FeaturedView, LoaderManager.LoaderCallbacks<List<ChiptuneReference>>,OnItemClickListener<ChiptuneReference>,MusicPlayerCallbacks {
 
     /***********************************************************************************************
      *
@@ -175,13 +176,15 @@ public class FeaturedActivity extends BaseActivity implements FeaturedView, Load
 
         }
 
-        MenuItem offline = menu.findItem(R.id.action_offline);
-        if(mFeaturedPlaylist.isOffline(mAtm)){
-            Drawable icon = getResources().getDrawable(R.drawable.ic_action_cloud_done);
-            offline.setIcon(icon);
-        }else{
-            Drawable icon = getResources().getDrawable(R.drawable.ic_action_cloud_download);
-            offline.setIcon(icon);
+        if(mFeaturedPlaylist != null) {
+            MenuItem offline = menu.findItem(R.id.action_offline);
+            if (mFeaturedPlaylist.isOffline(mAtm)) {
+                Drawable icon = getResources().getDrawable(R.drawable.ic_action_cloud_done);
+                offline.setIcon(icon);
+            } else {
+                Drawable icon = getResources().getDrawable(R.drawable.ic_action_cloud_download);
+                offline.setIcon(icon);
+            }
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -295,6 +298,7 @@ public class FeaturedActivity extends BaseActivity implements FeaturedView, Load
     public void initializeLoader(Playlist featured) {
         mFeaturedPlaylist = featured;
         mFeaturedId = mFeaturedPlaylist.getId();
+        getSupportActionBar().setTitle(mFeaturedPlaylist.feature_title);
         getSupportLoaderManager().initLoader(0, null, this);
     }
 
@@ -342,6 +346,16 @@ public class FeaturedActivity extends BaseActivity implements FeaturedView, Load
      * Base Methods
      *
      */
+
+    @Override
+    protected int getSelfNavDrawerItem() {
+        return NAVDRAWER_ITEM_FEATURED;
+    }
+
+    @Override
+    protected void onNavDrawerSlide(float offset) {
+
+    }
 
     @Override
     protected Object[] getModules() {

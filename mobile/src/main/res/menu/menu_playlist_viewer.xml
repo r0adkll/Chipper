@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item android:id="@+id/action_submit_feature"
+        android:title="@string/action_submit_feature"
+        android:titleCondensed="@string/action_submit_feature_condensed"
+        android:icon="@drawable/ic_action_loyalty"
+        app:showAsAction="always" />
+
     <item android:id="@+id/action_search"
         android:title="Search"
         android:icon="@drawable/ic_action_search"
@@ -18,8 +24,7 @@
     <item android:id="@+id/action_share"
         android:title="@string/action_share"
         android:icon="@drawable/ic_action_share"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         />
-
 
 </menu>

@@ -2,6 +2,7 @@ package com.r0adkll.chipper.api.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.Model;
@@ -64,6 +65,7 @@ public class Playlist extends Model implements Parcelable{
         // Update the basic values now
         p.id = playlist.id;
         p.name = playlist.name;
+        p.feature_title = playlist.feature_title;
         p.updated = playlist.updated;
         p.token = playlist.token;
         p.permissions = playlist.permissions;
@@ -104,13 +106,12 @@ public class Playlist extends Model implements Parcelable{
     public String id;
 
     @Column(
-        notNull = true,
         onUpdate = Column.ForeignKeyAction.CASCADE,
         onDelete = Column.ForeignKeyAction.CASCADE
     )
     public User owner;
 
-    @Column(index = true, notNull = true)
+    @Column(index = true)
     public String name;
 
     /**
@@ -124,7 +125,6 @@ public class Playlist extends Model implements Parcelable{
     public long updated;
 
     @Column(
-        notNull = true,
         onUpdate = Column.ForeignKeyAction.CASCADE,
         onDelete = Column.ForeignKeyAction.SET_NULL
     )
@@ -164,6 +164,7 @@ public class Playlist extends Model implements Parcelable{
         id = in.readString();
         owner = in.readParcelable(User.class.getClassLoader());
         name = in.readString();
+        feature_title = in.readString();
         updated = in.readLong();
         updated_by_user = in.readParcelable(User.class.getClassLoader());
         token = in.readString();
@@ -190,6 +191,7 @@ public class Playlist extends Model implements Parcelable{
         // Update the basic values now
         id = playlist.id;
         name = playlist.name;
+        feature_title = playlist.feature_title;
         updated = playlist.updated;
         token = playlist.token;
         permissions = playlist.permissions;
@@ -233,16 +235,19 @@ public class Playlist extends Model implements Parcelable{
             updated_by_user = _updatedByUser;
         }
 
+
         // 3) Batch delete all the Chiptune references from the database
-        List<ChiptuneReference> references = chiptuneReferences();
-        ActiveAndroid.beginTransaction();
-        try {
-            for (ChiptuneReference reference : references) {
-                reference.delete();
+        if(getId() != null) {
+            List<ChiptuneReference> references = chiptuneReferences();
+            ActiveAndroid.beginTransaction();
+            try {
+                for (ChiptuneReference reference : references) {
+                    reference.delete();
+                }
+                ActiveAndroid.setTransactionSuccessful();
+            } finally {
+                ActiveAndroid.endTransaction();
             }
-            ActiveAndroid.setTransactionSuccessful();
-        }finally {
-            ActiveAndroid.endTransaction();
         }
 
         // now save all the ones from the updated playlist
@@ -537,6 +542,10 @@ public class Playlist extends Model implements Parcelable{
         Map<String, Object> map = new HashMap<>();
         map.put("name", name);
 
+        if(!TextUtils.isEmpty(feature_title)){
+            map.put("feature_title", feature_title);
+        }
+
         // Set the permissions on the playlist if available in the object
         if(permissions != null && !permissions.isEmpty()){
             map.put("permission", permissions);
@@ -602,6 +611,7 @@ public class Playlist extends Model implements Parcelable{
         dest.writeString(id);
         dest.writeParcelable(owner, 0);
         dest.writeString(name);
+        dest.writeString(feature_title);
         dest.writeLong(updated);
         dest.writeParcelable(updated_by_user, 0);
         dest.writeString(token);

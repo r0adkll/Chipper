@@ -72,8 +72,9 @@ public class FeaturedPresenterImpl implements FeaturedPresenter {
                 if(featured != null){
                     featured.update(playlist);
                 }else{
-                    featured = playlist;
+                    featured = new Playlist();
                     featured.save();
+                    featured.update(playlist);
                 }
 
                 // Initialize the loader in the ui

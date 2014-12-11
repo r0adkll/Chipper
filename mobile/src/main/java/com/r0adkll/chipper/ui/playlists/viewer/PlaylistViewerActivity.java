@@ -27,9 +27,11 @@ import com.activeandroid.Model;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.listeners.EventListener;
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.events.OfflineModeChangeEvent;
 import com.r0adkll.chipper.data.events.OfflineRequestCompletedEvent;
+import com.r0adkll.chipper.qualifiers.CurrentUser;
 import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
 import com.r0adkll.chipper.ui.adapters.PlaylistChiptuneAdapter;
 import com.r0adkll.chipper.api.model.Chiptune;
@@ -84,6 +86,8 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
     @Inject PlaylistChiptuneAdapter adapter;
     @Inject Bus mBus;
     @Inject CashMachine mAtm;
+    @Inject @CurrentUser
+    User mUser;
 
     @Icicle
     long mPlaylistId = -1;
@@ -199,6 +203,9 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
             offline.setIcon(icon);
         }
 
+        MenuItem submitFeature = menu.findItem(R.id.action_submit_feature);
+        submitFeature.setVisible(mUser.admin);
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -228,6 +235,9 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
                 return true;
             case R.id.action_share:
                 presenter.sharePlaylist(mPlaylist);
+                return true;
+            case R.id.action_submit_feature:
+                presenter.submitForFeature(mPlaylist);
                 return true;
         }
         return super.onOptionsItemSelected(item);

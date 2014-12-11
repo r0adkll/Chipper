@@ -16,6 +16,8 @@ public interface PlaylistViewerPresenter extends IActionPresenter{
 
     public void sharePlaylist(Playlist playlist);
 
+    public void submitForFeature(Playlist playlist);
+
     public ModelLoader<ChiptuneReference> getLoader(Playlist playlist);
 
 }

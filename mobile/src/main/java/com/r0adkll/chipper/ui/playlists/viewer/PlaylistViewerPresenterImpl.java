@@ -1,10 +1,14 @@
 package com.r0adkll.chipper.ui.playlists.viewer;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.text.InputType;
 
 import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
 import com.nispok.snackbar.Snackbar;
+import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.ChiptuneReference;
@@ -18,10 +22,15 @@ import com.r0adkll.chipper.data.model.ModelLoader;
 import com.r0adkll.chipper.data.model.OfflineRequest;
 import com.r0adkll.chipper.ui.player.MusicPlayer;
 import com.r0adkll.chipper.utils.CallbackHandler;
+import com.r0adkll.postoffice.PostOffice;
+import com.r0adkll.postoffice.styles.EditTextStyle;
 
 import java.util.Arrays;
 import java.util.List;
 
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 import timber.log.Timber;
 
 /**
@@ -146,6 +155,53 @@ public class PlaylistViewerPresenterImpl implements PlaylistViewerPresenter {
     @Override
     public void sharePlaylist(Playlist playlist) {
 
+    }
+
+    @Override
+    public void submitForFeature(final Playlist playlist) {
+        // Prompt the user for a feature title
+        PostOffice.newMail(mView.getActivity())
+                .setTitle(R.string.dialog_submit_feature_title)
+                .setMessage(R.string.dialog_submit_feature_msg)
+                .setStyle(
+                        new EditTextStyle.Builder(mView.getActivity())
+                            .setHint("Feature title")
+                            .setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS)
+                            .setOnTextAcceptedListener(new EditTextStyle.OnTextAcceptedListener() {
+                                @Override
+                                public void onAccepted(String s) {
+
+                                    playlist.feature_title = s;
+                                    mService.updateFeaturePlaylist(playlist.toUpdateMap(), new Callback<Playlist>() {
+                                        @Override
+                                        public void success(Playlist playlist, Response response) {
+                                            String text = String.format("%s is now the featured playlist", playlist.name);
+                                            mView.showSnackBar(text);
+                                        }
+
+                                        @Override
+                                        public void failure(RetrofitError error) {
+                                            mView.showSnackBar(error.getLocalizedMessage());
+                                        }
+                                    });
+
+                                }
+                            }).build()
+                )
+                .setButton(Dialog.BUTTON_POSITIVE, R.string.dialog_button_submit, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setButton(Dialog.BUTTON_NEGATIVE, android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setButtonTextColor(Dialog.BUTTON_POSITIVE, R.color.primary)
+                .show(mView.getActivity().getFragmentManager());
     }
 
     @Override

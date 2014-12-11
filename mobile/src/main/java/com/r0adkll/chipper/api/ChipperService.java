@@ -372,4 +372,17 @@ public interface ChipperService {
     @GET("/general/chiptunes")
     void getChiptunes(Callback<List<Chiptune>> cb);
 
+    /**
+     * If you are an administrator, you can upload featured playlists
+     * to the server. This will only update (or create if non-existant) the
+     * feature playlist and send a push message to every registered device notifying it
+     * that it has updated.
+     *
+     * @param body      the featured playlist body
+     * @param cb        the callback
+     */
+    @POST("/admin/featured")
+    void updateFeaturePlaylist(@Body Map<String, Object> body,
+                               Callback<Playlist> cb);
+
 }

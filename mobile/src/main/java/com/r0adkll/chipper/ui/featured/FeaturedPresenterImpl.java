@@ -194,6 +194,6 @@ public class FeaturedPresenterImpl implements FeaturedPresenter {
      * @param error
      */
     private void handleRetrofitError(RetrofitError error){
-        mView.showErrorMessage(error.getLocalizedMessage());
+        mView.showSnackBar(error.getLocalizedMessage());
     }
 }

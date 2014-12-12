@@ -74,28 +74,12 @@
         android:background="@drawable/list_item_background"
         >
 
-        <TextView
-            android:id="@+id/vote"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-
-            tools:text="74"
-            android:textSize="18sp"
-            android:textColor="@color/primary"
-            android:fontFamily="@string/font_fontFamily_medium"
-            android:textStyle="@integer/font_textStyle_medium"
-            />
-
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/vote"
             android:layout_toLeftOf="@+id/length"
-            android:paddingLeft="@dimen/activity_padding"
             >
 
             <TextView

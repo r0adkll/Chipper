@@ -13,8 +13,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.activeandroid.Model;
+import com.fortysevendeg.swipelistview.BaseSwipeListViewListener;
+import com.fortysevendeg.swipelistview.SwipeListView;
 import com.nispok.snackbar.Snackbar;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
@@ -24,8 +27,10 @@ import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.data.events.OfflineModeChangeEvent;
 import com.r0adkll.chipper.data.events.OfflineRequestCompletedEvent;
+import com.r0adkll.chipper.ui.adapters.FeaturedChiptuneAdapter;
 import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
 import com.r0adkll.chipper.ui.adapters.PlaylistChiptuneAdapter;
+import com.r0adkll.chipper.ui.adapters.RecyclerArrayAdapter;
 import com.r0adkll.chipper.ui.model.BaseActivity;
 import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
 import com.r0adkll.chipper.ui.player.MusicPlayerCallbacks;
@@ -37,6 +42,8 @@ import com.r0adkll.postoffice.PostOffice;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -49,7 +56,11 @@ import icepick.Icicle;
 /**
  * Created by r0adkll on 11/16/14.
  */
-public class FeaturedActivity extends BaseDrawerActivity implements FeaturedView, LoaderManager.LoaderCallbacks<List<ChiptuneReference>>,OnItemClickListener<ChiptuneReference>,MusicPlayerCallbacks {
+public class FeaturedActivity extends BaseDrawerActivity implements
+        FeaturedView,
+        LoaderManager.LoaderCallbacks<List<ChiptuneReference>>,
+        OnItemClickListener<ChiptuneReference>,
+        MusicPlayerCallbacks, RecyclerArrayAdapter.OnItemOptionSelectedListener<ChiptuneReference> {
 
     /***********************************************************************************************
      *
@@ -57,6 +68,7 @@ public class FeaturedActivity extends BaseDrawerActivity implements FeaturedView
      *
      */
 
+    public final SimpleDateFormat mDateFormat = new SimpleDateFormat("MM-dd-yyyy 'at' h:mm a");
 
     /***********************************************************************************************
      *
@@ -64,13 +76,13 @@ public class FeaturedActivity extends BaseDrawerActivity implements FeaturedView
      *
      */
 
-    @InjectView(R.id.recycle_view)  RecyclerView mRecyclerView;
+    @InjectView(R.id.recycle_view)  SwipeListView mRecyclerView;
     @InjectView(R.id.empty_layout)  EmptyView mEmptyView;
     @InjectView(R.id.fab_play)      FrameLayout mFabPlay;
 
     @Inject ChiptuneProvider chiptuneProvider;
     @Inject FeaturedPresenter presenter;
-    @Inject PlaylistChiptuneAdapter adapter;
+    @Inject FeaturedChiptuneAdapter adapter;
     @Inject Bus mBus;
     @Inject CashMachine mAtm;
 
@@ -89,6 +101,7 @@ public class FeaturedActivity extends BaseDrawerActivity implements FeaturedView
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(0, 0);
         Icepick.restoreInstanceState(this, savedInstanceState);
 
         // Set the content view of this activity
@@ -187,7 +200,7 @@ public class FeaturedActivity extends BaseDrawerActivity implements FeaturedView
             }
         }
 
-        return super.onPrepareOptionsMenu(menu);
+        return true;
     }
 
     @Override
@@ -203,7 +216,10 @@ public class FeaturedActivity extends BaseDrawerActivity implements FeaturedView
                     mAtm.deleteOfflineFiles(new CallbackHandler() {
                         @Override
                         public void onHandle(Object value) {
+                            adapter.notifyDataSetChanged();
                             supportInvalidateOptionsMenu();
+                            showSnackBar(String.format("%d chiptunes were deleted from the disk",
+                                            mFeaturedPlaylist.getCount()));
                         }
 
                         @Override public void onFailure(String msg) {}
@@ -235,8 +251,15 @@ public class FeaturedActivity extends BaseDrawerActivity implements FeaturedView
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mRecyclerView.addItemDecoration(new DividerDecoration(this));
-        adapter.setOnItemClickListener(this);
-
+        mRecyclerView.setSwipeListViewListener(new BaseSwipeListViewListener(){
+            @Override
+            public void onClickFrontView(int position) {
+                ChiptuneReference reference = adapter.getItem(position);
+                Chiptune chiptune = chiptuneProvider.getChiptune(reference.chiptune_id);
+                presenter.onChiptuneSelected(chiptune);
+            }
+        });
+        adapter.setOnItemOptionSelectedListener(this);
     }
 
     /**
@@ -253,6 +276,29 @@ public class FeaturedActivity extends BaseDrawerActivity implements FeaturedView
     public void onItemClick(View v, ChiptuneReference item, int position) {
         Chiptune chiptune = chiptuneProvider.getChiptune(item.chiptune_id);
         presenter.onChiptuneSelected(chiptune);
+    }
+
+    @Override
+    public void onSelected(View view, ChiptuneReference reference) {
+        Chiptune item = chiptuneProvider.getChiptune(reference.chiptune_id);
+        switch (view.getId()){
+            case R.id.opt_favorite:
+                presenter.favoriteChiptunes(item);
+                break;
+            case R.id.opt_upvote:
+                presenter.upvoteChiptune(item);
+                break;
+            case R.id.opt_downvote:
+                presenter.downvoteChiptune(item);
+                break;
+            case R.id.opt_add:
+                presenter.addChiptunesToPlaylist(item);
+                break;
+            case R.id.opt_offline:
+                presenter.offlineChiptunes(item);
+                break;
+        }
+        mRecyclerView.closeOpenedItems();
     }
 
     @Override
@@ -298,7 +344,12 @@ public class FeaturedActivity extends BaseDrawerActivity implements FeaturedView
     public void initializeLoader(Playlist featured) {
         mFeaturedPlaylist = featured;
         mFeaturedId = mFeaturedPlaylist.getId();
+
         getSupportActionBar().setTitle(mFeaturedPlaylist.feature_title);
+//        getSupportActionBar().setSubtitle(String.format("Updated on %s", mDateFormat.format(new Date(mFeaturedPlaylist.updated * 1000))));
+        getSupportActionBar().setSubtitle(Playlist.FEATURED);
+        supportInvalidateOptionsMenu();
+
         getSupportLoaderManager().initLoader(0, null, this);
     }
 
@@ -310,13 +361,6 @@ public class FeaturedActivity extends BaseDrawerActivity implements FeaturedView
     @Override
     public void hideProgress() {
         mEmptyView.setLoading(false);
-    }
-
-    @Override
-    public void showErrorMessage(String msg) {
-        PostOffice.newMail(this)
-                .setMessage(msg)
-                .show(getFragmentManager());
     }
 
     @Override
@@ -380,4 +424,5 @@ public class FeaturedActivity extends BaseDrawerActivity implements FeaturedView
     public void answerOfflineModeChangeEvent(OfflineModeChangeEvent event){
         adapter.reconcile();
     }
+
 }

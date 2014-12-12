@@ -203,6 +203,7 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
             offline.setIcon(icon);
         }
 
+        // Set the admin submit feature visible or not depending on the user
         MenuItem submitFeature = menu.findItem(R.id.action_submit_feature);
         submitFeature.setVisible(mUser.admin);
 

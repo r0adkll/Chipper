@@ -180,6 +180,10 @@ public class OfflineIntentService extends IntentService {
 
     }
 
+    /**
+     * Show starting download notification
+     * @param numDownload
+     */
     private void showStartingNotification(int numDownload){
 
         String title = "Downloading...";
@@ -209,15 +213,19 @@ public class OfflineIntentService extends IntentService {
     private void showEndingNotification(int numDownloaded){
 
         String title = "Download finished";
-        String text = String.format("%d chipunes now available for offline use", numDownloaded);
+        String text = String.format("%d chiptunes now available for offline use", numDownloaded);
         String ticker = String.format("Finished downloading %d chiptunes", numDownloaded);
 
         Intent main = new Intent(this, Chipper.class);
         PendingIntent mainPi = PendingIntent.getActivity(this, 0, main, 0);
 
+        Intent undo = new Intent(this, Chipper.class);
+        PendingIntent undoPi = PendingIntent.getActivity(this, 0, undo, 0);
+
         NotificationCompat.WearableExtender wearableExtender =
                 new NotificationCompat.WearableExtender()
-                .setBackground(BitmapFactory.decodeResource(getResources(), R.drawable.chipper_round_watch_bg));
+                .setBackground(BitmapFactory.decodeResource(getResources(), R.drawable.chipper_round_watch_bg))
+                .addAction(new NotificationCompat.Action(R.drawable.ic_action_delete, "Undo", undoPi));
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setContentTitle(title)
@@ -228,7 +236,6 @@ public class OfflineIntentService extends IntentService {
                 .setTicker(ticker)
                 .setOngoing(false)
                 .setAutoCancel(true)
-                .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
                 .extend(wearableExtender )
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 

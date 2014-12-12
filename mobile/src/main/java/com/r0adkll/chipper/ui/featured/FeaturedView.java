@@ -12,8 +12,6 @@ public interface FeaturedView extends IView {
 
     public void hideProgress();
 
-    public void showErrorMessage(String msg);
-
     public void initializeLoader(Playlist featured);
 
     public Playlist getFeaturedPlaylist();

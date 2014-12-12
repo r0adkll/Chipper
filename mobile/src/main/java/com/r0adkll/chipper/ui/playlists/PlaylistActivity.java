@@ -87,6 +87,7 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
         setContentView(R.layout.activity_playlists);
         overridePendingTransition(0, 0);
         getSupportActionBar().setTitle(R.string.navdrawer_item_playlists);
+        getSupportActionBar().setSubtitle("Last synced at 5:00 PM");
 
         // Setup the FAB
         setupFab();

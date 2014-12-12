@@ -127,15 +127,20 @@ public class PopularChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, Popul
         // Color the Vote Options
         int userVoteValue = mVoteManager.getUserVoteValue(tune.id);
         int accentColor = holder.itemView.getContext().getResources().getColor(R.color.accentColor);
+        int primary = holder.itemView.getContext().getResources().getColor(R.color.primary);
+        int textColor = holder.itemView.getContext().getResources().getColor(R.color.body_text_secondary_light);
         if(userVoteValue == 1){
             holder.optUpvote.setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
             holder.optDownvote.clearColorFilter();
+            holder.vote.setTextColor(primary);
         }else if(userVoteValue == -1){
             holder.optUpvote.clearColorFilter();
             holder.optDownvote.setColorFilter(accentColor, PorterDuff.Mode.SRC_IN);
+            holder.vote.setTextColor(primary);
         }else{
             holder.optUpvote.clearColorFilter();
             holder.optDownvote.clearColorFilter();
+            holder.vote.setTextColor(textColor);
         }
 
         // Color the favorites option

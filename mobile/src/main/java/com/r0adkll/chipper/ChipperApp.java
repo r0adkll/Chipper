@@ -1,6 +1,7 @@
 package com.r0adkll.chipper;
 
 import android.app.Application;
+import android.app.Fragment;
 import android.app.Service;
 import android.content.Context;
 
@@ -13,6 +14,7 @@ import com.r0adkll.chipper.api.model.Device;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.api.model.Vote;
+import com.r0adkll.chipper.data.Historian;
 import com.r0adkll.chipper.utils.CrashlyticsTree;
 import com.r0adkll.chipper.utils.FileTree;
 import com.r0adkll.postoffice.PostOffice;
@@ -48,7 +50,9 @@ public class ChipperApp extends Application{
                         Chiptune.class,
                         Playlist.class,
                         ChiptuneReference.class,
-                        Vote.class
+                        Vote.class,
+                        Historian.RecentEvent.class,
+                        Historian.Count.class
                 );
 
         // Initialize the Database ORM
@@ -63,15 +67,12 @@ public class ChipperApp extends Application{
         }
 
         // Setup PostOffice stamp
-        Stamp stamp = new Stamp.Builder(this)
+        PostOffice.lick(new Stamp.Builder(this)
                 .setDesign(Design.MATERIAL_LIGHT)
                 .setThemeColorResource(R.color.primary)
                 .setCancelable(true)
                 .setCanceledOnTouchOutside(true)
-                .build();
-
-        // Lick the stamp and apply it
-        PostOffice.lick(stamp);
+                .build());
 
         // Setup the object graph
         buildObjectGraphAndInject();
@@ -129,5 +130,31 @@ public class ChipperApp extends Application{
     public static ChipperApp get(Service ctx){
         return (ChipperApp) ctx.getApplication();
     }
+
+    /**
+     * Get a reference to this application with a service
+     * object
+     *
+     * @param ctx
+     * @return
+     */
+    public static ChipperApp get(Fragment ctx){
+        return get(ctx.getActivity());
+    }
+
+    /**
+     * Get a reference to this application with a service
+     * object
+     *
+     * @param ctx
+     * @return
+     */
+    public static ChipperApp get(android.support.v4.app.Fragment ctx){
+        return get(ctx.getActivity());
+    }
+
+
+
+
 
 }

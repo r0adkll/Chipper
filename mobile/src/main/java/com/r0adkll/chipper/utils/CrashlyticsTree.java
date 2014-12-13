@@ -6,9 +6,12 @@ package com.r0adkll.chipper.utils;
 
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
 //import com.crashlytics.android.Crashlytics;
@@ -126,6 +129,6 @@ public class CrashlyticsTree implements Timber.TaggedTree {
      * @param message       the log message
      */
     private void log(int priority, String tag, String message){
-        //Crashlytics.log(priority, tag, message);
+        Crashlytics.log(priority, tag, message);
     }
 }

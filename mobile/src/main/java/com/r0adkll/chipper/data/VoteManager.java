@@ -68,7 +68,7 @@ public class VoteManager {
      * @param cb            the callback
      */
     @DebugLog
-    public void upvote(Chiptune chiptune, final CallbackHandler cb){
+    public void upvote(final Chiptune chiptune, final CallbackHandler cb){
         mService.vote(mCurrentUser.id, Vote.TYPE_UP, chiptune.id, new retrofit.Callback<Map<String, Object>>() {
             @Override
             public void success(Map<String, Object> voteData, Response response) {
@@ -89,6 +89,10 @@ public class VoteManager {
                 }else{
                     vote.save();
                 }
+
+                // Update history records
+                Historian.getArchive()
+                        .updateLastVoted(chiptune);
 
                 // Update local reference of total vote value
                 mOverallVoteMap.put(vote.tune_id, totalValue);
@@ -111,7 +115,7 @@ public class VoteManager {
      * @param cb            the callback
      */
     @DebugLog
-    public void downvote(Chiptune chiptune, final CallbackHandler cb){
+    public void downvote(final Chiptune chiptune, final CallbackHandler cb){
         mService.vote(mCurrentUser.id, Vote.TYPE_DOWN, chiptune.id, new retrofit.Callback<Map<String, Object>>() {
             @Override
             public void success(Map<String, Object> voteData, Response response) {
@@ -132,6 +136,10 @@ public class VoteManager {
                 }else{
                     vote.save();
                 }
+
+                // Update history records
+                Historian.getArchive()
+                        .updateLastVoted(chiptune);
 
                 // Update local reference of total vote value
                 mOverallVoteMap.put(vote.tune_id, totalValue);

@@ -35,6 +35,7 @@ import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
+import com.r0adkll.chipper.data.Historian;
 import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.VoteManager;
 import com.r0adkll.chipper.playback.events.MediaSessionEvent;
@@ -325,7 +326,15 @@ public class MusicService extends Service {
      */
     private void next(){
         if(mQueue != null){
+
+            // Update history records
+            Historian.getArchive()
+                    .incrementSkipCount(mQueue.current(mCurrentState));
+
+            // Force the next tune in the queue
             mQueue.next(mCurrentState, true);
+
+            // Start the playback of the next tune
             startPlayback();
 
             // Post Session Queue change event
@@ -348,14 +357,30 @@ public class MusicService extends Service {
                 if(progress > PREVIOUS_TIME_CUTOFF){
                     seek(0);
                 }else{
+
+                    // Update history records
+                    Historian.getArchive()
+                            .incrementSkipCount(mQueue.current(mCurrentState));
+
+                    // Force the previous tune in the queue
                     mQueue.previous(mCurrentState);
+
+                    // Start playback of the previous tune
                     startPlayback();
 
                     // Post Session Queue change event
                     mBus.post(new PlayQueueEvent(mQueue, mCurrentState));
                 }
             }else{
+
+                // Update history records
+                Historian.getArchive()
+                        .incrementSkipCount(mQueue.current(mCurrentState));
+
+                // Force the previous tune in the queue
                 mQueue.previous(mCurrentState);
+
+                // Start the playback of this previous tune
                 startPlayback();
 
                 // Post Session Queue change event
@@ -457,6 +482,10 @@ public class MusicService extends Service {
                     // Initiate Playback
                     play();
 
+                    // Update history records
+                    Historian.getArchive()
+                            .incrementPlayCount(mQueue.current(mCurrentState));
+
                     // Update playback state and metadata
                     mCurrentSession.setPlaybackState(buildPlaybackState(PlaybackStateCompat.STATE_PLAYING));
 
@@ -479,6 +508,10 @@ public class MusicService extends Service {
 
                     // Kill Play Progress update handler
                     mHandler.removeCallbacks(mPlayProgressUpdater);
+
+                    // Update historical record
+                    Historian.getArchive()
+                            .incrementCompletionCount(mQueue.current(mCurrentState));
 
                     // Attempt to get the next chiptune and play it
                     Chiptune next = mQueue.next(mCurrentState, false);

@@ -31,6 +31,9 @@ public class Vote extends Model implements Parcelable{
     @Column
     public int value;
 
+    @Column
+    public long updated;
+
 
     /**
      * Default Constructor
@@ -72,6 +75,7 @@ public class Vote extends Model implements Parcelable{
         dest.writeString(id);
         dest.writeString(tune_id);
         dest.writeInt(value);
+        dest.writeLong(updated);
     }
 
     public static final Creator<Vote> CREATOR = new Creator<Vote>() {

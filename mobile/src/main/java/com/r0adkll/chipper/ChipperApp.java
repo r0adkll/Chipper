@@ -51,8 +51,7 @@ public class ChipperApp extends Application{
                         Playlist.class,
                         ChiptuneReference.class,
                         Vote.class,
-                        Historian.RecentEvent.class,
-                        Historian.Count.class
+                        Historian.Chronicle.class
                 );
 
         // Initialize the Database ORM

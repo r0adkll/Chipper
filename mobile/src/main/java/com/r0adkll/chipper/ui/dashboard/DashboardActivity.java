@@ -1,15 +1,20 @@
 package com.r0adkll.chipper.ui.dashboard;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.nispok.snackbar.Snackbar;
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.data.Historian;
 import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
 import com.r0adkll.chipper.ui.player.MusicPlayer;
 import com.r0adkll.chipper.utils.UIUtils;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -77,8 +82,27 @@ public class DashboardActivity extends BaseDrawerActivity implements DashboardVi
      *
      */
 
+    @Override
+    public void setRecents(List<Historian.Chronicle> records) {
 
+    }
 
+    @Override
+    public Activity getActivity() {
+        return this;
+    }
+
+    @Override
+    public void refreshContent() {
+
+    }
+
+    @Override
+    public void showSnackBar(String text) {
+        Snackbar.with(this)
+                .text(text)
+                .show(this);
+    }
 
     /***********************************************************************************************
      *

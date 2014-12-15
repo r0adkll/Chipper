@@ -1,4 +1,4 @@
-![chipper icon](https://raw.githubusercontent.com/r0adkll/Chipper/gh-pages/images/play_banner.png?token=ABLhfDXswXm-c4JhV777KEQqqO4i2O1xks5Ujv1cwA%3D%3D)
+![chipper icon](play_banner.png)
 
 Chipper
 =======

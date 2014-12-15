@@ -18,6 +18,7 @@ import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.account.GoogleAccountManager;
 import com.r0adkll.chipper.data.events.OfflineModeChangeEvent;
+import com.r0adkll.chipper.ui.dashboard.DashboardActivity;
 import com.r0adkll.chipper.ui.featured.FeaturedActivity;
 import com.r0adkll.chipper.ui.player.MusicPlayer;
 import com.r0adkll.chipper.utils.prefs.BooleanPreference;
@@ -509,9 +510,9 @@ public abstract class BaseDrawerActivity extends ActionBarActivity implements Go
         Intent intent;
         switch (item) {
             case NAVDRAWER_ITEM_DASHBOARD:
-//                intent = new Intent(this, MyScheduleActivity.class);
-//                startActivity(intent);
-//                finish();
+                intent = new Intent(this, DashboardActivity.class);
+                startActivity(intent);
+                finish();
                 break;
             case NAVDRAWER_ITEM_CHIPTUNES:
                 intent = new Intent(this, ChiptunesActivity.class);

@@ -82,6 +82,9 @@
         <!-- The Featured Playlist Activity -->
         <activity android:name=".ui.featured.FeaturedActivity" />
 
+        <!-- The Dashboard Activity -->
+        <activity android:name=".ui.dashboard.DashboardActivity" />
+
         <!-- Settings Activity -->
         <activity android:name=".ui.settings.SettingsActivity"
             android:label="@string/settings"

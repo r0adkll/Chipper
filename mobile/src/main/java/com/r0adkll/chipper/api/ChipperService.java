@@ -6,6 +6,7 @@ import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.ServerTime;
 import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.api.model.Vote;
+import com.r0adkll.chipper.data.Historian;
 
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.Path;
+import retrofit.http.Query;
 
 /**
  * API Definitions for the new Java Chipper API
@@ -46,6 +48,8 @@ public interface ChipperService {
               Callback<User> cb);
 
     /**
+     * TODO: Create this endpoint in the API
+     *
      * This is the login endpoint used to login in using their
      * username and password combination.
      *
@@ -60,6 +64,8 @@ public interface ChipperService {
                Callback<User> cb);
 
     /**
+     * TODO: Create this endpoint in the API
+     *
      * Create an account that doesn't use Google+ auth
      *
      * @param email         the email address they wish to use
@@ -346,6 +352,25 @@ public interface ChipperService {
                    @Body List<Map<String, Object>> body,
                    Callback cb);
 
+
+    /**
+     * TODO: Create this endpoint in the API
+     *
+     * Post a play stats to the server so the API can collect play statistics to give
+     * useful feedback to the users. i.e. System Wide Most Played, or Popular this week, or
+     * Most often completed, etc.
+     *
+     * @param userId        the the id of the user
+     * @param chiptuneId    the id of the chiptune that stat is about
+     * @param statsType     the stats increment type, see {@link com.r0adkll.chipper.data.Historian.Chronicle}
+     * @param cb            the callback
+     */
+    @POST("/user/{id}/stats/{chiptuneId}/{type}")
+    void postStats(@Path("id") String userId,
+                   @Path("chiptuneId") String chiptuneId,
+                   @Path("type") String statsType,
+                   Callback<Historian.Chronicle> cb);
+
     /**
      * Get the current featured playlist
      *
@@ -371,6 +396,37 @@ public interface ChipperService {
      */
     @GET("/general/chiptunes")
     void getChiptunes(Callback<List<Chiptune>> cb);
+
+    /**
+     * Get the most played chiptunes from the server with a given
+     * limit (DEFAULT 5)
+     *
+     * @param limit     the # of most played chiptunes to return (DEFAULT: 5)
+     * @param cb        the callback
+     */
+    @GET("/general/mostplayed")
+    void getMostPlayed(@Query("limit") int limit,
+                       Callback<List<Historian.Chronicle>> cb);
+
+    /**
+     * Get teh most skipped chiptunes from the server with a given limit
+     *
+     * @param limit     the # of most skipped chiptunes to return (DEFAULT: 5)
+     * @param cb        the callback
+     */
+    @GET("/general/mostskipped")
+    void getMostSkipped(@Query("limit") int limit,
+                        Callback<List<Historian.Chronicle>> cb);
+
+    /**
+     * Get the most completed chiptunes from the server with a given limit
+     *
+     * @param limit     the # of completely played chiptunes to return (DEFAULT: 5)
+     * @param cb        the callback
+     */
+    @GET("/general/mostcompleted")
+    void getMostCompleted(@Query("limit") int limit,
+                          Callback<List<Historian.Chronicle>> cb);
 
     /**
      * If you are an administrator, you can upload featured playlists

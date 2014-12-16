@@ -45,7 +45,7 @@ public class RecentsCard extends DashboardCard {
         }
 
         // Build recent's content
-        constructChronicleList(Historian.getArchive().getRecentlyPlayed(LIMIT),
+        constructChronicleList(Historian.with(getContext()).getRecentlyPlayed(LIMIT),
                 container, getContext().getString(R.string.dashboard_recents_empty_msg));
 
         // Return the new found content

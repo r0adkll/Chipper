@@ -2,9 +2,11 @@ package com.r0adkll.chipper.ui.dashboard;
 
 import android.content.Intent;
 
+import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.data.Historian;
 import com.r0adkll.chipper.ui.dashboard.model.DashboardCard;
 import com.r0adkll.chipper.ui.dashboard.model.MostPlayedCard;
+import com.r0adkll.chipper.ui.dashboard.model.MostPlayedServerCard;
 import com.r0adkll.chipper.ui.dashboard.model.RecentsCard;
 import com.r0adkll.chipper.ui.player.MusicPlayer;
 
@@ -16,10 +18,12 @@ import java.util.List;
  */
 public class DashboardPresenterImpl implements DashboardPresenter {
 
+    private ChipperService mService;
     private DashboardView mView;
 
-    public DashboardPresenterImpl(DashboardView view){
+    public DashboardPresenterImpl(DashboardView view, ChipperService service){
         mView = view;
+        mService = service;
     }
 
     @Override
@@ -29,7 +33,8 @@ public class DashboardPresenterImpl implements DashboardPresenter {
             Arrays.asList(
                 new DashboardCard[]{
                     new RecentsCard(mView.getActivity()),
-                    new MostPlayedCard(mView.getActivity())
+                    new MostPlayedCard(mView.getActivity()),
+                    new MostPlayedServerCard(mView.getActivity(), mService)
                 }
             )
         );

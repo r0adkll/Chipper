@@ -34,7 +34,8 @@ import hugo.weaving.DebugLog;
         SyncModule.class
     },
     injects = {
-        OfflineIntentService.class
+        OfflineIntentService.class,
+        Historian.class
     },
     complete = false,
     library = true

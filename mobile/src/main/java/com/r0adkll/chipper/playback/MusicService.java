@@ -122,6 +122,7 @@ public class MusicService extends Service {
     @Inject ChiptuneProvider mProvider;
     @Inject CashMachine mATM;
     @Inject Bus mBus;
+    @Inject Historian mHistorian;
 
     @Inject @SessionShufflePreference BooleanPreference mShufflePref;
     @Inject @SessionRepeatPreference IntPreference mRepeatPref;
@@ -329,8 +330,7 @@ public class MusicService extends Service {
         if(mQueue != null){
 
             // Update history records
-            Historian.getArchive()
-                    .incrementSkipCount(mQueue.current(mCurrentState));
+            mHistorian.incrementSkipCount(mQueue.current(mCurrentState));
 
             // Force the next tune in the queue
             mQueue.next(mCurrentState, true);
@@ -360,8 +360,7 @@ public class MusicService extends Service {
                 }else{
 
                     // Update history records
-                    Historian.getArchive()
-                            .incrementSkipCount(mQueue.current(mCurrentState));
+                    mHistorian.incrementSkipCount(mQueue.current(mCurrentState));
 
                     // Force the previous tune in the queue
                     mQueue.previous(mCurrentState);
@@ -375,8 +374,7 @@ public class MusicService extends Service {
             }else{
 
                 // Update history records
-                Historian.getArchive()
-                        .incrementSkipCount(mQueue.current(mCurrentState));
+                mHistorian.incrementSkipCount(mQueue.current(mCurrentState));
 
                 // Force the previous tune in the queue
                 mQueue.previous(mCurrentState);
@@ -484,8 +482,7 @@ public class MusicService extends Service {
                     play();
 
                     // Update history records
-                    Historian.getArchive()
-                            .incrementPlayCount(mQueue.current(mCurrentState));
+                    mHistorian.incrementPlayCount(mQueue.current(mCurrentState));
 
                     // Update playback state and metadata
                     mCurrentSession.setPlaybackState(buildPlaybackState(PlaybackStateCompat.STATE_PLAYING));
@@ -514,8 +511,7 @@ public class MusicService extends Service {
                     mHandler.removeCallbacks(mPlayProgressUpdater);
 
                     // Update historical record
-                    Historian.getArchive()
-                            .incrementCompletionCount(mQueue.current(mCurrentState));
+                    mHistorian.incrementCompletionCount(mQueue.current(mCurrentState));
 
                     // Attempt to get the next chiptune and play it
                     Chiptune next = mQueue.next(mCurrentState, false);

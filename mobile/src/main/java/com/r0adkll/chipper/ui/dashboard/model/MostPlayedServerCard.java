@@ -3,55 +3,96 @@ package com.r0adkll.chipper.ui.dashboard.model;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.data.Historian;
 import com.r0adkll.chipper.ui.player.MusicPlayer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by r0adkll on 12/16/14.
  */
-public class MostPlayedCard extends DashboardCard {
+public class MostPlayedServerCard extends DashboardCard {
     public static final int ID = 1;
 
     public static final int LIMIT = 5;
+
+    private ChipperService mService;
 
     /**
      * Default Constructor
      *
      * @param ctx the context reference
      */
-    public MostPlayedCard(Context ctx) {
+    public MostPlayedServerCard(Context ctx, ChipperService service) {
         super(ctx);
+        mService = service;
     }
 
     @Override
     public CharSequence getTitle() {
-        return getContext().getString(R.string.dashboard_mostplayed_header_title);
+        return getContext().getString(R.string.dashboard_mostplayed_server_header_title);
     }
 
     @Override
     public View getContentView(View contentView) {
-        LinearLayout container;
+        RelativeLayout content;
+        final LinearLayout container;
+        final ProgressBar loading;
         if(contentView != null){
-            container = (LinearLayout) contentView;
+            content = (RelativeLayout) contentView;
+            container = ButterKnife.findById(content, R.id.container);
+            container.removeAllViews();
+            loading = ButterKnife.findById(content, R.id.loading);
         }else{
+            content = new RelativeLayout(getContext());
+
+            loading = new ProgressBar(getContext());
+            loading.setIndeterminate(true);
+            loading.setId(R.id.loading);
+            RelativeLayout.LayoutParams params =
+                    new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.addRule(RelativeLayout.CENTER_IN_PARENT);
+            content.addView(loading, params);
+
             container = new LinearLayout(getContext());
             container.setOrientation(LinearLayout.VERTICAL);
+            container.setId(R.id.container);
+            content.addView(container);
         }
 
-        // Build recent's content
-        constructChronicleList(Historian.with(getContext()).getMostPlayed(LIMIT),
-                container, getContext().getString(R.string.dashboard_recents_empty_msg));
+        // Request server's most recent
+        loading.setVisibility(View.VISIBLE);
+        mService.getMostPlayed(LIMIT, new Callback<List<Historian.Chronicle>>() {
+            @Override
+            public void success(List<Historian.Chronicle> chronicles, Response response) {
+                loading.setVisibility(View.GONE);
+                constructChronicleList(chronicles, container, getContext().getString(R.string.dashboard_recents_empty_msg));
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                loading.setVisibility(View.GONE);
+                constructChronicleList(new ArrayList<Historian.Chronicle>(), container, getContext().getString(R.string.dashboard_recents_empty_msg));
+            }
+        });
 
         // Return the new found content
-        return container;
+        return content;
     }
 
     @Override

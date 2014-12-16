@@ -1,13 +1,23 @@
 package com.r0adkll.chipper.data;
 
+import android.app.Application;
+import android.content.Context;
+
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 import com.activeandroid.query.Select;
+import com.r0adkll.chipper.ChipperApp;
+import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.qualifiers.CurrentUser;
 import com.r0adkll.chipper.utils.Tools;
 
 import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * This manager is used to keep a record of the user's entire activity. This means their playback
@@ -19,6 +29,7 @@ import java.util.List;
  *
  * Created by r0adkll on 12/13/14.
  */
+@Singleton
 public class Historian {
 
     /**
@@ -32,16 +43,32 @@ public class Historian {
      *
      * @return      the archive singleton instance
      */
-    public static Historian getArchive(){
-        if(_instance == null) _instance = new Historian();
+    public static Historian with(Context ctx){
+        if(_instance == null) _instance = new Historian(ctx);
         return _instance;
     }
 
     /**
+     * Inject the API service to the server
+     */
+    @Inject ChipperService mService;
+    @Inject @CurrentUser
+    User mUser;
+
+    /**
      * Hidden constructor
      */
-    private Historian(){}
+    private Historian(Context ctx){
+        ChipperApp.get(ctx).inject(this);
+    }
 
+    /**
+     * Injectable Constructor
+     */
+    @Inject
+    public Historian(Application app){
+        ChipperApp.get(app).inject(this);
+    }
 
     /***********************************************************************************************
      *
@@ -98,6 +125,10 @@ public class Historian {
      * @param chiptune      the chiptune to increment the playcount for
      */
     public void incrementPlayCount(Chiptune chiptune){
+        // Update remote references
+        mService.postStats(mUser.id, chiptune.id, Chronicle.PLAY_COUNT, null);
+
+        // Update Local Reference
         Chronicle chronic = getRecord(chiptune);
         chronic.play_count++;
         chronic.last_played = Tools.time();
@@ -110,6 +141,9 @@ public class Historian {
      * @param chiptune      the chiptune to increment the skip count for
      */
     public void incrementSkipCount(Chiptune chiptune){
+        // Update remote references
+        mService.postStats(mUser.id, chiptune.id, Chronicle.SKIP_COUNT, null);
+
         Chronicle chronic = getRecord(chiptune);
         chronic.skip_count++;
         chronic.save();
@@ -121,6 +155,9 @@ public class Historian {
      * @param chiptune      the chiptune to increment the completion count for
      */
     public void incrementCompletionCount(Chiptune chiptune){
+        // Update remote references
+        mService.postStats(mUser.id, chiptune.id, Chronicle.COMPLETION_COUNT, null);
+
         Chronicle chronic = getRecord(chiptune);
         chronic.completed_count++;
         chronic.save();
@@ -132,6 +169,8 @@ public class Historian {
      * @param chiptune      the chiptune to mark the latest vote time for
      */
     public void updateLastVoted(Chiptune chiptune){
+        mService.postStats(mUser.id, chiptune.id, Chronicle.LAST_VOTED, null);
+
         Chronicle chronic = getRecord(chiptune);
         chronic.last_voted = Tools.time();
         chronic.save();
@@ -182,6 +221,22 @@ public class Historian {
     @Table(name = "records")
     public static class Chronicle extends Model{
 
+        /* The Stats Types */
+        public static final String PLAY_COUNT = "play";
+        public static final String SKIP_COUNT = "skip";
+        public static final String COMPLETION_COUNT = "completion";
+        public static final String LAST_VOTED = "lastvoted";
+
+        @Column(name = "record_id")
+        public String id;
+
+        /*
+         * These are serialized values from GSON after retrieving the object
+         * from the network request. These don't need to be saved, however post
+         * request the chiptune my need to be fetched
+         */
+        public String chiptune_id;
+
         /**
          * The chiptune reference that this history record pertains to
          */
@@ -218,6 +273,12 @@ public class Historian {
          */
         @Column
         public long last_voted;
+
+        /**
+         * The last time this value was updated on the server
+         */
+        @Column
+        public long updated;
 
     }
 

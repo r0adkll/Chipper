@@ -35,8 +35,9 @@ public class VoteManager {
      *
      */
 
-    private ChipperService mService;
-    private User mCurrentUser;
+    @Inject ChipperService mService;
+    @Inject @CurrentUser User mCurrentUser;
+    @Inject Historian mHistorian;
 
     private Map<String, Integer> mOverallVoteMap;
 
@@ -45,10 +46,8 @@ public class VoteManager {
      * Injectable Constructor
      */
     @Inject
-    public VoteManager(ChipperService service, @CurrentUser User currentUser){
+    public VoteManager(){
         mOverallVoteMap = new HashMap<>();
-        mService = service;
-        mCurrentUser = currentUser;
     }
 
 
@@ -91,8 +90,7 @@ public class VoteManager {
                 }
 
                 // Update history records
-                Historian.getArchive()
-                        .updateLastVoted(chiptune);
+                mHistorian.updateLastVoted(chiptune);
 
                 // Update local reference of total vote value
                 mOverallVoteMap.put(vote.tune_id, totalValue);
@@ -138,8 +136,7 @@ public class VoteManager {
                 }
 
                 // Update history records
-                Historian.getArchive()
-                        .updateLastVoted(chiptune);
+                mHistorian.updateLastVoted(chiptune);
 
                 // Update local reference of total vote value
                 mOverallVoteMap.put(vote.tune_id, totalValue);

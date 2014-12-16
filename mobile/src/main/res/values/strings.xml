@@ -78,5 +78,6 @@
     <string name="setting_num_recents">Number of displayed recents</string>
     <string name="setting_num_mostplayed">Number of most frequently played</string>
     <string name="action_favorite">Favorite</string>
+    <string name="dashboard_mostplayed_server_header_title">Globally most played</string>
 
 </resources>

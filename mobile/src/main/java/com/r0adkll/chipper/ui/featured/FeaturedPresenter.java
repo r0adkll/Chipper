@@ -18,6 +18,8 @@ public interface FeaturedPresenter extends IActionPresenter{
 
     public void sharePlaylist(Playlist playlist);
 
+    public void favoritePlaylist(Playlist playlist);
+
     public ModelLoader<ChiptuneReference> getLoader(Playlist playlist);
 
 }

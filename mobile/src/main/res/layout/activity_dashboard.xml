@@ -26,40 +26,34 @@
         <RelativeLayout android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <!-- The Custom Actionbar -->
-            <android.support.v7.widget.Toolbar
-                xmlns:app="http://schemas.android.com/apk/res-auto"
+            <FrameLayout
                 style="@style/Widget.Chipper.HeaderBar"
-                android:id="@+id/toolbar_actionbar"
-                android:layout_height="@dimen/actionbar_extended_height"
                 android:layout_width="match_parent"
-                android:minHeight="?attr/actionBarSize"
-                android:gravity="bottom"
-                android:paddingBottom="@dimen/activity_padding"
+                android:layout_height="@dimen/actionbar_extended_height">
 
-                app:theme="@style/ThemeOverlay.Chipper.ActionBar"
-                app:popupTheme="@style/ThemeOverlay.Chipper.ActionBar.Popup"
-                app:titleTextAppearance="@style/TextAppearance.Chipper.ExtendedActionBar.Title"
-                />
+                <!-- The Custom Actionbar -->
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar_actionbar"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:minHeight="?attr/actionBarSize"
+
+                    app:theme="@style/ThemeOverlay.Chipper.ActionBar"
+                    app:popupTheme="@style/ThemeOverlay.Chipper.ActionBar.Popup"
+                    app:titleTextAppearance="@style/TextAppearance.Chipper.ActionBar.Title"
+                    />
+
+            </FrameLayout>
 
             <!-- The fragment content container, This will always be on the bottom-->
-            <LinearLayout
-                android:id="@+id/container"
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycle_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:layout_marginTop="?attr/actionBarSize"
-                >
-
-                <!-- The recents list, horizontal layout -->
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/recents_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-
-
-
-            </LinearLayout>
+                android:elevation="6dp"
+                android:paddingTop="?attr/actionBarSize"
+                android:paddingBottom="@dimen/activity_padding"
+                android:clipToPadding="false"/>
 
             <include layout="@layout/layout_fab_shuffleplay"
                 android:id="@+id/fab_shuffle_play"

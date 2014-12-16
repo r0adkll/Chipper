@@ -71,5 +71,12 @@
     <string name="dialog_submit_feature_title">Enter a feature title</string>
     <string name="dialog_submit_feature_msg">Choose a display title for this feature playlist.</string>
     <string name="dialog_button_submit">Submit</string>
+    <string name="dashboard_recents_header_title">Recently played</string>
+    <string name="dashboard_mostplayed_header_title">Most played</string>
+    <string name="dashboard_recents_empty_msg">No recents available</string>
+    <string name="setting_category_dashboard">Dashboard</string>
+    <string name="setting_num_recents">Number of displayed recents</string>
+    <string name="setting_num_mostplayed">Number of most frequently played</string>
+    <string name="action_favorite">Favorite</string>
 
 </resources>

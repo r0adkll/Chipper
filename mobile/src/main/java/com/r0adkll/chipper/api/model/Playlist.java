@@ -12,6 +12,7 @@ import com.activeandroid.query.Select;
 import com.google.gson.annotations.SerializedName;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
+import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.utils.Tools;
 
 import java.util.ArrayList;
@@ -594,6 +595,13 @@ public class Playlist extends Model implements Parcelable{
         return false;
     }
 
+    public boolean isFavorited(ChiptuneProvider provider, PlaylistManager playlistManager){
+        List<Chiptune> chiptunes = getChiptunes(provider);
+        for(Chiptune chiptune: chiptunes){
+            if(!playlistManager.isFavorited(chiptune)) return false;
+        }
+        return true;
+    }
 
     /***********************************************************************************************
      *

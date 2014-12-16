@@ -13,6 +13,7 @@ import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Device;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.ui.dashboard.DashboardActivity;
 import com.r0adkll.chipper.utils.prefs.StringPreference;
 import com.r0adkll.chipper.utils.Tools;
 import com.r0adkll.chipper.ui.all.ChiptunesActivity;
@@ -223,7 +224,7 @@ public class LoginPresenterImpl implements LoginPresenter {
      * Launch into the main portion of the application
      */
     private void launchMainActivity(){
-        Intent main = new Intent(mView.getActivity(), ChiptunesActivity.class);
+        Intent main = new Intent(mView.getActivity(), DashboardActivity.class);
         main.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mView.getActivity().startActivity(main);
         mView.close();

@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <PreferenceCategory android:title="@string/setting_category_dashboard">
+
+        <ListPreference
+            android:key="pref_num_recents"
+            android:title="@string/setting_num_recents"
+            android:summary="5"
+            android:entries="@array/num_records"
+            android:entryValues="@array/num_records_values"
+            />
+
+        <ListPreference
+            android:key="pref_num_most_played"
+            android:title="@string/setting_num_mostplayed"
+            android:summary="5"
+            android:entries="@array/num_records"
+            android:entryValues="@array/num_records_values"
+            />
+
+    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/setting_category_general">
 
         <SwitchPreference

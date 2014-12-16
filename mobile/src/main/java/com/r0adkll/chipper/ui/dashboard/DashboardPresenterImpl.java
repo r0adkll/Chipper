@@ -1,15 +1,20 @@
 package com.r0adkll.chipper.ui.dashboard;
 
-import com.r0adkll.chipper.data.Historian;
+import android.content.Intent;
 
+import com.r0adkll.chipper.data.Historian;
+import com.r0adkll.chipper.ui.dashboard.model.DashboardCard;
+import com.r0adkll.chipper.ui.dashboard.model.MostPlayedCard;
+import com.r0adkll.chipper.ui.dashboard.model.RecentsCard;
+import com.r0adkll.chipper.ui.player.MusicPlayer;
+
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by r0adkll on 12/14/14.
  */
 public class DashboardPresenterImpl implements DashboardPresenter {
-
-    private static final int RECENTS_LIMIT = 10;
 
     private DashboardView mView;
 
@@ -18,12 +23,22 @@ public class DashboardPresenterImpl implements DashboardPresenter {
     }
 
     @Override
-    public void loadRecents() {
+    public void loadDashboardCards() {
 
-        List<Historian.Chronicle> history = Historian.getArchive().getRecentlyPlayed(RECENTS_LIMIT);
+        mView.setDashboardCards(
+            Arrays.asList(
+                new DashboardCard[]{
+                    new RecentsCard(mView.getActivity()),
+                    new MostPlayedCard(mView.getActivity())
+                }
+            )
+        );
 
     }
 
-
-
+    @Override
+    public void onChronicleSelected(Historian.Chronicle record) {
+        Intent playIntent = MusicPlayer.createPlayback(mView.getActivity(), record.chiptune);
+        MusicPlayer.startPlayback(mView.getActivity(), playIntent);
+    }
 }

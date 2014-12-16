@@ -180,6 +180,19 @@ public class FeaturedPresenterImpl implements FeaturedPresenter {
     }
 
     @Override
+    public void favoritePlaylist(Playlist playlist) {
+        List<Chiptune> chiptunes = playlist.getChiptunes(mProvider);
+        Chiptune[] tunes = new Chiptune[chiptunes.size()];
+        chiptunes.toArray(tunes);
+
+        if(mPlaylistManager.addToFavorites(tunes)){
+            String text = String.format("%d added to favorites", chiptunes.size());
+            mView.showSnackBar(text);
+        }
+
+    }
+
+    @Override
     public ModelLoader<ChiptuneReference> getLoader(Playlist playlist) {
         From query = new Select()
                 .from(ChiptuneReference.class)

@@ -25,6 +25,7 @@ import com.r0adkll.chipper.api.model.ChiptuneReference;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
+import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.events.OfflineModeChangeEvent;
 import com.r0adkll.chipper.data.events.OfflineRequestCompletedEvent;
 import com.r0adkll.chipper.ui.adapters.FeaturedChiptuneAdapter;
@@ -81,6 +82,7 @@ public class FeaturedActivity extends BaseDrawerActivity implements
     @InjectView(R.id.fab_play)      FrameLayout mFabPlay;
 
     @Inject ChiptuneProvider chiptuneProvider;
+    @Inject PlaylistManager playlistManager;
     @Inject FeaturedPresenter presenter;
     @Inject FeaturedChiptuneAdapter adapter;
     @Inject Bus mBus;
@@ -192,12 +194,18 @@ public class FeaturedActivity extends BaseDrawerActivity implements
         if(mFeaturedPlaylist != null) {
             MenuItem offline = menu.findItem(R.id.action_offline);
             if (mFeaturedPlaylist.isOffline(mAtm)) {
-                Drawable icon = getResources().getDrawable(R.drawable.ic_action_cloud_done);
-                offline.setIcon(icon);
+                offline.setIcon(R.drawable.ic_action_cloud_done);
             } else {
-                Drawable icon = getResources().getDrawable(R.drawable.ic_action_cloud_download);
-                offline.setIcon(icon);
+                offline.setIcon(R.drawable.ic_action_cloud_download);
             }
+
+            MenuItem favorite = menu.findItem(R.id.action_favorite);
+            if(mFeaturedPlaylist.isFavorited(chiptuneProvider, playlistManager)){
+                favorite.setIcon(R.drawable.ic_action_favorite);
+            }else{
+                favorite.setIcon(R.drawable.ic_action_favorite_outline);
+            }
+
         }
 
         return true;
@@ -232,6 +240,10 @@ public class FeaturedActivity extends BaseDrawerActivity implements
                 return true;
             case R.id.action_share:
                 presenter.sharePlaylist(mFeaturedPlaylist);
+                return true;
+            case R.id.action_favorite:
+                presenter.favoritePlaylist(mFeaturedPlaylist);
+                supportInvalidateOptionsMenu();
                 return true;
         }
         return super.onOptionsItemSelected(item);

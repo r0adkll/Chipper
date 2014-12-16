@@ -64,6 +64,21 @@ public class Historian {
     }
 
     /**
+     * Get the most played chiptunes
+     *
+     * @param limit     the # of chiptunes you want returned (i.e. Last 10)
+     * @return          the list of the user's most played chiptunes
+     */
+    public List<Chronicle> getMostPlayed(int limit){
+        return new Select()
+                .from(Chronicle.class)
+                .orderBy("play_count DESC")
+                .where("play_count > 0")
+                .limit(limit)
+                .execute();
+    }
+
+    /**
      * Get a list of chiptunes that were recently voted
      *
      * @param limit     the # of chiptunes you want returned (i.e. Last 10)

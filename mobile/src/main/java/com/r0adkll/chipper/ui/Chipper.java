@@ -10,11 +10,13 @@ import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Device;
 import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.data.VoteManager;
 import com.r0adkll.chipper.push.PushManager;
 import com.r0adkll.chipper.push.PushUtils;
 import com.r0adkll.chipper.qualifiers.CurrentDevice;
 import com.r0adkll.chipper.qualifiers.CurrentUser;
+import com.r0adkll.chipper.ui.dashboard.DashboardActivity;
 import com.r0adkll.chipper.utils.Tools;
 import com.r0adkll.chipper.ui.all.ChiptunesActivity;
 import com.r0adkll.chipper.ui.login.LoginActivity;
@@ -51,6 +53,9 @@ public class Chipper extends Activity {
     @Inject
     VoteManager mVoteManager;
 
+    @Inject
+    ChiptuneProvider mProvider;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +78,9 @@ public class Chipper extends Activity {
 
                 Timber.i("Existing device found! Device[%s, %s]", mCurrentDevice.device_id, mCurrentDevice.id);
 
+                // Load all chiptunes into memory
+                mProvider.loadChiptunes(null);
+
                 // Recheck push registration
                 mPushManager.checkRegistration(this);
 
@@ -80,7 +88,7 @@ public class Chipper extends Activity {
                 mVoteManager.syncUserVotes();
 
                 // Show the Starting Activity (All List)
-                Intent main = new Intent(this, ChiptunesActivity.class);
+                Intent main = new Intent(this, DashboardActivity.class);
                 startActivity(main);
                 finish();
 
@@ -101,6 +109,9 @@ public class Chipper extends Activity {
 
                                     Timber.i("New Device registered [%s]", device.id);
 
+                                    // Load all chiptunes into memory
+                                    mProvider.loadChiptunes(null);
+
                                     // Recheck push registration
                                     mPushManager.checkRegistration(Chipper.this);
 
@@ -108,7 +119,7 @@ public class Chipper extends Activity {
                                     mVoteManager.syncUserVotes();
 
                                     // Show the Starting Activity (All List)
-                                    Intent main = new Intent(Chipper.this, ChiptunesActivity.class);
+                                    Intent main = new Intent(Chipper.this, DashboardActivity.class);
                                     startActivity(main);
                                     finish();
                                 }else{

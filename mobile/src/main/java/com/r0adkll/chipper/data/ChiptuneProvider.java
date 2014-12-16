@@ -7,6 +7,7 @@ import com.activeandroid.query.Select;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.utils.CallbackHandler;
 import com.r0adkll.chipper.utils.ChiptuneComparator;
 import com.r0adkll.deadskunk.utils.Utils;
 
@@ -77,6 +78,30 @@ public class ChiptuneProvider {
     }
 
     /**
+     * Dynamically load a random chiptune. Instantly if the chiptunes are already loaded into memory
+     * but load them from the db if not, and if not in the database, load them from the server
+     *
+     * @param cb        the callback
+     */
+    public void loadRandomChiptune(final CallbackHandler<Chiptune> cb){
+        if(mChiptunes.size() > 0){
+            cb.onHandle(getRandomChiptune());
+        }else{
+            loadChiptunes(new Callback<List<Chiptune>>() {
+                @Override
+                public void success(List<Chiptune> chiptunes, Response response) {
+                    cb.onHandle(getRandomChiptune());
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+                    Timber.e(error, "Unable to get a random chiptune");
+                }
+            });
+        }
+    }
+
+    /**
      * Return a new list of all chiptunes available
      *
      * @return      all teh chiptunes
@@ -95,7 +120,7 @@ public class ChiptuneProvider {
 
         // First check for memory cache
         if(!mChiptunes.isEmpty()){
-            cb.success(mChiptunes, null);
+            if(cb != null) cb.success(mChiptunes, null);
             return;
         }
 
@@ -121,7 +146,7 @@ public class ChiptuneProvider {
             @Override
             protected void onPostExecute(List<Chiptune> chiptunes) {
                 if(chiptunes != null){
-                    cb.success(chiptunes, null);
+                    if(cb != null) cb.success(chiptunes, null);
                 }else{
 
                     // Make request
@@ -142,12 +167,12 @@ public class ChiptuneProvider {
 
                             Timber.i("Chiptunes loaded from API: %d", chiptunes.size());
                             setChiptunes(chiptunes);
-                            cb.success(chiptunes, response);
+                            if(cb != null) cb.success(chiptunes, response);
                         }
 
                         @Override
                         public void failure(RetrofitError error) {
-                            cb.failure(error);
+                            if(cb != null) cb.failure(error);
                         }
                     });
 

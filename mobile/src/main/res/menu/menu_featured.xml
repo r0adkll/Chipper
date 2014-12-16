@@ -9,6 +9,11 @@
         app:actionViewClass="android.support.v7.widget.SearchView"
         />
 
+    <item android:id="@+id/action_favorite"
+        android:title="@string/action_favorite"
+        android:icon="@drawable/ic_action_favorite"
+        app:showAsAction="always" />
+
     <item android:id="@+id/action_offline"
         android:title="@string/action_offline"
         android:icon="@drawable/ic_action_cloud_download"

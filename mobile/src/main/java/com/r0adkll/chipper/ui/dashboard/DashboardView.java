@@ -1,6 +1,7 @@
 package com.r0adkll.chipper.ui.dashboard;
 
 import com.r0adkll.chipper.data.Historian;
+import com.r0adkll.chipper.ui.dashboard.model.DashboardCard;
 import com.r0adkll.chipper.ui.model.IView;
 
 import java.util.List;
@@ -10,8 +11,6 @@ import java.util.List;
  */
 public interface DashboardView extends IView{
 
-    public void setRecents(List<Historian.Chronicle> records);
-
-
+    public void setDashboardCards(List<DashboardCard> cards);
 
 }

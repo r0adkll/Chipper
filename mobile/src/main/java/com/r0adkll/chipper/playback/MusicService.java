@@ -41,6 +41,7 @@ import com.r0adkll.chipper.data.VoteManager;
 import com.r0adkll.chipper.playback.events.MediaSessionEvent;
 import com.r0adkll.chipper.playback.events.PlayProgressEvent;
 import com.r0adkll.chipper.playback.events.PlayQueueEvent;
+import com.r0adkll.chipper.playback.events.PlaybackStartedEvent;
 import com.r0adkll.chipper.playback.model.AudioSession;
 import com.r0adkll.chipper.playback.model.PlayQueue;
 import com.r0adkll.chipper.playback.model.SessionState;
@@ -495,6 +496,9 @@ public class MusicService extends Service {
                     // Execute Play progress update handler loop
                     mHandler.postDelayed(mPlayProgressUpdater, 200);
 
+                    // Post playback event
+                    mBus.post(new PlaybackStartedEvent());
+
                     // TODO: Update Widget
 
 
@@ -620,20 +624,28 @@ public class MusicService extends Service {
     private void coldStartRandomPlayback(){
 
         // Get a random chiptune, and construct the play queue from it
-        Chiptune randomChiptune = mProvider.getRandomChiptune();
-        mQueue = new PlayQueue(mProvider, randomChiptune);
+        mProvider.loadRandomChiptune(new CallbackHandler<Chiptune>() {
+            @Override
+            public void onHandle(Chiptune value) {
+                mQueue = new PlayQueue(mProvider, value);
 
-        // Set session as active
-        mCurrentSession.setActive(true);
+                // Set session as active
+                mCurrentSession.setActive(true);
 
-        // Start playback of the current queue
-        startPlayback();
+                // Start playback of the current queue
+                startPlayback();
 
-        // Post Session Queue change event
-        mBus.post(new PlayQueueEvent(mQueue, mCurrentState));
+                // Post Session Queue change event
+                mBus.post(new PlayQueueEvent(mQueue, mCurrentState));
 
-        // Update the shuffle
-        shuffle(true);
+                // Update the shuffle
+                shuffle(true);
+            }
+
+            @Override
+            public void onFailure(String msg) {
+            }
+        });
 
     }
 

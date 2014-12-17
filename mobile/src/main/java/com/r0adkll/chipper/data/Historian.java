@@ -19,6 +19,10 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+
 /**
  * This manager is used to keep a record of the user's entire activity. This means their playback
  * history, vote history, playlist history, chiptunes played to completion, chiptunes skipped,
@@ -126,7 +130,10 @@ public class Historian {
      */
     public void incrementPlayCount(Chiptune chiptune){
         // Update remote references
-        mService.postStats(mUser.id, chiptune.id, Chronicle.PLAY_COUNT, null);
+        mService.postStats(mUser.id, chiptune.id, Chronicle.PLAY_COUNT, new Callback<Chronicle>() {
+            @Override public void success(Chronicle chronicle, Response response) {}
+            @Override public void failure(RetrofitError error) {}
+        });
 
         // Update Local Reference
         Chronicle chronic = getRecord(chiptune);
@@ -142,7 +149,10 @@ public class Historian {
      */
     public void incrementSkipCount(Chiptune chiptune){
         // Update remote references
-        mService.postStats(mUser.id, chiptune.id, Chronicle.SKIP_COUNT, null);
+        mService.postStats(mUser.id, chiptune.id, Chronicle.SKIP_COUNT, new Callback<Chronicle>() {
+            @Override public void success(Chronicle chronicle, Response response) {}
+            @Override public void failure(RetrofitError error) {}
+        });
 
         Chronicle chronic = getRecord(chiptune);
         chronic.skip_count++;
@@ -156,7 +166,10 @@ public class Historian {
      */
     public void incrementCompletionCount(Chiptune chiptune){
         // Update remote references
-        mService.postStats(mUser.id, chiptune.id, Chronicle.COMPLETION_COUNT, null);
+        mService.postStats(mUser.id, chiptune.id, Chronicle.COMPLETION_COUNT, new Callback<Chronicle>() {
+            @Override public void success(Chronicle chronicle, Response response) {}
+            @Override public void failure(RetrofitError error) {}
+        });
 
         Chronicle chronic = getRecord(chiptune);
         chronic.completed_count++;
@@ -169,7 +182,10 @@ public class Historian {
      * @param chiptune      the chiptune to mark the latest vote time for
      */
     public void updateLastVoted(Chiptune chiptune){
-        mService.postStats(mUser.id, chiptune.id, Chronicle.LAST_VOTED, null);
+        mService.postStats(mUser.id, chiptune.id, Chronicle.LAST_VOTED, new Callback<Chronicle>() {
+            @Override public void success(Chronicle chronicle, Response response) {}
+            @Override public void failure(RetrofitError error) {}
+        });
 
         Chronicle chronic = getRecord(chiptune);
         chronic.last_voted = Tools.time();

@@ -3,55 +3,87 @@ package com.r0adkll.chipper.ui.dashboard.model;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.api.ChipperService;
+import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.data.Historian;
 import com.r0adkll.chipper.ui.player.MusicPlayer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.ButterKnife;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by r0adkll on 12/16/14.
  */
-public class MostPlayedCard extends DashboardCard {
+public class MostCompletedServerCard extends DashboardCard implements Callback<List<Historian.Chronicle>>{
     public static final int ID = 1;
 
     public static final int LIMIT = 5;
+
+    private ChipperService mService;
+    private ChiptuneProvider mProvider;
+
+    private LinearLayout mContainer;
+    private ProgressBar mLoading;
 
     /**
      * Default Constructor
      *
      * @param ctx the context reference
      */
-    public MostPlayedCard(Context ctx) {
+    public MostCompletedServerCard(Context ctx, ChipperService service, ChiptuneProvider provider) {
         super(ctx);
+        mService = service;
+        mProvider = provider;
     }
 
     @Override
     public CharSequence getTitle() {
-        return getContext().getString(R.string.dashboard_mostplayed_header_title);
+        return getContext().getString(R.string.dashboard_mostplayed_server_header_title);
     }
 
     @Override
     public View getContentView(View contentView) {
-        LinearLayout container;
+        RelativeLayout content;
         if(contentView != null){
-            container = (LinearLayout) contentView;
+            content = (RelativeLayout) contentView;
+            mContainer = ButterKnife.findById(content, R.id.container);
+            mLoading = ButterKnife.findById(content, R.id.loading);
         }else{
-            container = new LinearLayout(getContext());
-            container.setOrientation(LinearLayout.VERTICAL);
+            content = new RelativeLayout(getContext());
+
+            mLoading = new ProgressBar(getContext());
+            mLoading.setIndeterminate(true);
+            mLoading.setId(R.id.loading);
+            RelativeLayout.LayoutParams params =
+                    new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.addRule(RelativeLayout.CENTER_IN_PARENT);
+            content.addView(mLoading, params);
+
+            mContainer = new LinearLayout(getContext());
+            mContainer.setOrientation(LinearLayout.VERTICAL);
+            mContainer.setId(R.id.container);
+            content.addView(mContainer);
         }
 
-        // Build recent's content
-        constructChronicleList(Historian.with(getContext()).getMostPlayed(LIMIT),
-                container, getContext().getString(R.string.dashboard_mostplayed_empty_msg));
+        // Request server's most recent
+        mLoading.setVisibility(View.VISIBLE);
+        mService.getMostPlayed(LIMIT, this);
 
         // Return the new found content
-        return container;
+        return content;
     }
 
     @Override
@@ -111,5 +143,22 @@ public class MostPlayedCard extends DashboardCard {
             container.addView(view);
         }
 
+    }
+
+    @Override
+    public void success(List<Historian.Chronicle> chronicles, Response response) {
+        // Find all the chronicles
+        for(Historian.Chronicle chronicle: chronicles){
+            chronicle.chiptune = mProvider.getChiptune(chronicle.chiptune_id);
+        }
+
+        mLoading.setVisibility(View.GONE);
+        constructChronicleList(chronicles, mContainer, getContext().getString(R.string.dashboard_mostplayed_empty_msg));
+    }
+
+    @Override
+    public void failure(RetrofitError error) {
+        mLoading.setVisibility(View.GONE);
+        constructChronicleList(new ArrayList<Historian.Chronicle>(), mContainer, getContext().getString(R.string.dashboard_mostplayed_empty_msg));
     }
 }

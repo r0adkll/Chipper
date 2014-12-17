@@ -1,6 +1,7 @@
 package com.r0adkll.chipper.ui.dashboard;
 
 import com.r0adkll.chipper.api.ChipperService;
+import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.ui.UIModule;
 
 import javax.inject.Singleton;
@@ -30,8 +31,9 @@ public class DashboardModule {
 
     @Provides @Singleton
     DashboardPresenter providePresenter(DashboardView view,
-                                        ChipperService service){
-        return new DashboardPresenterImpl(view, service);
+                                        ChipperService service,
+                                        ChiptuneProvider provider){
+        return new DashboardPresenterImpl(view, service, provider);
     }
 
 }

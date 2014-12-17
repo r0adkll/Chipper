@@ -17,6 +17,61 @@ import timber.log.Timber;
  */
 public class PushUtils {
 
+    /***********************************************************************************************
+     *
+     * Push Keys
+     *
+     */
+
+    /**
+     * Push type that let's the device know to sync their playlists with the
+     * server
+     */
+    public static final String TYPE_SYNC_PLAYLIST = "com.r0adkll.chipper.push.SYNC_PLAYLISTS";
+
+    /**
+     * Push type that let's the device know to sync vote data with the server
+     */
+    public static final String TYPE_SYNC_VOTES = "com.r0adkll.chipper.push.SYNC_VOTES";
+
+    /**
+     * Push type that let's the device know to sync the devices on the account
+     */
+    public static final String TYPE_SYNC_DEVICES = "com.r0adkll.chipper.push.SYNC_DEVICES";
+
+    /**
+     * Push type to display a system notification to the user
+     */
+    public static final String TYPE_NOTIFICATION = "com.r0adkll.chipper.push.NOTIFICATION";
+
+    /**
+     * Push type to push configuration changes to the device
+     *
+     */
+    public static final String TYPE_CONFIG = "com.r0adkll.chipper.push.CONFIGURATION";
+
+    /**
+     * Push type to let the device know to sync their shared playlists
+     */
+    public static final String TYPE_SHARED_SYNC = "com.r0adkll.chipper.push.SHARED_SYNC";
+
+    /**
+     * Push type to let the owner of a playlist know that their shared playlist has
+     * been redeemed
+     */
+    public static final String TYPE_SHARE_REDEEMED = "com.r0adkll.chipper.push.SHARE_REDEEMED";
+
+    /**
+     * Pusht ype to let devices know that there is a new featured playlist
+     */
+    public static final String TYPE_FEATURED = "com.r0adkll.chipper.push.NEW_FEATURE";
+
+    /***********************************************************************************************
+     *
+     * Constants
+     *
+     */
+
     public static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     /**

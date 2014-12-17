@@ -31,6 +31,7 @@ import android.view.KeyEvent;
 import com.activeandroid.Model;
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.CashMachine;
@@ -58,6 +59,9 @@ import com.squareup.otto.Produce;
 import javax.inject.Inject;
 
 import hugo.weaving.DebugLog;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 import timber.log.Timber;
 
 /**
@@ -75,6 +79,7 @@ public class MusicService extends Service {
 
     public static final String INTENT_ACTION_PLAY = "com.r0adkll.chipper.intent.action.START_PLAYBACK";
     public static final String INTENT_ACTION_COLDSTART = "com.r0adkll.chipper.intent.action.COLDSTART_PLAYBACK";
+    public static final String INTENT_ACTION_COLDSTART_FEATURED = "com.r0adkll.chipper.intent.action.COLDSTART_FEATURED_PLAYBACK";
 
     public static final String ACTION_PLAY = "com.r0adkll.chipper.intent.PLAY";
     public static final String ACTION_PAUSE = "com.r0adkll.chipper.intent.PAUSE";
@@ -114,6 +119,7 @@ public class MusicService extends Service {
      *
      */
 
+    @Inject ChipperService mService;
     @Inject AudioManager mAudioManager;
     @Inject NotificationManagerCompat mNotificationManagerCompat;
     @Inject NotificationManager mNotificationManager;
@@ -233,6 +239,35 @@ public class MusicService extends Service {
                     break;
                 case INTENT_ACTION_COLDSTART:
                     coldStartRandomPlayback();
+                    break;
+                case INTENT_ACTION_COLDSTART_FEATURED:
+                    mService.getFeaturedPlaylist(new Callback<Playlist>() {
+                        @Override
+                        public void success(Playlist playlist, Response response) {
+                            if(playlist.getCount() > 0){
+                                Chiptune chiptune = playlist.getChiptunes(mProvider).get(0);
+
+                                // Initialize the queue
+                                mQueue = new PlayQueue(mProvider, chiptune, playlist);
+
+                                // Set session as active
+                                mCurrentSession.setActive(true);
+
+                                // Post Session Queue change event
+                                mBus.post(new PlayQueueEvent(mQueue, mCurrentState));
+
+                                // Start playback
+                                startPlayback();
+                            }else{
+                                Timber.e("Unable to start playing featured playlist, no chiptunes found");
+                            }
+                        }
+
+                        @Override
+                        public void failure(RetrofitError error) {
+                            Timber.e(error, "Unable to start playback of featured playlist");
+                        }
+                    });
                     break;
             }
         }

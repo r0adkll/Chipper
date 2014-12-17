@@ -80,5 +80,6 @@
     <string name="action_favorite">Favorite</string>
     <string name="dashboard_mostplayed_server_header_title">Globally most played</string>
     <string name="dashboard_mostplayed_empty_msg">No chiptunes available</string>
+    <string name="dashboard_mostcompleted_server_header_title">Globally most completed</string>
 
 </resources>

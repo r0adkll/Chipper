@@ -50,7 +50,7 @@ public class MostCompletedServerCard extends DashboardCard implements Callback<L
 
     @Override
     public CharSequence getTitle() {
-        return getContext().getString(R.string.dashboard_mostplayed_server_header_title);
+        return getContext().getString(R.string.dashboard_mostcompleted_server_header_title);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class MostCompletedServerCard extends DashboardCard implements Callback<L
 
         // Request server's most recent
         mLoading.setVisibility(View.VISIBLE);
-        mService.getMostPlayed(LIMIT, this);
+        mService.getMostCompleted(LIMIT, this);
 
         // Return the new found content
         return content;
@@ -114,7 +114,7 @@ public class MostCompletedServerCard extends DashboardCard implements Callback<L
             TextView playCount = ButterKnife.findById(view, R.id.play_count);
             playCount.setVisibility(View.VISIBLE);
             title.setText(String.format("%s - %s", record.chiptune.artist, record.chiptune.title));
-            playCount.setText(String.valueOf(record.play_count));
+            playCount.setText(String.valueOf(record.completed_count));
 
             view.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -6,6 +6,7 @@ import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.data.Historian;
 import com.r0adkll.chipper.ui.dashboard.model.DashboardCard;
+import com.r0adkll.chipper.ui.dashboard.model.MostCompletedServerCard;
 import com.r0adkll.chipper.ui.dashboard.model.MostPlayedCard;
 import com.r0adkll.chipper.ui.dashboard.model.MostPlayedServerCard;
 import com.r0adkll.chipper.ui.dashboard.model.RecentsCard;
@@ -39,7 +40,8 @@ public class DashboardPresenterImpl implements DashboardPresenter {
                 new DashboardCard[]{
                     new RecentsCard(mView.getActivity()),
                     new MostPlayedCard(mView.getActivity()),
-                    new MostPlayedServerCard(mView.getActivity(), mService, mProvider)
+                    new MostPlayedServerCard(mView.getActivity(), mService, mProvider),
+                    new MostCompletedServerCard(mView.getActivity(), mService, mProvider)
                 }
             )
         );

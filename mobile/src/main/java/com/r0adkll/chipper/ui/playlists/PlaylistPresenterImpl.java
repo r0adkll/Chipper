@@ -1,6 +1,9 @@
 package com.r0adkll.chipper.ui.playlists;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.util.Pair;
+import android.view.View;
 
 import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
@@ -14,11 +17,14 @@ import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.model.ModelLoader;
 import com.r0adkll.chipper.data.model.OfflineRequest;
 import com.r0adkll.chipper.ui.playlists.viewer.PlaylistViewerActivity;
+import com.r0adkll.chipper.utils.UIUtils;
+import com.r0adkll.deadskunk.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import butterknife.ButterKnife;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -127,11 +133,19 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
 
     }
 
+    @SuppressLint("NewApi")
     @Override
-    public void onPlaylistSelected(Playlist playlist, int position) {
+    public void onPlaylistSelected(View view, Playlist playlist, int position) {
         Intent intent = new Intent(mView.getActivity(), PlaylistViewerActivity.class);
         intent.putExtra(PlaylistViewerActivity.EXTRA_PLAYLIST_ID, playlist.getId());
-        mView.getActivity().startActivity(intent);
+
+        View title = ButterKnife.findById(view, R.id.title);
+
+        if(Utils.isLollipop()) view.setElevation(Utils.dpToPx(mView.getActivity(), 8));
+        UIUtils.startActivityWithTransition(mView.getActivity(), intent,
+                new Pair<>(title, "toolbar_title"),
+                new Pair<>(view, "playlist_background"));
+
     }
 
     @Override

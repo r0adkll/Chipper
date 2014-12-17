@@ -17,6 +17,12 @@
         <item name="android:statusBarColor">@color/statusBar</item>
         <item name="actionModeStyle">@style/Widget.Chipper.ActionMode</item>
 
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowSharedElementEnterTransition">@transition/change_bounds</item>
+        <item name="android:windowSharedElementExitTransition">@transition/change_bounds</item>
+        <item name="android:windowAllowEnterTransitionOverlap">false</item>
+        <item name="android:windowAllowReturnTransitionOverlap">true</item>
+
     </style>
 
     <style name="Theme.Chipper.TV" parent="Theme.Leanback">

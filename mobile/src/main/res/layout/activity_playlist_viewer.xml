@@ -30,6 +30,7 @@
             android:minHeight="?attr/actionBarSize"
             android:gravity="bottom"
             android:paddingBottom="@dimen/activity_padding"
+            android:transitionName="toolbar_title"
 
             app:theme="@style/ThemeOverlay.Chipper.ActionBar"
             app:popupTheme="@style/ThemeOverlay.Chipper.ActionBar.Popup"
@@ -43,6 +44,7 @@
             android:layout_height="match_parent"
             android:layout_below="@+id/toolbar_actionbar"
             android:background="@color/background_material_light"
+            android:transitionName="playlist_background"
             >
 
             <android.support.v7.widget.RecyclerView

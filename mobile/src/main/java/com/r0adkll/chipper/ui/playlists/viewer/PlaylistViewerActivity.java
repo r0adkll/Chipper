@@ -1,5 +1,6 @@
 package com.r0adkll.chipper.ui.playlists.viewer;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
@@ -151,6 +152,16 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
         mBus.register(this);
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    public void onBackPressed() {
+        if(Utils.isLollipop()){
+            finishAfterTransition();
+        }else {
+            super.onBackPressed();
+        }
+    }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -210,11 +221,16 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
         return super.onPrepareOptionsMenu(menu);
     }
 
+    @SuppressLint("NewApi")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
-                finish();
+                if(Utils.isLollipop()){
+                    finishAfterTransition();
+                }else {
+                    finish();
+                }
                 return true;
             case R.id.action_offline:
                 if(mPlaylist.isOffline(mAtm)){

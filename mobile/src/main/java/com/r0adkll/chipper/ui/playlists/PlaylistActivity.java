@@ -125,8 +125,9 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
 
             @Override
             public void onClickFrontView(int position) {
+                View view = mRecyclerView.getChildAt(position);
                 Playlist item = adapter.getItem(position);
-                presenter.onPlaylistSelected(item, position);
+                presenter.onPlaylistSelected(view, item, position);
             }
 
             @Override
@@ -267,7 +268,7 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
 
     @Override
     public void onItemClick(View v, Playlist item, int position) {
-        presenter.onPlaylistSelected(item, position);
+        presenter.onPlaylistSelected(v, item, position);
     }
 
 

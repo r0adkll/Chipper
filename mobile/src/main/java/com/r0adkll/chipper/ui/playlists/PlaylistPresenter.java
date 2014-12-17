@@ -1,5 +1,7 @@
 package com.r0adkll.chipper.ui.playlists;
 
+import android.view.View;
+
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.model.ModelLoader;
 
@@ -18,7 +20,7 @@ public interface PlaylistPresenter {
 
     public void offlinePlaylist(Playlist playlist);
 
-    public void onPlaylistSelected(Playlist playlist, int position);
+    public void onPlaylistSelected(View view, Playlist playlist, int position);
 
     public ModelLoader<Playlist> getLoader();
 

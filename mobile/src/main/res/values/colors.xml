@@ -8,7 +8,7 @@
 
     <color name="secondary">#333333</color>
 
-    <color name="fab">@color/button_material_dark</color>
+    <color name="fab">#E91E63</color>
     <color name="fabPressed">#2F2F2F</color>
 
     <color name="statusBar">#b2669900</color>

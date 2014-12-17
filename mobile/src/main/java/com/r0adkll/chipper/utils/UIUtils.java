@@ -1,13 +1,19 @@
 package com.r0adkll.chipper.utils;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.Paint;
 import android.os.Build;
+import android.text.TextUtils;
+import android.util.Pair;
 import android.view.View;
 import android.view.ViewOutlineProvider;
 import android.widget.FrameLayout;
@@ -22,6 +28,33 @@ import butterknife.ButterKnife;
  * Created by r0adkll on 11/13/14.
  */
 public class UIUtils {
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static void startActivityWithTransition(Activity activity,
+                                                   Intent intent,
+                                                   final View clickedView,
+                                                   final String transitionName) {
+        ActivityOptions options = null;
+        if (Utils.isLollipop() && clickedView != null && !TextUtils.isEmpty(transitionName)) {
+            options = ActivityOptions
+                    .makeSceneTransitionAnimation(activity, clickedView, transitionName);
+        }
+
+        activity.startActivity(intent, (options != null) ? options.toBundle() : null);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static void startActivityWithTransition(Activity activity,
+                                                   Intent intent,
+                                                   Pair<View, String>... transitions){
+        ActivityOptions options = null;
+        if (Utils.isLollipop() && transitions != null) {
+            options = ActivityOptions
+                    .makeSceneTransitionAnimation(activity, transitions);
+        }
+
+        activity.startActivity(intent, (options != null) ? options.toBundle() : null);
+    }
 
     public static void setAccessibilityIgnore(View view) {
         view.setClickable(false);

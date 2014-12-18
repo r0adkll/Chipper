@@ -57,6 +57,9 @@ public class SyncCampaign implements Runnable{
 
 
     /**
+     * TODO: Modify 'Model.java' object to create a .save() method that doesn't notify
+     * TODO: the content provider so we don't chain a rediculous # sync requests
+     *
      * Run the campaign
      */
     @Override

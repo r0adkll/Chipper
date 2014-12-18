@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.ChipperService;
+import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.data.Historian;
 import com.r0adkll.chipper.ui.player.MusicPlayer;
@@ -147,6 +148,9 @@ public class MostPlayedServerCard extends DashboardCard implements Callback<List
 
     @Override
     public void success(List<Historian.Chronicle> chronicles, Response response) {
+        // Check provider
+        if(mProvider.getAllChiptunes().isEmpty()) return;
+
         // Find all the chronicles
         for(Historian.Chronicle chronicle: chronicles){
             chronicle.chiptune = mProvider.getChiptune(chronicle.chiptune_id);

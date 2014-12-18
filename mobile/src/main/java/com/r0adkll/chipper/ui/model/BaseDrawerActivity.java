@@ -1,7 +1,9 @@
 package com.r0adkll.chipper.ui.model;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
@@ -14,10 +16,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.activeandroid.content.ContentProvider;
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.account.GoogleAccountManager;
+import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.events.OfflineModeChangeEvent;
+import com.r0adkll.chipper.data.model.PlaylistObserver;
 import com.r0adkll.chipper.push.PushManager;
 import com.r0adkll.chipper.ui.dashboard.DashboardActivity;
 import com.r0adkll.chipper.ui.featured.FeaturedActivity;

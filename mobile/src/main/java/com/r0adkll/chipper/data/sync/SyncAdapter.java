@@ -7,10 +7,13 @@ import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
 
+import com.r0adkll.chipper.BuildConfig;
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.api.ChipperService;
 
 import javax.inject.Inject;
+
+import timber.log.Timber;
 
 /**
  * Project: Chipper
@@ -34,6 +37,16 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     public SyncAdapter(Context context) {
         super(context, true);
         ChipperApp.get(context).inject(this);
+
+        if (!BuildConfig.DEBUG) {
+            Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                @Override
+                public void uncaughtException(Thread thread, Throwable throwable) {
+                    Timber.e("Uncaught sync exception, suppressing UI in release build.", throwable);
+                }
+            });
+        }
+
     }
 
     @Override
@@ -44,7 +57,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
         // Start/Create new campaign
         mCampaign = mCampaignFactory.create(mService, syncResult);
-        mCampaign.run();
+
+        // Run the campaign
+        try {
+            mCampaign.run();
+        }catch(Exception e){
+            Timber.e(e, "Uncaught error occured on on the Sync Campaign");
+        }
 
     }
 

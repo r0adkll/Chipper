@@ -2,6 +2,7 @@ package com.r0adkll.chipper.api.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.BaseColumns;
 
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
@@ -11,7 +12,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by r0adkll on 11/16/14.
  */
-@Table(name = "playlist_chiptunes")
+@Table(name = "playlist_chiptunes", id = BaseColumns._ID)
 public class ChiptuneReference extends Model implements Parcelable {
 
     /***********************************************************************************************

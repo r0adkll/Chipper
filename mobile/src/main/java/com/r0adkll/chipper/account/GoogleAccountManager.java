@@ -45,8 +45,8 @@ public class GoogleAccountManager {
     public static final String PREF_DISPLAY_NAME = "pref_google_display_name";
     public static final String PREF_IMAGE_URL = "pref_google_image_url";
     public static final String PREF_COVER_URL = "pref_google_cover_url";
-    public static final String AUTHORITY = "com.r0adkll.chipper.provider";
-    public static final String ACCOUNT_TYPE = "r0adkll.com";
+    public static final String AUTHORITY = "com.r0adkll.chipper";
+    public static final String ACCOUNT_TYPE = "com.r0adkll";
 
     /***********************************************************************************************
      *

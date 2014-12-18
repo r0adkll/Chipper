@@ -14,8 +14,7 @@ import dagger.Provides;
  */
 @Module(
     injects = {
-        SyncAdapter.class,
-        SyncService.class
+        SyncAdapter.class
     },
     complete = false
 )

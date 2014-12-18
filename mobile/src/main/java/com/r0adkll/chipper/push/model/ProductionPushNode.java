@@ -204,7 +204,7 @@ public class ProductionPushNode implements PushNode {
 
         // Set the action to start playing the new featured playlist
         builder.addAction(R.drawable.ic_action_play,
-                "Start listening", buildMusicService(MusicService.INTENT_ACTION_COLDSTART));
+                "Start listening", buildMusicService(MusicService.INTENT_ACTION_COLDSTART_FEATURED));
 
         // Show the notification
         mNotifMan.notify(TYPE_FEATURED_ID, builder.build());

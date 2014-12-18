@@ -116,8 +116,7 @@
 
         <!-- The Sync Service -->
         <service android:name=".data.sync.SyncService"
-            android:exported="true"
-            android:process=":sync">
+            android:exported="true">
 
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
@@ -138,14 +137,13 @@
         </receiver>
         <service android:name=".push.GcmIntentService" />
 
-        <!-- Stub Content Provider -->
+        <!-- Active Android Content Provider -->
         <provider
-            android:authorities="com.r0adkll.chipper.provider"
-            android:name="com.r0adkll.chipper.data.sync.StubProvider"
+            android:authorities="com.r0adkll.chipper"
+            android:name="com.activeandroid.content.ContentProvider"
             android:exported="false"
-            android:syncable="true" />
-
-
+            android:syncable="true"
+            />
 
         <!--========================================================================================
 

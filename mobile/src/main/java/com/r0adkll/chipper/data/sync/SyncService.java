@@ -8,6 +8,8 @@ import com.r0adkll.chipper.ChipperApp;
 
 import javax.inject.Inject;
 
+import timber.log.Timber;
+
 /**
  * Project: Chipper
  * Package: com.r0adkll.chipper.data.sync
@@ -15,13 +17,16 @@ import javax.inject.Inject;
  */
 public class SyncService extends Service {
 
-    @Inject
-    SyncAdapter mSyncAdapter;
+    private static SyncAdapter mSyncAdapter;
+    private static final Object sSyncAdapterLock = new Object();
 
     @Override
     public void onCreate() {
-        super.onCreate();
-        ChipperApp.get(this).inject(this);
+        synchronized (sSyncAdapterLock){
+            if(mSyncAdapter == null){
+                mSyncAdapter = new SyncAdapter(this);
+            }
+        }
     }
 
     @Override

@@ -204,6 +204,30 @@ public class VoteManager {
                 Timber.e("Error synchronizing the user's vote values: %s", error.getLocalizedMessage());
             }
         });
+    }
+
+    /**
+     * Update the user's vote data from the server, this realistically just needs to be run once
+     * per app start
+     *
+     */
+    public void syncUserVotes(String userId){
+        // Download and update the local store of all the user's vote data from the server
+        mService.getUserVotes(userId, new retrofit.Callback<List<Vote>>() {
+            @Override
+            public void success(List<Vote> votes, Response response) {
+                // Store Votes
+                saveVoteData(votes);
+
+                // TODO: Signal UI
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Timber.e("Error synchronizing the user's vote values: %s", error.getLocalizedMessage());
+            }
+        });
 
     }
 

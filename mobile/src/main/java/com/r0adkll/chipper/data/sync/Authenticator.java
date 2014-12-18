@@ -22,7 +22,7 @@ public class Authenticator extends AbstractAccountAuthenticator {
 
     @Override
     public Bundle editProperties(AccountAuthenticatorResponse response, String accountType) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -37,21 +37,21 @@ public class Authenticator extends AbstractAccountAuthenticator {
 
     @Override
     public Bundle getAuthToken(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options) throws NetworkErrorException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public String getAuthTokenLabel(String authTokenType) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Bundle updateCredentials(AccountAuthenticatorResponse response, Account account, String authTokenType, Bundle options) throws NetworkErrorException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Bundle hasFeatures(AccountAuthenticatorResponse response, Account account, String[] features) throws NetworkErrorException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }

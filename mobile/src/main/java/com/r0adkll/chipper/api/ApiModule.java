@@ -41,7 +41,7 @@ public final class ApiModule {
 
     @Provides @Singleton
     Endpoint provideEndpoint(){
-        return Endpoints.newFixedEndpoint(DEVELOPMENT_BASE_URL);
+        return Endpoints.newFixedEndpoint(PRODUCTION_BASE_URL);
     }
 
     @Provides @Singleton

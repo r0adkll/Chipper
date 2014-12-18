@@ -2,6 +2,7 @@ package com.r0adkll.chipper.data.sync;
 
 import android.content.SyncResult;
 
+import com.activeandroid.content.ContentProvider;
 import com.activeandroid.query.Select;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Playlist;
@@ -60,6 +61,7 @@ public class SyncCampaign implements Runnable{
      */
     @Override
     public void run() {
+        Timber.i("Beginning Sync Campaign");
 
         // Get Logged in user
         User user = new Select()
@@ -83,48 +85,58 @@ public class SyncCampaign implements Runnable{
                 for(Playlist localPlaylist: local){
                     if(mIsCanceled) return;
 
-                    // Iterate through the remove playlists
+                    // Check to see if the playlists remote id is set
                     boolean hasRemote = false;
-                    for(Playlist remotePlaylist: remote){
-                        if(mIsCanceled) return;
+                    if(localPlaylist.id != null || localPlaylist.name.equalsIgnoreCase(Playlist.FAVORITES)) {
 
-                        // Check for similar playlists
-                        if(localPlaylist.id.equals(remotePlaylist.id) && !remotePlaylist.deleted){
-                            hasRemote = true;
-                            // Ok, found a matching playlist for this local playlist, now determine which
-                            // needs to be updated
+                        // Iterate through the remove playlists
+                        for (Playlist remotePlaylist : remote) {
+                            if (mIsCanceled) return;
 
-                            long localTime = localPlaylist.updated;
-                            long remoteTime = remotePlaylist.updated;
+                            // Build cases
+                            boolean idCheck = localPlaylist.id != null ? localPlaylist.id.equals(remotePlaylist.id) : false;
+                            boolean favoritesCheck = localPlaylist.name.equalsIgnoreCase(Playlist.FAVORITES) &&
+                                    remotePlaylist.name.equalsIgnoreCase(Playlist.FAVORITES);
+                            boolean areEqual = idCheck || favoritesCheck;
 
-                            if(localTime > remoteTime){
-                                // Local playlist is newer than remote, send update to update it
-                                Playlist updatedPlaylist = mService.updatePlaylistSync(user.id, localPlaylist.id, localPlaylist.toUpdateMap());
-                                if(updatedPlaylist != null) {
-                                    localPlaylist.update(updatedPlaylist);
+                            // Check for similar playlists
+                            if (areEqual && !remotePlaylist.deleted) {
+                                hasRemote = true;
+                                // Ok, found a matching playlist for this local playlist, now determine which
+                                // needs to be updated
+
+                                long localTime = localPlaylist.updated;
+                                long remoteTime = remotePlaylist.updated;
+
+                                if (localTime > remoteTime) {
+                                    // Local playlist is newer than remote, send update to update it
+                                    Playlist updatedPlaylist = mService.updatePlaylistSync(user.id, localPlaylist.id, localPlaylist.toUpdateMap());
+                                    if (updatedPlaylist != null) {
+                                        localPlaylist.update(updatedPlaylist);
+                                        mSyncResult.stats.numUpdates++;
+                                        Timber.d("Local playlist [%s] newer than remote, uploading...", localPlaylist.name);
+                                    } else {
+                                        mSyncResult.stats.numSkippedEntries++;
+                                    }
+                                } else if (localTime < remoteTime) {
+                                    // Remote playlist is newer, update the local reference
+                                    localPlaylist.update(remotePlaylist);
                                     mSyncResult.stats.numUpdates++;
-                                    Timber.i("Local playlist [%s] newer than remote, uploading...", localPlaylist.name);
-                                }else{
-                                    mSyncResult.stats.numSkippedEntries++;
+                                    Timber.d("Remote playlist [%s] is newer than local, downloading...", remotePlaylist.name);
+                                } else if (localTime == remoteTime) {
+                                    // These playlists are current, do nothing
                                 }
-                            }else if(localTime < remoteTime){
-                                // Remote playlist is newer, update the local reference
-                                localPlaylist.update(remotePlaylist);
-                                mSyncResult.stats.numUpdates++;
-                                Timber.i("Remote playlist [%s] is newer than local, downloading...", remotePlaylist.name);
-                            }else if(localTime == remoteTime){
-                                // These playlists are current, do nothing
+
+                                break;
+                            } else if (idCheck && remotePlaylist.deleted) {
+
+                                // Remote playlist has been deleted, so delete the local reference too
+                                localPlaylist.delete();
+                                mSyncResult.stats.numDeletes++;
+                                Timber.d("Local playlist [%s] was deleted since the remote was marked as deleted");
                             }
 
-                            break;
-                        }else if(localPlaylist.id.equals(remotePlaylist.id) && remotePlaylist.deleted){
-
-                            // Remote playlist has been deleted, so delete the local reference too
-                            localPlaylist.delete();
-                            mSyncResult.stats.numDeletes++;
-                            Timber.i("Local playlist [%s] was deleted since the remote was marked as deleted");
                         }
-
                     }
 
                     // 2) Check to see if this local playlist has a remote reference, if not uploaded it
@@ -135,7 +147,7 @@ public class SyncCampaign implements Runnable{
                         if(updatedPlaylist != null) {
                             localPlaylist.update(updatedPlaylist);
                             mSyncResult.stats.numUpdates++;
-                            Timber.i("Playlist [%s] not found on server, uploading...", localPlaylist.name);
+                            Timber.d("Playlist [%s] not found on server, uploading...", localPlaylist.name);
                         }else{
                             mSyncResult.stats.numSkippedEntries++;
                         }
@@ -158,7 +170,7 @@ public class SyncCampaign implements Runnable{
 
                     if(!hasLocal && !remotePlaylist.deleted){
                         // Add remote playlist to local
-                        Timber.i("Remote playlist found that doesn't exist locally, %s", remotePlaylist.name);
+                        Timber.d("Remote playlist found that doesn't exist locally, %s", remotePlaylist.name);
 
                         // Create a new playlist
                         Playlist newPlaylist = new Playlist();
@@ -171,6 +183,8 @@ public class SyncCampaign implements Runnable{
 
             }
         }
+
+        Timber.i("Playlist Sync Complete");
     }
 
     /**

@@ -303,7 +303,6 @@ public class ChiptunesActivity extends BaseDrawerActivity
         mCurrentSnackbar = Snackbar.with(this)
                 .text(text)
                 .eventListener(new EventListener() {
-                    @DebugLog
                     @Override
                     public void onShow(int i) {
                         float height = Utils.dpToPx(getActivity(), i);
@@ -316,7 +315,6 @@ public class ChiptunesActivity extends BaseDrawerActivity
                                 .start();
                     }
 
-                    @DebugLog
                     @Override
                     public void onDismiss(int i) {
                         // Animate FAB

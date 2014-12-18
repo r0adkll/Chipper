@@ -3,6 +3,7 @@ package com.r0adkll.chipper.api.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.BaseColumns;
 
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
@@ -13,7 +14,7 @@ import java.util.List;
 /**
  * Created by r0adkll on 11/1/14.
  */
-@Table(name = "Users")
+@Table(name = "Users", id = BaseColumns._ID)
 public class User extends Model implements Parcelable{
 
     @Column(name = "userId")

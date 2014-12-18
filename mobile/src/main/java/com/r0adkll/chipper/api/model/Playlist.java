@@ -2,6 +2,7 @@ package com.r0adkll.chipper.api.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.provider.BaseColumns;
 import android.text.TextUtils;
 
 import com.activeandroid.ActiveAndroid;
@@ -28,7 +29,7 @@ import timber.log.Timber;
 /**
  * Created by r0adkll on 11/2/14.
  */
-@Table(name = "Playlists")
+@Table(name = "Playlists", id = BaseColumns._ID)
 public class Playlist extends Model implements Parcelable{
 
     /***********************************************************************************************
@@ -201,7 +202,7 @@ public class Playlist extends Model implements Parcelable{
         // 1) Find owner reference
         User _owner = new Select()
                 .from(User.class)
-                .where("id = ?", playlist.owner.id)
+                .where("userId = ?", playlist.owner.id)
                 .and("email = ?", playlist.owner.email)
                 .limit(1)
                 .executeSingle();
@@ -220,7 +221,7 @@ public class Playlist extends Model implements Parcelable{
         // 2) Find updated_by_user reference
         User _updatedByUser = new Select()
                 .from(User.class)
-                .where("id = ?", playlist.updated_by_user.id)
+                .where("userId = ?", playlist.updated_by_user.id)
                 .and("email = ?", playlist.updated_by_user.email)
                 .limit(1)
                 .executeSingle();

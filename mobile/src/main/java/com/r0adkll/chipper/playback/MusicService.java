@@ -29,6 +29,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.KeyEvent;
 
 import com.activeandroid.Model;
+import com.activeandroid.query.Select;
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.ChipperService;
@@ -244,11 +245,26 @@ public class MusicService extends Service {
                     mService.getFeaturedPlaylist(new Callback<Playlist>() {
                         @Override
                         public void success(Playlist playlist, Response response) {
-                            if(playlist.getCount() > 0){
-                                Chiptune chiptune = playlist.getChiptunes(mProvider).get(0);
+                            // Update the local reference in the database
+                            Playlist featured = new Select()
+                                    .from(Playlist.class)
+                                    .where("name=?", Playlist.FEATURED)
+                                    .limit(1)
+                                    .executeSingle();
+
+                            if(featured != null){
+                                featured.update(playlist);
+                            }else{
+                                featured = new Playlist();
+                                featured.save();
+                                featured.update(playlist);
+                            }
+
+                            if(featured.getCount() > 0){
+                                Chiptune chiptune = featured.getChiptunes(mProvider).get(0);
 
                                 // Initialize the queue
-                                mQueue = new PlayQueue(mProvider, chiptune, playlist);
+                                mQueue = new PlayQueue(mProvider, chiptune, featured);
 
                                 // Set session as active
                                 mCurrentSession.setActive(true);

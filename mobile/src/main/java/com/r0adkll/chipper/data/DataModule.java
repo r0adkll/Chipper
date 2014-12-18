@@ -8,6 +8,7 @@ import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.Device;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.data.model.PlaylistObserver;
 import com.r0adkll.chipper.data.sync.SyncModule;
 import com.r0adkll.chipper.qualifiers.CurrentDevice;
 import com.r0adkll.chipper.qualifiers.CurrentUser;
@@ -35,7 +36,8 @@ import hugo.weaving.DebugLog;
     },
     injects = {
         OfflineIntentService.class,
-        Historian.class
+        Historian.class,
+        PlaylistObserver.class
     },
     complete = false,
     library = true

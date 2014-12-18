@@ -3,6 +3,7 @@ package com.r0adkll.chipper.ui.login;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -13,6 +14,7 @@ import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Device;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.ui.Chipper;
 import com.r0adkll.chipper.ui.dashboard.DashboardActivity;
 import com.r0adkll.chipper.utils.prefs.StringPreference;
 import com.r0adkll.chipper.utils.Tools;
@@ -31,7 +33,7 @@ import timber.log.Timber;
  */
 public class LoginPresenterImpl implements LoginPresenter {
 
-    public static final String ACCOUNT_TYPE = "r0adkll.com";
+    public static final String ACCOUNT_TYPE = "com.r0adkll";
 
     private LoginView mView;
     private ChipperService mChipperService;
@@ -125,7 +127,7 @@ public class LoginPresenterImpl implements LoginPresenter {
             if(favorites != null){
                 favorites.owner = user;
                 favorites.updated_by_user = user;
-                favorites.updated = Tools.time();
+                favorites.updated = 0L;
                 favorites.save();
                 Timber.i("Successfully linked pre-configured 'Favorites' to the new user");
             }else{
@@ -133,7 +135,8 @@ public class LoginPresenterImpl implements LoginPresenter {
                 favorites.name = "Favorites";
                 favorites.updated_by_user = user;
                 favorites.owner = user;
-                favorites.updated = Tools.time();
+                favorites.updated = 0L;
+
                 favorites.save();
                 Timber.i("Successfully created new pre-configured 'Favorites' for the new user");
             }
@@ -208,6 +211,8 @@ public class LoginPresenterImpl implements LoginPresenter {
         }
 
         if(!hasExistingAcct) {
+            ContentResolver.setSyncAutomatically(newAcct, GoogleAccountManager.AUTHORITY, true);
+            ContentResolver.setIsSyncable(newAcct, GoogleAccountManager.AUTHORITY, 1);
             if (accountManager.addAccountExplicitly(newAcct, null, null)) {
                 Timber.i("Account Created: [%s][%s]", newAcct.name, newAcct.type);
                 return true;
@@ -224,7 +229,7 @@ public class LoginPresenterImpl implements LoginPresenter {
      * Launch into the main portion of the application
      */
     private void launchMainActivity(){
-        Intent main = new Intent(mView.getActivity(), DashboardActivity.class);
+        Intent main = new Intent(mView.getActivity(), Chipper.class);
         main.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mView.getActivity().startActivity(main);
         mView.close();

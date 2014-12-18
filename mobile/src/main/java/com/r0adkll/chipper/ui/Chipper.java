@@ -1,17 +1,23 @@
 package com.r0adkll.chipper.ui;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 
+import com.activeandroid.content.ContentProvider;
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Device;
+import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.data.VoteManager;
+import com.r0adkll.chipper.data.model.PlaylistObserver;
 import com.r0adkll.chipper.push.PushManager;
 import com.r0adkll.chipper.push.PushUtils;
 import com.r0adkll.chipper.qualifiers.CurrentDevice;
@@ -78,8 +84,11 @@ public class Chipper extends Activity {
                 // Load all chiptunes into memory
                 mProvider.loadChiptunes(null);
 
+                // Set the content observer
+                setupContentObserver();
+
                 // Sync the user's votes
-                mVoteManager.syncUserVotes();
+                mVoteManager.syncUserVotes(mCurrentUser.id);
 
                 // Show the Starting Activity (All List)
                 Intent main = new Intent(this, DashboardActivity.class);
@@ -106,8 +115,11 @@ public class Chipper extends Activity {
                                     // Load all chiptunes into memory
                                     mProvider.loadChiptunes(null);
 
+                                    // Set the content observer
+                                    setupContentObserver();
+
                                     // Sync the user's votes
-                                    mVoteManager.syncUserVotes();
+                                    mVoteManager.syncUserVotes(mCurrentUser.id);
 
                                     // Show the Starting Activity (All List)
                                     Intent main = new Intent(Chipper.this, DashboardActivity.class);
@@ -128,5 +140,16 @@ public class Chipper extends Activity {
 
         }
 
+    }
+
+    /**
+     * Setup the content observer that triggers account syncs with the server
+     */
+    private void setupContentObserver(){
+        ContentResolver resolver = getContentResolver();
+        Uri uri = ContentProvider.createUri(Playlist.class, null);
+
+        PlaylistObserver observer = new PlaylistObserver(this, new Handler());
+        resolver.registerContentObserver(uri, true, observer);
     }
 }

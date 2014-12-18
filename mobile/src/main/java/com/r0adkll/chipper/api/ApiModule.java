@@ -36,11 +36,12 @@ import retrofit.converter.GsonConverter;
 )
 public final class ApiModule {
 
+    public static final String DEVELOPMENT_BASE_URL = "http://192.168.1.85:6080/CHIPPER/V1/";
     public static final String PRODUCTION_BASE_URL = "http://r0adkll.com:6080/CHIPPER/V1/";
 
     @Provides @Singleton
     Endpoint provideEndpoint(){
-        return Endpoints.newFixedEndpoint(PRODUCTION_BASE_URL);
+        return Endpoints.newFixedEndpoint(DEVELOPMENT_BASE_URL);
     }
 
     @Provides @Singleton

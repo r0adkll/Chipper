@@ -18,6 +18,8 @@ import com.r0adkll.chipper.ui.Chipper;
 import com.r0adkll.chipper.ui.featured.FeaturedActivity;
 import com.r0adkll.chipper.ui.playlists.PlaylistActivity;
 
+import timber.log.Timber;
+
 import static com.r0adkll.chipper.push.PushUtils.*;
 
 /**
@@ -64,6 +66,7 @@ public class ProductionPushNode implements PushNode {
 
     @Override
     public void onPushMessage(String type, Bundle extras) {
+        Timber.i("onPushMessage(%s, %s)", type, extras);
         switch (type){
             case TYPE_SYNC_PLAYLIST:
                 syncPlaylists();

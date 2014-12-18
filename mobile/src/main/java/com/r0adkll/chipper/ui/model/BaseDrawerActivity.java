@@ -18,6 +18,7 @@ import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.account.GoogleAccountManager;
 import com.r0adkll.chipper.data.events.OfflineModeChangeEvent;
+import com.r0adkll.chipper.push.PushManager;
 import com.r0adkll.chipper.ui.dashboard.DashboardActivity;
 import com.r0adkll.chipper.ui.featured.FeaturedActivity;
 import com.r0adkll.chipper.ui.player.MusicPlayer;
@@ -102,6 +103,9 @@ public abstract class BaseDrawerActivity extends ActionBarActivity implements Go
     GoogleAccountManager mAccountManager;
 
     @Inject
+    PushManager mPushManager;
+
+    @Inject
     Bus mBus;
 
     private MusicPlayer mPlayer;
@@ -135,6 +139,12 @@ public abstract class BaseDrawerActivity extends ActionBarActivity implements Go
         // Setup Account Manager
         mAccountManager.setOnAccountLoadedListener(this);
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mPushManager.handleActivityResult(this, requestCode, resultCode, data);
     }
 
     @Override
@@ -172,6 +182,7 @@ public abstract class BaseDrawerActivity extends ActionBarActivity implements Go
     protected void onStart() {
         super.onStart();
         mAccountManager.onStart();
+        mPushManager.checkRegistration(this);
         setupAccountBox();
     }
 

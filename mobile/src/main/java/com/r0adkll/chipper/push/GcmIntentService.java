@@ -17,8 +17,6 @@ import javax.inject.Inject;
  */
 public class GcmIntentService extends IntentService{
 
-    public static final String KEY_SYNC_REQUEST = "com.r0adkll.chipper.SYNC";
-
     @Inject
     PushNode mNode;
 
@@ -27,6 +25,11 @@ public class GcmIntentService extends IntentService{
      */
     public GcmIntentService() {
         super("GcmIntentService");
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
         ChipperApp.get(this).inject(this);
     }
 

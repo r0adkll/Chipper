@@ -48,9 +48,6 @@ public class Chipper extends Activity {
     ChipperService mService;
 
     @Inject
-    PushManager mPushManager;
-
-    @Inject
     VoteManager mVoteManager;
 
     @Inject
@@ -81,9 +78,6 @@ public class Chipper extends Activity {
                 // Load all chiptunes into memory
                 mProvider.loadChiptunes(null);
 
-                // Recheck push registration
-                mPushManager.checkRegistration(this);
-
                 // Sync the user's votes
                 mVoteManager.syncUserVotes();
 
@@ -112,9 +106,6 @@ public class Chipper extends Activity {
                                     // Load all chiptunes into memory
                                     mProvider.loadChiptunes(null);
 
-                                    // Recheck push registration
-                                    mPushManager.checkRegistration(Chipper.this);
-
                                     // Sync the user's votes
                                     mVoteManager.syncUserVotes();
 
@@ -137,11 +128,5 @@ public class Chipper extends Activity {
 
         }
 
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        mPushManager.handleActivityResult(this, requestCode, resultCode, data);
     }
 }

@@ -7,6 +7,7 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.os.Bundle;
 
 import com.activeandroid.query.Select;
 import com.r0adkll.chipper.account.GoogleAccountManager;
@@ -158,7 +159,7 @@ public class LoginPresenterImpl implements LoginPresenter {
                                 // Store device
                                 if (device.save() > 0) {
                                     Timber.i("Device regsitered: %s", device.id);
-                                    launchMainActivity();
+                                    launchMainActivity(user);
                                 } else {
                                     mView.showErroMessage("Unable to register device, please try again");
                                 }
@@ -194,6 +195,8 @@ public class LoginPresenterImpl implements LoginPresenter {
 
         // Create new account
         final Account newAcct = new Account(user.email, ACCOUNT_TYPE);
+        ContentResolver.setSyncAutomatically(newAcct, GoogleAccountManager.AUTHORITY, true);
+        ContentResolver.setIsSyncable(newAcct, GoogleAccountManager.AUTHORITY, 1);
 
         // Get account manager instance
         final AccountManager accountManager = AccountManager.get(activity);
@@ -211,8 +214,6 @@ public class LoginPresenterImpl implements LoginPresenter {
         }
 
         if(!hasExistingAcct) {
-            ContentResolver.setSyncAutomatically(newAcct, GoogleAccountManager.AUTHORITY, true);
-            ContentResolver.setIsSyncable(newAcct, GoogleAccountManager.AUTHORITY, 1);
             if (accountManager.addAccountExplicitly(newAcct, null, null)) {
                 Timber.i("Account Created: [%s][%s]", newAcct.name, newAcct.type);
                 return true;
@@ -228,7 +229,11 @@ public class LoginPresenterImpl implements LoginPresenter {
     /**
      * Launch into the main portion of the application
      */
-    private void launchMainActivity(){
+    private void launchMainActivity(User user){
+        // Force an initial sync
+        ContentResolver.requestSync(new Account(user.email, GoogleAccountManager.ACCOUNT_TYPE),
+                GoogleAccountManager.AUTHORITY, new Bundle());
+
         Intent main = new Intent(mView.getActivity(), Chipper.class);
         main.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mView.getActivity().startActivity(main);

@@ -1,5 +1,6 @@
 package com.r0adkll.chipper.ui;
 
+import android.accounts.Account;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.os.Handler;
 import com.activeandroid.content.ContentProvider;
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
+import com.r0adkll.chipper.account.GoogleAccountManager;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Device;
 import com.r0adkll.chipper.api.model.Playlist;
@@ -118,6 +120,9 @@ public class Chipper extends Activity {
                                     // Set the content observer
                                     setupContentObserver();
 
+                                    // Force an initial Sync
+                                    initialSync();
+
                                     // Sync the user's votes
                                     mVoteManager.syncUserVotes(mCurrentUser.id);
 
@@ -140,6 +145,12 @@ public class Chipper extends Activity {
 
         }
 
+    }
+
+    private void initialSync(){
+        // Force an initial sync
+        ContentResolver.requestSync(new Account(mCurrentUser.email, GoogleAccountManager.ACCOUNT_TYPE),
+                GoogleAccountManager.AUTHORITY, new Bundle());
     }
 
     /**

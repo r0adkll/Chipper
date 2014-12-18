@@ -239,6 +239,17 @@ public interface ChipperService {
                         Callback<Map<String, String>> cb);
 
     /**
+     * Delete a specified playlist synchronously
+     *
+     * @param userId        the id of the user the playlist belongs to
+     * @param playlistId    the id of the playlist to delete
+     * @return              the server response
+     */
+    @DELETE("/user/{id}/playlists/{pid}")
+    Map<String, String> deletePlaylistSync(@Path("id") String userId,
+                                           @Path("pid") String playlistId);
+
+    /**
      * Share a playlist
      *
      * @param userId        the id of the user the playlist belongs to

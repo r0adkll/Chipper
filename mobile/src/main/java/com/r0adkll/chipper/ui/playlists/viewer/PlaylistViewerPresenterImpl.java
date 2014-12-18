@@ -174,7 +174,7 @@ public class PlaylistViewerPresenterImpl implements PlaylistViewerPresenter {
                                     playlist.feature_title = s;
                                     mService.updateFeaturePlaylist(playlist.toUpdateMap(), new Callback<Playlist>() {
                                         @Override
-                                        public void success(Playlist playlist, Response response) {
+                                        public void success(Playlist updatedPlaylist, Response response) {
                                             String text = String.format("%s is now the featured playlist", playlist.name);
                                             mView.showSnackBar(text);
                                         }

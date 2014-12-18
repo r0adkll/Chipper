@@ -1,15 +1,16 @@
-package com.r0adkll.chipper.data.sync;
+package com.r0adkll.chipper.data.sync.campaign;
 
-import android.content.SyncResult;
+import android.text.TextUtils;
 
-import com.activeandroid.content.ContentProvider;
 import com.activeandroid.query.Select;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
+import com.squareup.otto.Bus;
 
 import java.util.List;
 
+import retrofit.RetrofitError;
 import timber.log.Timber;
 
 /**
@@ -17,44 +18,14 @@ import timber.log.Timber;
  * Package: com.r0adkll.chipper.data.sync
  * Created by drew.heavner on 11/18/14.
  */
-public class SyncCampaign implements Runnable{
+public class PlaylistCampaign extends SyncCampaign{
 
     /**
-     * Campaign factory interface for creating dynamic sync campaign construction factories
-     *
+     * Create a new sync campaign
      */
-    public interface Factory{
-
-        /**
-         * Create a campaign for a sync result
-         * @param syncResult    the result to create a campaign for
-         * @return              the sync campaign
-         */
-        SyncCampaign create(ChipperService service, SyncResult syncResult);
-
+    public PlaylistCampaign(ChipperService service, Bus bus){
+        super(service, bus);
     }
-
-    /***********************************************************************************************
-     *
-     * Variables
-     *
-     */
-
-
-    private ChipperService mService;
-    private final SyncResult mSyncResult;
-    private boolean mIsCanceled = false;
-
-    /**
-     * Constructor for a campaign
-     *
-     * @param result        the sync result
-     */
-    public SyncCampaign(ChipperService service, SyncResult result){
-        mService = service;
-        mSyncResult = result;
-    }
-
 
     /**
      * TODO: Modify 'Model.java' object to create a .save() method that doesn't notify
@@ -64,6 +35,9 @@ public class SyncCampaign implements Runnable{
      */
     @Override
     public void run() {
+        // Ensure that the sync result has been set
+        if(getSyncResult() == null) return;
+
         Timber.i("Beginning Sync Campaign");
 
         // Get Logged in user
@@ -79,14 +53,15 @@ public class SyncCampaign implements Runnable{
             Timber.i("Starting Sync for User [%s, %s]", user.email, user.id);
 
             // Get the local and remote playlists
-            List<Playlist> remote = mService.getPlaylistsSync(user.id);
+            List<Playlist> remote = getService().getPlaylistsSync(user.id);
             List<Playlist> local = user.getPlaylists();
 
             if(remote != null){
 
                 // Iterate through the local playlists
                 for(Playlist localPlaylist: local){
-                    if(mIsCanceled) return;
+                    if(isCanceled()) return;
+                    if(!TextUtils.isEmpty(localPlaylist.feature_title)) continue;
 
                     // Check to see if the playlists remote id is set
                     boolean hasRemote = false;
@@ -94,7 +69,7 @@ public class SyncCampaign implements Runnable{
 
                         // Iterate through the remove playlists
                         for (Playlist remotePlaylist : remote) {
-                            if (mIsCanceled) return;
+                            if (isCanceled()) return;
 
                             // Build cases
                             boolean idCheck = localPlaylist.id != null ? localPlaylist.id.equals(remotePlaylist.id) : false;
@@ -112,19 +87,38 @@ public class SyncCampaign implements Runnable{
                                 long remoteTime = remotePlaylist.updated;
 
                                 if (localTime > remoteTime) {
-                                    // Local playlist is newer than remote, send update to update it
-                                    Playlist updatedPlaylist = mService.updatePlaylistSync(user.id, localPlaylist.id, localPlaylist.toUpdateMap());
-                                    if (updatedPlaylist != null) {
-                                        localPlaylist.update(updatedPlaylist);
-                                        mSyncResult.stats.numUpdates++;
-                                        Timber.d("Local playlist [%s] newer than remote, uploading...", localPlaylist.name);
-                                    } else {
-                                        mSyncResult.stats.numSkippedEntries++;
+                                    // First check if local playlist has been deleted
+                                    if(!localPlaylist.deleted) {
+
+                                        // Local playlist is newer than remote, send update to update it
+                                        Playlist updatedPlaylist = getService().updatePlaylistSync(user.id, localPlaylist.id, localPlaylist.toUpdateMap());
+                                        if (updatedPlaylist != null) {
+                                            localPlaylist.update(updatedPlaylist);
+                                            getSyncResult().stats.numUpdates++;
+                                            Timber.d("Local playlist [%s] newer than remote, uploading...", localPlaylist.name);
+                                        } else {
+                                            getSyncResult().stats.numSkippedEntries++;
+                                        }
+
+                                    }else{
+
+                                        // Local has been deleted, so delete it from the server
+                                        try {
+                                            getService().deletePlaylistSync(user.id, localPlaylist.id);
+                                            localPlaylist.delete();
+                                            getSyncResult().stats.numDeletes++;
+                                            Timber.d("Local playlist [%s] is newer, but is deleted. Deleting from server!", localPlaylist.name);
+                                        }catch (RetrofitError e){
+                                            Timber.e(e, "Unable to delete local playlist: %s", e.getLocalizedMessage());
+                                            getSyncResult().stats.numSkippedEntries++;
+                                        }
+
                                     }
+
                                 } else if (localTime < remoteTime) {
                                     // Remote playlist is newer, update the local reference
                                     localPlaylist.update(remotePlaylist);
-                                    mSyncResult.stats.numUpdates++;
+                                    getSyncResult().stats.numUpdates++;
                                     Timber.d("Remote playlist [%s] is newer than local, downloading...", remotePlaylist.name);
                                 } else if (localTime == remoteTime) {
                                     // These playlists are current, do nothing
@@ -135,8 +129,8 @@ public class SyncCampaign implements Runnable{
 
                                 // Remote playlist has been deleted, so delete the local reference too
                                 localPlaylist.delete();
-                                mSyncResult.stats.numDeletes++;
-                                Timber.d("Local playlist [%s] was deleted since the remote was marked as deleted");
+                                getSyncResult().stats.numDeletes++;
+                                Timber.d("Local playlist [%s] was deleted since the remote was marked as deleted", localPlaylist.name);
                             }
 
                         }
@@ -145,14 +139,22 @@ public class SyncCampaign implements Runnable{
                     // 2) Check to see if this local playlist has a remote reference, if not uploaded it
                     if(!hasRemote){
 
-                        // Upload to the server and update the local reference with the response
-                        Playlist updatedPlaylist = mService.updatePlaylistSync(user.id, "new", localPlaylist.toUpdateMap());
-                        if(updatedPlaylist != null) {
-                            localPlaylist.update(updatedPlaylist);
-                            mSyncResult.stats.numUpdates++;
-                            Timber.d("Playlist [%s] not found on server, uploading...", localPlaylist.name);
+                        if(!localPlaylist.deleted) {
+
+                            // Upload to the server and update the local reference with the response
+                            Playlist updatedPlaylist = getService().updatePlaylistSync(user.id, "new", localPlaylist.toUpdateMap());
+                            if (updatedPlaylist != null) {
+                                localPlaylist.update(updatedPlaylist);
+                                getSyncResult().stats.numUpdates++;
+                                Timber.d("Playlist [%s] not found on server, uploading...", localPlaylist.name);
+                            } else {
+                                getSyncResult().stats.numSkippedEntries++;
+                            }
+
                         }else{
-                            mSyncResult.stats.numSkippedEntries++;
+                            localPlaylist.delete();
+                            getSyncResult().stats.numDeletes++;
+                            Timber.d("Local playlist [%s] wasn't found on the server, and is deleted, removing from system.", localPlaylist.name);
                         }
 
                     }
@@ -161,7 +163,7 @@ public class SyncCampaign implements Runnable{
 
                 // TODO: 3) Find remote playlists that don't exist locally and synchronize them
                 for(Playlist remotePlaylist: remote){
-                    if(mIsCanceled) return;
+                    if(isCanceled()) return;
 
                     boolean hasLocal = false;
                     for(Playlist playlist: local){
@@ -179,7 +181,7 @@ public class SyncCampaign implements Runnable{
                         Playlist newPlaylist = new Playlist();
                         newPlaylist.save();
                         newPlaylist.update(remotePlaylist);
-                        mSyncResult.stats.numUpdates++;
+                        getSyncResult().stats.numUpdates++;
                     }
 
                 }
@@ -188,13 +190,6 @@ public class SyncCampaign implements Runnable{
         }
 
         Timber.i("Playlist Sync Complete");
-    }
-
-    /**
-     * Cancel the campaign
-     */
-    public void cancel(){
-        mIsCanceled = true;
     }
 
 }

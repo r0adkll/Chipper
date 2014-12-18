@@ -10,6 +10,9 @@ import android.os.Bundle;
 import com.r0adkll.chipper.BuildConfig;
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.api.ChipperService;
+import com.r0adkll.chipper.data.sync.campaign.CampaignFactory;
+import com.r0adkll.chipper.data.sync.campaign.SyncCampaign;
+import com.r0adkll.chipper.qualifiers.PlaylistSyncFactory;
 
 import javax.inject.Inject;
 
@@ -23,10 +26,8 @@ import timber.log.Timber;
 public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Inject
-    ChipperService mService;
-
-    @Inject
-    SyncCampaign.Factory mCampaignFactory;
+    @PlaylistSyncFactory
+    CampaignFactory mCampaignFactory;
 
     private SyncCampaign mCampaign;
 
@@ -56,11 +57,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         cancelCampaign();
 
         // Start/Create new campaign
-        mCampaign = mCampaignFactory.create(mService, syncResult);
+        mCampaign = mCampaignFactory.createCampaign();
 
         // Run the campaign
         try {
-            mCampaign.run();
+            mCampaign.start(syncResult);
         }catch(Exception e){
             Timber.e(e, "Uncaught error occured on on the Sync Campaign");
         }

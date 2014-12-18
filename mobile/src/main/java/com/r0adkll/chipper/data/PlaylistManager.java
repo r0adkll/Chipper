@@ -15,6 +15,7 @@ import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.qualifiers.CurrentUser;
 import com.r0adkll.chipper.ui.model.PlaylistStyle;
 import com.r0adkll.chipper.utils.CallbackHandler;
+import com.r0adkll.chipper.utils.Tools;
 import com.r0adkll.deadskunk.utils.IntentUtils;
 import com.r0adkll.postoffice.PostOffice;
 import com.r0adkll.postoffice.styles.EditTextStyle;
@@ -73,7 +74,8 @@ public class PlaylistManager  {
     public Playlist createPlaylist(String name){
 
         // Absolutely ignore any playlist labeled 'Favorites' as this is a reserved playlist name
-        if(name.equalsIgnoreCase("favorites")){
+        if(name.equalsIgnoreCase(Playlist.FAVORITES) ||
+                name.equalsIgnoreCase(Playlist.FEATURED)){
             return null;
         }
 
@@ -114,25 +116,13 @@ public class PlaylistManager  {
             // DO NOT DELETE the favorites playlist
             if(playlist.name.equalsIgnoreCase("favorites")) continue;
 
-            // Load the playlists chiptune references from the database so those can be restored as welll
-            playlist.loadChiptuneReferences(); 
-
-            // Attempt to delete the server version
-            mService.deletePlaylist(mCurrentUser.id, playlist.id, new Callback<Map<String, String>>() {
-                @Override
-                public void success(Map<String, String> result, Response response) {
-                    String msg = result.get("message");
-                    Timber.i("Successfully deleted playlist from server: %s", msg);
-                }
-
-                @Override
-                public void failure(RetrofitError error) {
-                    Timber.e("Error deleting playlist on the server: %s", error.getLocalizedMessage());
-                }
-            });
+//            // Load the playlists chiptune references from the database so those can be restored as welll
+//            playlist.loadChiptuneReferences();
 
             // Delete locally
-            playlist.delete();
+            playlist.deleted = true;
+            playlist.updated = Tools.time();
+            //playlist.save();
         }
 
         return playlists;

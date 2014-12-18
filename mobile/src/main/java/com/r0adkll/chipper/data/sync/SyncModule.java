@@ -1,6 +1,10 @@
 package com.r0adkll.chipper.data.sync;
 
-import android.app.Application;
+import com.r0adkll.chipper.api.ChipperService;
+import com.r0adkll.chipper.data.sync.campaign.CampaignFactory;
+import com.r0adkll.chipper.data.sync.campaign.PlaylistCampaignFactory;
+import com.r0adkll.chipper.qualifiers.PlaylistSyncFactory;
+import com.squareup.otto.Bus;
 
 import javax.inject.Singleton;
 
@@ -22,14 +26,9 @@ public class SyncModule {
 
     @Provides
     @Singleton
-    SyncCampaign.Factory provideSyncCampaignFactory(){
-        return new CampaignFactoryImpl();
-    }
-
-    @Provides
-    @Singleton
-    SyncAdapter provideSyncAdapter(Application app){
-        return new SyncAdapter(app);
+    @PlaylistSyncFactory
+    CampaignFactory providePlaylistCampaignFactory(ChipperService service, Bus bus){
+        return new PlaylistCampaignFactory(service, bus);
     }
 
 }

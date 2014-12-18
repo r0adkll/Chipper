@@ -5,10 +5,12 @@ import android.content.Intent;
 import android.util.Pair;
 import android.view.View;
 
+import com.activeandroid.ActiveAndroid;
 import com.activeandroid.query.From;
 import com.activeandroid.query.Select;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.listeners.ActionClickListener;
+import com.nispok.snackbar.listeners.EventListener;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Playlist;
@@ -108,10 +110,35 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
                     .actionListener(new ActionClickListener() {
                         @Override
                         public void onActionClicked() {
-                            // Resave all the playlists
+                            // Re-flag all the playlists as not deleted,
+                            // so they won't be wiped out when this finishes
                             for(Playlist plist: plists){
-                                Playlist.create(plist);
+                                plist.deleted = false;
                             }
+                        }
+                    })
+                    .eventListener(new EventListener() {
+                        @Override
+                        public void onShow(int i) {
+
+                        }
+
+                        @Override
+                        public void onDismiss(int i) {
+                            // Iterate through all the playlists, and if they have their deleted
+                            // flag marked as true, then save them
+                            ActiveAndroid.beginTransaction();
+                            try{
+                                for(Playlist plist: plists){
+                                    // Save the playlist so the sync system will actually delete
+                                    // the data
+                                    plist.save();
+                                }
+                                ActiveAndroid.setTransactionSuccessful();
+                            }finally {
+                                ActiveAndroid.endTransaction();
+                            }
+
                         }
                     })
                     .duration(Snackbar.SnackbarDuration.LENGTH_LONG)
@@ -152,7 +179,9 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
     public ModelLoader<Playlist> getLoader() {
         From query = new Select()
                 .from(Playlist.class)
-                .where("owner=?", mUser.getId());
+                .where("owner=?", mUser.getId())
+                .and("deleted=?", false)
+                .and("name != ?", Playlist.FEATURED);
         return new ModelLoader<>(mView.getActivity(), Playlist.class, query, true);
     }
 }

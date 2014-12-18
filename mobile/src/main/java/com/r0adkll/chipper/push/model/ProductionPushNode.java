@@ -119,7 +119,7 @@ public class ProductionPushNode implements PushNode {
         Account acct = new Account(mUser.email, GoogleAccountManager.ACCOUNT_TYPE);
 
         // Sync push received, cause a sync to occur
-        ContentResolver.requestSync(acct, GoogleAccountManager.AUTHORITY, null);
+        ContentResolver.requestSync(acct, GoogleAccountManager.AUTHORITY, new Bundle());
     }
 
     private void syncVotes(){

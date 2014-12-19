@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -17,14 +18,22 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewOutlineProvider;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.activeandroid.Model;
+import com.github.ksoichiro.android.observablescrollview.ObservableRecyclerView;
+import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
+import com.github.ksoichiro.android.observablescrollview.ScrollState;
+import com.nineoldandroids.view.ViewHelper;
+import com.nineoldandroids.view.ViewPropertyAnimator;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.listeners.EventListener;
 import com.r0adkll.chipper.R;
@@ -62,11 +71,12 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import icepick.Icepick;
 import icepick.Icicle;
+import timber.log.Timber;
 
 /**
  * Created by r0adkll on 11/16/14.
  */
-public class PlaylistViewerActivity extends BaseActivity implements PlaylistViewerView, LoaderManager.LoaderCallbacks<List<ChiptuneReference>>,OnItemClickListener<ChiptuneReference>,MusicPlayerCallbacks {
+public class PlaylistViewerActivity extends BaseActivity implements PlaylistViewerView, LoaderManager.LoaderCallbacks<List<ChiptuneReference>>,OnItemClickListener<ChiptuneReference>,MusicPlayerCallbacks, ObservableScrollViewCallbacks {
 
     /***********************************************************************************************
      *
@@ -82,10 +92,14 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
      *
      */
 
-    @InjectView(R.id.recycle_view)  RecyclerView mRecyclerView;
-    @InjectView(R.id.empty_layout)  EmptyView mEmptyView;
-    @InjectView(R.id.fab_play)      FrameLayout mFabPlay;
-    @InjectView(R.id.overlay)       ImageView mOverlay;
+    @InjectView(R.id.recycle_view)      ObservableRecyclerView mRecyclerView;
+    @InjectView(R.id.empty_layout)      EmptyView mEmptyView;
+    @InjectView(R.id.fab_play)          FrameLayout mFabPlay;
+    @InjectView(R.id.overlay)           ImageView mOverlay;
+
+    @InjectView(R.id.title)             TextView mTitleView;
+    @InjectView(R.id.flexible_space)    View mFlexibleSpaceView;
+    @InjectView(R.id.app_bar)           FrameLayout mAppBar;
 
     @Inject ChiptuneProvider chiptuneProvider;
     @Inject PlaylistViewerPresenter presenter;
@@ -97,6 +111,12 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
 
     @Icicle
     long mPlaylistId = -1;
+
+    private int mTotalFlexibleSpaceHeight;
+    private int mFlexibleSpaceHeight;
+    private int mFlexibleSpaceShowFabOffset;
+    private int mActionBarSize;
+    private boolean mFabIsShown;
 
     // The local playlist reference
     private Playlist mPlaylist;
@@ -129,13 +149,20 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
         if(mPlaylist == null) finish();
 
         // Set Title
-        getSupportActionBar().setTitle(mPlaylist.name);
+        getSupportActionBar().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        setupRecyclerView();
+
+        mTitleView.setText(mPlaylist.name);
+        mFlexibleSpaceHeight = getResources().getDimensionPixelSize(R.dimen.flexible_space_height);
+        mFlexibleSpaceShowFabOffset = getResources().getDimensionPixelOffset(R.dimen.flexible_space_show_fab_offset);
+        mActionBarSize = getActionBarSize();
+        mTotalFlexibleSpaceHeight = mFlexibleSpaceHeight + mActionBarSize;
 
         // Now present the layout
         UIUtils.setupFAB(this, mFabPlay);
         mFabPlay.setOnClickListener(mFABClickListener);
-        setupRecyclerView();
 
         // Set the player callbacks
         getPlayer().setCallbacks(this);
@@ -287,6 +314,7 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
         mRecyclerView.addOnItemTouchListener(new DragController(mRecyclerView, mOverlay, R.id.handle));
         adapter.setOnItemClickListener(this);
 
+        mRecyclerView.setScrollViewCallbacks(this);
     }
 
     /**
@@ -313,6 +341,89 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
     @Override
     public void onStopped() {
         getSlidingLayout().hidePanel();
+    }
+
+    /***********************************************************************************************
+     *
+     * Observable RecyclerView Callbacks
+     *
+     */
+
+    @Override
+    public void onScrollChanged(int scrollY, boolean firstScroll, boolean dragging) {
+        updateFlexibleSpaceText(scrollY);
+
+        // Translate FAB
+        int maxFabTranslationY = mTotalFlexibleSpaceHeight - mFabPlay.getHeight() / 2;
+        int fabTranslationY = Math.max(mActionBarSize - mFabPlay.getHeight() / 2,
+                Math.min(maxFabTranslationY, -scrollY + mTotalFlexibleSpaceHeight - mFabPlay.getHeight() / 2));
+//        ViewHelper.setTranslationX(mFabPlay, mOverlayView.getWidth() - mFabMargin - mFab.getWidth());
+        ViewHelper.setTranslationY(mFabPlay, fabTranslationY);
+
+        // Show/hide FAB
+        if (ViewHelper.getTranslationY(mFabPlay) < mFlexibleSpaceShowFabOffset) {
+            hideFab();
+        } else {
+            showFab();
+        }
+
+    }
+
+    @Override
+    public void onDownMotionEvent() {
+
+    }
+
+    @Override
+    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
+
+    }
+
+    private void updateFlexibleSpaceText(final int scrollY) {
+        ViewHelper.setTranslationY(mFlexibleSpaceView, -scrollY);
+        int adjustedScrollY = scrollY;
+        if (scrollY < 0) {
+            adjustedScrollY = 0;
+        } else if (mFlexibleSpaceHeight < scrollY) {
+            adjustedScrollY = mFlexibleSpaceHeight;
+        }
+        float maxScale = (float) (mFlexibleSpaceHeight - getActionBarToolbar().getHeight()) / getActionBarToolbar().getHeight();
+        float scale = maxScale * ((float) mFlexibleSpaceHeight - adjustedScrollY) / mFlexibleSpaceHeight;
+
+        ViewHelper.setPivotX(mTitleView, 0);
+        ViewHelper.setPivotY(mTitleView, 0);
+        ViewHelper.setScaleX(mTitleView, 1 + scale);
+        ViewHelper.setScaleY(mTitleView, 1 + scale);
+        ViewHelper.setTranslationY(mTitleView, ViewHelper.getTranslationY(mFlexibleSpaceView) + mFlexibleSpaceView.getHeight() - mTitleView.getHeight() * (1 + scale));
+        int maxTitleTranslationY = getActionBarToolbar().getHeight() + mFlexibleSpaceHeight - (int) (mTitleView.getHeight() * (1 + scale));
+        int titleTranslationY = (int) (maxTitleTranslationY * ((float) mFlexibleSpaceHeight - adjustedScrollY) / mFlexibleSpaceHeight);
+        ViewHelper.setTranslationY(mTitleView, titleTranslationY);
+    }
+
+    private int getActionBarSize() {
+        TypedValue typedValue = new TypedValue();
+        int[] textSizeAttr = new int[]{R.attr.actionBarSize};
+        int indexOfAttrTextSize = 0;
+        TypedArray a = obtainStyledAttributes(typedValue.data, textSizeAttr);
+        int actionBarSize = a.getDimensionPixelSize(indexOfAttrTextSize, -1);
+        a.recycle();
+        return actionBarSize;
+    }
+
+    private void showFab() {
+        if (!mFabIsShown) {
+            ViewPropertyAnimator.animate(mFabPlay).cancel();
+            ViewPropertyAnimator.animate(mFabPlay).scaleX(1).scaleY(1).setDuration(200).start();
+            mFabIsShown = true;
+        }
+    }
+
+    private void hideFab() {
+        if (mFabIsShown) {
+            ViewPropertyAnimator.animate(mFabPlay).cancel();
+            ViewPropertyAnimator.animate(mFabPlay).scaleX(0).scaleY(0).setDuration(200).start();
+            mFabIsShown = false;
+        }
     }
 
     /***********************************************************************************************

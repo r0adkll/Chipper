@@ -74,6 +74,11 @@
         <item name="android:elevation" tools:ignore="NewApi">@dimen/headerbar_elevation</item>
     </style>
 
+    <style name="Widget.Chipper.HeaderBar.Transparent" parent="">
+        <item name="android:background">@color/transparent</item>
+        <item name="android:elevation" tools:ignore="NewApi">@dimen/headerbar_elevation</item>
+    </style>
+
     <style name="Widget.Chipper.ActionMode" parent="Widget.AppCompat.ActionMode">
         <item name="background">@drawable/cab_background_top_chipper</item>
     </style>

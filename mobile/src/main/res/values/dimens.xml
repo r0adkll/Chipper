@@ -15,6 +15,8 @@
 
     <dimen name="actionbar_extended_height">128dp</dimen>
     <dimen name="fab_press_translation_value">6dp</dimen>
+    <dimen name="flexible_space_height">72dp</dimen>
+    <dimen name="flexible_space_show_fab_offset">120dp</dimen>
 
     <!-- body content -->
     <dimen name="element_spacing_normal">8dp</dimen>

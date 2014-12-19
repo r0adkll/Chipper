@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.activeandroid.ActiveAndroid;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.ChiptuneReference;
@@ -23,13 +24,15 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import hugo.weaving.DebugLog;
 
 /**
  * Project: Chipper
  * Package: com.r0adkll.chipper.ui.adapters
  * Created by drew.heavner on 11/20/14.
  */
-public class PlaylistChiptuneAdapter extends RecyclerArrayAdapter<ChiptuneReference, PlaylistChiptuneAdapter.PlaylistChiptuneViewHolder> {
+public class PlaylistChiptuneAdapter extends RecyclerArrayAdapter<ChiptuneReference, PlaylistChiptuneAdapter.PlaylistChiptuneViewHolder>
+        implements DragInterface{
 
     @Inject
     ChiptuneProvider mChiptuneProvider;
@@ -40,12 +43,18 @@ public class PlaylistChiptuneAdapter extends RecyclerArrayAdapter<ChiptuneRefere
     @Inject @OfflineSwitchPreference
     BooleanPreference mOfflinePref;
 
+    private OnMoveItemListener mMoveItemListener;
+
     /**
      * Constructor
      */
     @Inject
     public PlaylistChiptuneAdapter(){
         super();
+    }
+
+    public void setOnMoveItemListener(OnMoveItemListener listener){
+        mMoveItemListener = listener;
     }
 
     @Override
@@ -101,6 +110,43 @@ public class PlaylistChiptuneAdapter extends RecyclerArrayAdapter<ChiptuneRefere
         });
     }
 
+    @Override
+    public long getItemId(int position) {
+        return getItem(position).getId();
+    }
+
+    @Override
+    public int getPositionForId(long id) {
+        for (int i = 0; i < getItemCount(); i++) {
+            if (getItem(i).getId() == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Override
+    public void onDragStarted(int i) {
+
+    }
+
+    @DebugLog
+    @Override
+    public void onDragEnded(int start, int end) {
+        ActiveAndroid.beginTransaction();
+        try {
+            for (int i = 0; i < items.size(); i++) {
+                ChiptuneReference ref = items.get(i);
+                ref.sort_order = i;
+                ref.save();
+            }
+            ActiveAndroid.setTransactionSuccessful();
+        }finally{
+            ActiveAndroid.endTransaction();
+        }
+
+        if(mMoveItemListener != null) mMoveItemListener.onItemMove(start, end);
+    }
 
     /**
      * The viewholder for this adapter
@@ -116,6 +162,10 @@ public class PlaylistChiptuneAdapter extends RecyclerArrayAdapter<ChiptuneRefere
             super(itemView);
             ButterKnife.inject(this, itemView);
         }
+    }
+
+    public static interface OnMoveItemListener{
+        public void onItemMove(int start, int end);
     }
 
 }

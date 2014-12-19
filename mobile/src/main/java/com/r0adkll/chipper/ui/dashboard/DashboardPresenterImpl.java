@@ -50,7 +50,6 @@ public class DashboardPresenterImpl implements DashboardPresenter {
 
     @Override
     public void onChronicleSelected(Historian.Chronicle record) {
-        Intent playIntent = MusicPlayer.createPlayback(mView.getActivity(), record.chiptune);
-        MusicPlayer.startPlayback(mView.getActivity(), playIntent);
+        MusicPlayer.createPlayback(mView.getActivity(), record.chiptune);
     }
 }

@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.activeandroid.ActiveAndroid;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.ChiptuneReference;
@@ -20,15 +21,18 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import hugo.weaving.DebugLog;
 
 /**
  * Project: Chipper
  * Package: com.r0adkll.chipper.ui.adapters
  * Created by drew.heavner on 11/20/14.
  */
-public class QueueChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, QueueChiptuneAdapter.PlaylistChiptuneViewHolder> {
+public class QueueChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, QueueChiptuneAdapter.PlaylistChiptuneViewHolder>
+        implements DragInterface{
 
     private Context ctx;
+    private OnMoveItemListener mMoveItemListener;
 
     /**
      * Constructor
@@ -37,6 +41,10 @@ public class QueueChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, QueueCh
     public QueueChiptuneAdapter(Application app){
         super();
         ctx = app;
+    }
+
+    public void setOnMoveItemListener(OnMoveItemListener listener){
+        mMoveItemListener = listener;
     }
 
 
@@ -83,6 +91,32 @@ public class QueueChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, QueueCh
         });
     }
 
+    @Override
+    public long getItemId(int position) {
+        return getItem(position).getId();
+    }
+
+    @Override
+    public int getPositionForId(long id) {
+        for (int i = 0; i < getItemCount(); i++) {
+            if (getItem(i).getId() == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Override
+    public void onDragStarted(int i) {
+
+    }
+
+    @DebugLog
+    @Override
+    public void onDragEnded(int start, int end) {
+        if(mMoveItemListener != null) mMoveItemListener.onItemMove(start, end);
+    }
+
 
     /**
      * The viewholder for this adapter
@@ -99,6 +133,10 @@ public class QueueChiptuneAdapter extends RecyclerArrayAdapter<Chiptune, QueueCh
             super(itemView);
             ButterKnife.inject(this, itemView);
         }
+    }
+
+    public static interface OnMoveItemListener{
+        public void onItemMove(int start, int end);
     }
 
 }

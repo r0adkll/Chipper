@@ -34,6 +34,7 @@ import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.FeaturedPlaylist;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
@@ -103,6 +104,7 @@ public class MusicService extends Service {
 
     public static final String EXTRA_CHIPTUNE = "com.r0adkll.chipper.extra.CHIPTUNE";
     public static final String EXTRA_PLAYLIST = "com.r0adkll.chipper.extra.PLAYLIST";
+    public static final String EXTRA_FEATURED_PLAYLIST = "com.r0adkll.chipper.extra.FEATURED_PLAYLIST";
     public static final String EXTRA_SHUFFLE = "com.r0adkll.chipper.extra.SHUFFLE";
     public static final String EXTRA_REPEAT = "com.r0adkll.chipper.extra.REPEAT";
     public static final String EXTRA_CURRENT_POSITION = "com.r0adkll.chipper.extra.CURRENT_POSITION";
@@ -214,6 +216,7 @@ public class MusicService extends Service {
                         // Parse the Chiptune and Playlist(optional) from the extras
                         long chiptuneId = xtras.getLong(EXTRA_CHIPTUNE, -1);
                         long playlistId = xtras.getLong(EXTRA_PLAYLIST, -1);
+                        long featuredId = xtras.getLong(EXTRA_FEATURED_PLAYLIST, -1);
 
                         // If a chiptune was found, determine if playlist was sent as well
                         if (chiptuneId != -1) {
@@ -224,7 +227,12 @@ public class MusicService extends Service {
                                 Playlist playlist = Model.load(Playlist.class, playlistId);
                                 mQueue = new PlayQueue(mProvider, chiptune, playlist);
                             } else {
-                                mQueue = new PlayQueue(mProvider, chiptune);
+                                if(featuredId != -1){
+                                    FeaturedPlaylist playlist = Model.load(FeaturedPlaylist.class, featuredId);
+                                    mQueue = new PlayQueue(mProvider, chiptune, playlist);
+                                }else {
+                                    mQueue = new PlayQueue(mProvider, chiptune);
+                                }
                             }
 
                             // Set session as active
@@ -242,20 +250,20 @@ public class MusicService extends Service {
                     coldStartRandomPlayback();
                     break;
                 case INTENT_ACTION_COLDSTART_FEATURED:
-                    mService.getFeaturedPlaylist(new Callback<Playlist>() {
+                    mService.getFeaturedPlaylist(new Callback<FeaturedPlaylist>() {
                         @Override
-                        public void success(Playlist playlist, Response response) {
+                        public void success(FeaturedPlaylist playlist, Response response) {
+
                             // Update the local reference in the database
-                            Playlist featured = new Select()
-                                    .from(Playlist.class)
-                                    .where("name=?", Playlist.FEATURED)
+                            FeaturedPlaylist featured = new Select()
+                                    .from(FeaturedPlaylist.class)
                                     .limit(1)
                                     .executeSingle();
 
                             if(featured != null){
                                 featured.update(playlist);
                             }else{
-                                featured = new Playlist();
+                                featured = new FeaturedPlaylist();
                                 featured.save();
                                 featured.update(playlist);
                             }

@@ -227,11 +227,8 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView,
     private View.OnClickListener mFABClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-
             // Prepare intent to start playback
-            Intent playback = MusicPlayer.createShufflePlayback(getActivity());
-            MusicPlayer.startPlayback(PopularActivity.this, playback);
-
+            MusicPlayer.createShufflePlayback(getActivity());
         }
     };
 

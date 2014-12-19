@@ -1,5 +1,6 @@
 package com.r0adkll.chipper.ui.featured;
 
+import com.r0adkll.chipper.api.model.FeaturedPlaylist;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.ui.model.IView;
 
@@ -12,8 +13,8 @@ public interface FeaturedView extends IView {
 
     public void hideProgress();
 
-    public void initializeLoader(Playlist featured);
+    public void initializeLoader(FeaturedPlaylist featured);
 
-    public Playlist getFeaturedPlaylist();
+    public FeaturedPlaylist getFeaturedPlaylist();
 
 }

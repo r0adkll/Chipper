@@ -7,6 +7,8 @@ import com.activeandroid.query.Select;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.ChiptuneReference;
+import com.r0adkll.chipper.api.model.FeaturedChiptuneReference;
+import com.r0adkll.chipper.api.model.FeaturedPlaylist;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.data.CashMachine;
@@ -59,20 +61,19 @@ public class FeaturedPresenterImpl implements FeaturedPresenter {
 
     @Override
     public void loadFromServer() {
-        mService.getFeaturedPlaylist(new Callback<Playlist>() {
+        mService.getFeaturedPlaylist(new Callback<FeaturedPlaylist>() {
             @Override
-            public void success(Playlist playlist, Response response) {
+            public void success(FeaturedPlaylist playlist, Response response) {
                 // Update the local reference in the database
-                Playlist featured = new Select()
-                        .from(Playlist.class)
-                        .where("name=?", Playlist.FEATURED)
+                FeaturedPlaylist featured = new Select()
+                        .from(FeaturedPlaylist.class)
                         .limit(1)
                         .executeSingle();
 
                 if(featured != null){
                     featured.update(playlist);
                 }else{
-                    featured = new Playlist();
+                    featured = new FeaturedPlaylist();
                     featured.save();
                     featured.update(playlist);
                 }
@@ -89,19 +90,17 @@ public class FeaturedPresenterImpl implements FeaturedPresenter {
     }
 
     @Override
-    public void onPlaySelected(Playlist playlist) {
+    public void onPlaySelected(FeaturedPlaylist playlist) {
         List<Chiptune> chiptunes = playlist.getChiptunes(mProvider);
         if(chiptunes != null && !chiptunes.isEmpty()){
             Chiptune chiptune = chiptunes.get(0);
-            Intent playback = MusicPlayer.createPlayback(mView.getActivity(), chiptune, playlist);
-            MusicPlayer.startPlayback(mView.getActivity(), playback);
+            MusicPlayer.createPlayback(mView.getActivity(), chiptune, playlist);
         }
     }
 
     @Override
     public void onChiptuneSelected(Chiptune chiptune) {
-        Intent playback = MusicPlayer.createPlayback(mView.getActivity(), chiptune, mView.getFeaturedPlaylist());
-        MusicPlayer.startPlayback(mView.getActivity(), playback);
+        MusicPlayer.createPlayback(mView.getActivity(), chiptune, mView.getFeaturedPlaylist());
     }
 
     @Override
@@ -170,17 +169,17 @@ public class FeaturedPresenterImpl implements FeaturedPresenter {
     }
 
     @Override
-    public void offlinePlaylist(Playlist playlist) {
+    public void offlinePlaylist(FeaturedPlaylist playlist) {
         CashMachine.offline(mView.getActivity(), playlist);
     }
 
     @Override
-    public void sharePlaylist(Playlist playlist) {
+    public void sharePlaylist(FeaturedPlaylist playlist) {
 
     }
 
     @Override
-    public void favoritePlaylist(Playlist playlist) {
+    public void favoritePlaylist(FeaturedPlaylist playlist) {
         List<Chiptune> chiptunes = playlist.getChiptunes(mProvider);
         Chiptune[] tunes = new Chiptune[chiptunes.size()];
         chiptunes.toArray(tunes);
@@ -193,12 +192,12 @@ public class FeaturedPresenterImpl implements FeaturedPresenter {
     }
 
     @Override
-    public ModelLoader<ChiptuneReference> getLoader(Playlist playlist) {
+    public ModelLoader<FeaturedChiptuneReference> getLoader(FeaturedPlaylist playlist) {
         From query = new Select()
-                .from(ChiptuneReference.class)
+                .from(FeaturedChiptuneReference.class)
                 .where("playlist=?", playlist.getId());
 
-        return new ModelLoader<>(mView.getActivity(), ChiptuneReference.class, query, true);
+        return new ModelLoader<>(mView.getActivity(), FeaturedChiptuneReference.class, query, true);
     }
 
 

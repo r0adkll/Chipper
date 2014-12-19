@@ -93,8 +93,7 @@ public class PopularPresenterImpl implements PopularPresenter {
     @Override
     public void onChiptuneSelected(Chiptune chiptune) {
         // Send to session to be played
-        MusicPlayer.startPlayback(mView.getActivity(),
-                MusicPlayer.createPlayback(mView.getActivity(), chiptune));
+        MusicPlayer.createPlayback(mView.getActivity(), chiptune);
     }
 
     @Override

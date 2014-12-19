@@ -40,16 +40,20 @@ import com.r0adkll.chipper.api.model.ChiptuneReference;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.ui.model.BaseActivity;
+import com.r0adkll.chipper.ui.model.DragController;
 import com.r0adkll.chipper.ui.player.MusicPlayerCallbacks;
 import com.r0adkll.chipper.ui.widget.DividerDecoration;
 import com.r0adkll.chipper.ui.widget.EmptyView;
 import com.r0adkll.chipper.utils.CallbackHandler;
+import com.r0adkll.chipper.utils.Tools;
 import com.r0adkll.chipper.utils.UIUtils;
 import com.r0adkll.deadskunk.utils.Utils;
 import com.r0adkll.postoffice.PostOffice;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -81,6 +85,7 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
     @InjectView(R.id.recycle_view)  RecyclerView mRecyclerView;
     @InjectView(R.id.empty_layout)  EmptyView mEmptyView;
     @InjectView(R.id.fab_play)      FrameLayout mFabPlay;
+    @InjectView(R.id.overlay)       ImageView mOverlay;
 
     @Inject ChiptuneProvider chiptuneProvider;
     @Inject PlaylistViewerPresenter presenter;
@@ -267,10 +272,19 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
      */
 
     private void setupRecyclerView(){
+        adapter.setOnMoveItemListener(new PlaylistChiptuneAdapter.OnMoveItemListener() {
+            @Override
+            public void onItemMove(int start, int end) {
+                mPlaylist.updated = Tools.time();
+                mPlaylist.save();
+            }
+        });
+
         adapter.setEmptyView(mEmptyView);
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mRecyclerView.addItemDecoration(new DividerDecoration(this));
+        mRecyclerView.addOnItemTouchListener(new DragController(mRecyclerView, mOverlay, R.id.handle));
         adapter.setOnItemClickListener(this);
 
     }
@@ -314,8 +328,9 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
 
     @Override
     public void onLoadFinished(Loader<List<ChiptuneReference>> objectLoader, List<ChiptuneReference> chiptunes) {
-        adapter.clear();
-        adapter.addAll(chiptunes);
+        adapter.clearRaw();
+        adapter.addAllRaw(chiptunes);
+        adapter.sort();
     }
 
     @Override

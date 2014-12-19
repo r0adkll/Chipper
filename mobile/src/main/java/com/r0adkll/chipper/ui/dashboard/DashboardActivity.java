@@ -124,8 +124,7 @@ public class DashboardActivity extends BaseDrawerActivity implements DashboardVi
     private View.OnClickListener mFabClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Intent intent = MusicPlayer.createShufflePlayback(DashboardActivity.this);
-            MusicPlayer.startPlayback(DashboardActivity.this, intent);
+            MusicPlayer.createShufflePlayback(DashboardActivity.this);
         }
     };
 

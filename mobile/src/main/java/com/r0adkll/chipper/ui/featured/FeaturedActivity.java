@@ -22,6 +22,8 @@ import com.nispok.snackbar.Snackbar;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.ChiptuneReference;
+import com.r0adkll.chipper.api.model.FeaturedChiptuneReference;
+import com.r0adkll.chipper.api.model.FeaturedPlaylist;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
@@ -59,9 +61,10 @@ import icepick.Icicle;
  */
 public class FeaturedActivity extends BaseDrawerActivity implements
         FeaturedView,
-        LoaderManager.LoaderCallbacks<List<ChiptuneReference>>,
-        OnItemClickListener<ChiptuneReference>,
-        MusicPlayerCallbacks, RecyclerArrayAdapter.OnItemOptionSelectedListener<ChiptuneReference> {
+        LoaderManager.LoaderCallbacks<List<FeaturedChiptuneReference>>,
+        OnItemClickListener<FeaturedChiptuneReference>,
+        MusicPlayerCallbacks,
+        RecyclerArrayAdapter.OnItemOptionSelectedListener<FeaturedChiptuneReference> {
 
     /***********************************************************************************************
      *
@@ -92,7 +95,7 @@ public class FeaturedActivity extends BaseDrawerActivity implements
     long mFeaturedId = -1;
 
     // The local playlist reference
-    private Playlist mFeaturedPlaylist;
+    private FeaturedPlaylist mFeaturedPlaylist;
 
     /***********************************************************************************************
      *
@@ -113,7 +116,7 @@ public class FeaturedActivity extends BaseDrawerActivity implements
         if(mFeaturedId != -1) {
 
             // Check the playlist id
-            mFeaturedPlaylist = Model.load(Playlist.class, mFeaturedId);
+            mFeaturedPlaylist = Model.load(FeaturedPlaylist.class, mFeaturedId);
             getSupportLoaderManager().initLoader(0, null, this);
             getSupportActionBar().setTitle(mFeaturedPlaylist.name);
 
@@ -266,7 +269,7 @@ public class FeaturedActivity extends BaseDrawerActivity implements
         mRecyclerView.setSwipeListViewListener(new BaseSwipeListViewListener(){
             @Override
             public void onClickFrontView(int position) {
-                ChiptuneReference reference = adapter.getItem(position);
+                FeaturedChiptuneReference reference = adapter.getItem(position);
                 Chiptune chiptune = chiptuneProvider.getChiptune(reference.chiptune_id);
                 presenter.onChiptuneSelected(chiptune);
             }
@@ -285,13 +288,13 @@ public class FeaturedActivity extends BaseDrawerActivity implements
     };
 
     @Override
-    public void onItemClick(View v, ChiptuneReference item, int position) {
+    public void onItemClick(View v, FeaturedChiptuneReference item, int position) {
         Chiptune chiptune = chiptuneProvider.getChiptune(item.chiptune_id);
         presenter.onChiptuneSelected(chiptune);
     }
 
     @Override
-    public void onSelected(View view, ChiptuneReference reference) {
+    public void onSelected(View view, FeaturedChiptuneReference reference) {
         Chiptune item = chiptuneProvider.getChiptune(reference.chiptune_id);
         switch (view.getId()){
             case R.id.opt_favorite:
@@ -330,18 +333,18 @@ public class FeaturedActivity extends BaseDrawerActivity implements
      */
 
     @Override
-    public Loader<List<ChiptuneReference>> onCreateLoader(int i, Bundle bundle) {
+    public Loader<List<FeaturedChiptuneReference>> onCreateLoader(int i, Bundle bundle) {
         return presenter.getLoader(mFeaturedPlaylist);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<ChiptuneReference>> objectLoader, List<ChiptuneReference> chiptunes) {
+    public void onLoadFinished(Loader<List<FeaturedChiptuneReference>> objectLoader, List<FeaturedChiptuneReference> chiptunes) {
         adapter.clear();
         adapter.addAll(chiptunes);
     }
 
     @Override
-    public void onLoaderReset(Loader<List<ChiptuneReference>> objectLoader) {
+    public void onLoaderReset(Loader<List<FeaturedChiptuneReference>> objectLoader) {
         adapter.clear();
     }
 
@@ -353,7 +356,7 @@ public class FeaturedActivity extends BaseDrawerActivity implements
 
 
     @Override
-    public void initializeLoader(Playlist featured) {
+    public void initializeLoader(FeaturedPlaylist featured) {
         mFeaturedPlaylist = featured;
         mFeaturedId = mFeaturedPlaylist.getId();
 
@@ -388,7 +391,7 @@ public class FeaturedActivity extends BaseDrawerActivity implements
     }
 
     @Override
-    public Playlist getFeaturedPlaylist() {
+    public FeaturedPlaylist getFeaturedPlaylist() {
         return mFeaturedPlaylist;
     }
 

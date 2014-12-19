@@ -81,8 +81,7 @@ public class RecentsCard extends DashboardCard {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    MusicPlayer.startPlayback(getContext(),
-                            MusicPlayer.createPlayback(getContext(), record.chiptune));
+                    MusicPlayer.createPlayback(getContext(), record.chiptune);
                 }
             });
 

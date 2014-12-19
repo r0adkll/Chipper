@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 
 import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.FeaturedPlaylist;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.model.OfflineRequest;
 import com.r0adkll.chipper.utils.CallbackHandler;
@@ -104,6 +105,24 @@ public class CashMachine {
      * @param playlist      the playlist to offline
      */
     public static void offline(Context ctx, Playlist playlist){
+
+        // Create OfflineRequest
+        OfflineRequest request = new OfflineRequest.Builder()
+                .addPlaylist(playlist)
+                .build();
+
+        Intent offlineIntent = new Intent(ctx, OfflineIntentService.class);
+        offlineIntent.putExtra(OfflineIntentService.EXTRA_OFFLINE_REQUEST, request);
+        ctx.startService(offlineIntent);
+
+    }
+
+    /**
+     * Cache an entire playlist for offline playback
+     *
+     * @param playlist      the playlist to offline
+     */
+    public static void offline(Context ctx, FeaturedPlaylist playlist){
 
         // Create OfflineRequest
         OfflineRequest request = new OfflineRequest.Builder()

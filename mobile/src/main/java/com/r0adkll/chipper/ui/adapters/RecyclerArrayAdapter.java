@@ -3,6 +3,7 @@ package com.r0adkll.chipper.ui.adapters;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.r0adkll.chipper.api.model.ChiptuneReference;
 import com.r0adkll.chipper.utils.prefs.BooleanPreference;
 import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
 
@@ -227,6 +228,16 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
             notifyDataSetChanged();
         }
     }
+    /**
+     * Add a collection of objects to this adapter
+     *ß
+     * @param collection        the collection of objects to add
+     */
+    public void addAllRaw(Collection<? extends M> collection) {
+        if (collection != null) {
+            items.addAll(collection);
+        }
+    }
 
     /**
      * Add a list of objects to this adapter
@@ -241,11 +252,16 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
      * Clear this adapter of all items
      */
     public void clear() {
-        int N = items.size();
         items.clear();
         filteredItems.clear();
         filter = null;
         notifyDataSetChanged();
+    }
+
+    public void clearRaw(){
+        items.clear();
+        filteredItems.clear();
+        filter = null;
     }
 
     /**
@@ -272,6 +288,21 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
         return item;
     }
 
+    public void moveItem(int start, int end){
+        int max = Math.max(start, end);
+        int min = Math.min(start, end);
+        if (min >= 0 && max < items.size()) {
+            M item = items.remove(min);
+            items.add(max, item);
+        }
+
+        // Assume no filtering when you are rearranging items in the adapter
+        filteredItems.clear();
+        filteredItems.addAll(items);
+
+        notifyItemMoved(min, max);
+    }
+
     public void reconcile(){
         filter();
         notifyDataSetChanged();
@@ -285,6 +316,12 @@ public abstract class RecyclerArrayAdapter<M, VH extends RecyclerView.ViewHolder
      */
     public void sort(Comparator<M> comparator){
         Collections.sort(items, comparator);
+        filter();
+        notifyDataSetChanged();
+    }
+
+    public void sort(){
+        onSort(items);
         filter();
         notifyDataSetChanged();
     }

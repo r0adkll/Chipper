@@ -71,15 +71,13 @@ public class PlaylistViewerPresenterImpl implements PlaylistViewerPresenter {
         List<Chiptune> chiptunes = playlist.getChiptunes(mProvider);
         if(chiptunes != null && !chiptunes.isEmpty()){
             Chiptune chiptune = chiptunes.get(0);
-            Intent playback = MusicPlayer.createPlayback(mView.getActivity(), chiptune, playlist);
-            MusicPlayer.startPlayback(mView.getActivity(), playback);
+            MusicPlayer.createPlayback(mView.getActivity(), chiptune, playlist);
         }
     }
 
     @Override
     public void onChiptuneSelected(Chiptune chiptune) {
-        Intent playback = MusicPlayer.createPlayback(mView.getActivity(), chiptune, mView.getPlaylist());
-        MusicPlayer.startPlayback(mView.getActivity(), playback);
+        MusicPlayer.createPlayback(mView.getActivity(), chiptune, mView.getPlaylist());
     }
 
     @Override

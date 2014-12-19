@@ -6,6 +6,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.FeaturedPlaylist;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.OfflineIntentService;
 
@@ -110,6 +111,11 @@ public class OfflineRequest implements Parcelable {
         }
 
         public Builder addPlaylist(Playlist plist){
+            request.chiptunes.addAll(plist.getChiptunes());
+            return this;
+        }
+
+        public Builder addPlaylist(FeaturedPlaylist plist){
             request.chiptunes.addAll(plist.getChiptunes());
             return this;
         }

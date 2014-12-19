@@ -1,6 +1,7 @@
 package com.r0adkll.chipper.playback.model;
 
 import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.FeaturedPlaylist;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 
@@ -36,6 +37,29 @@ public class PlayQueue {
      * @param plist         the playlist the chiptune belongs to
      */
     public PlayQueue(ChiptuneProvider provider, Chiptune chiptune, Playlist plist){
+        // Fill the queues
+        mQueue.addAll(plist.getChiptunes(provider));
+        mShuffleQueue.addAll(mQueue);
+
+        // Shuffle the shuffle queue
+        Collections.shuffle(mShuffleQueue);
+
+        // Find correct indexes
+        mIndex = mQueue.indexOf(chiptune);
+
+        // Ensure the starting chiptune is at the top of the shuffle list
+        mShuffleQueue.remove(chiptune);
+        mShuffleQueue.add(0, chiptune);
+        mShuffleIndex = 0;
+    }
+
+    /**
+     * Create a play queue from a chiptune to start playing, and the playlist it belongs to
+     *
+     * @param chiptune      the beginning of the play queue to play
+     * @param plist         the playlist the chiptune belongs to
+     */
+    public PlayQueue(ChiptuneProvider provider, Chiptune chiptune, FeaturedPlaylist plist){
         // Fill the queues
         mQueue.addAll(plist.getChiptunes(provider));
         mShuffleQueue.addAll(mQueue);

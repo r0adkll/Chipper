@@ -79,8 +79,7 @@ public class ChiptunesPresenterImpl implements ChiptunesPresenter {
     public void onChiptuneSelected(Chiptune chiptune) {
         // Send Otto Event to start playing this selected chiptune
         Timber.i("Chiptune selected[%s]: %s-%s", chiptune.id, chiptune.artist, chiptune.title);
-        Intent playback = MusicPlayer.createPlayback(mView.getActivity(), chiptune);
-        MusicPlayer.startPlayback(mView.getActivity(), playback);
+        MusicPlayer.createPlayback(mView.getActivity(), chiptune);
     }
 
     @Override

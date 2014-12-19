@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.ChiptuneReference;
+import com.r0adkll.chipper.api.model.FeaturedChiptuneReference;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.data.PlaylistManager;
@@ -32,7 +33,7 @@ import butterknife.InjectView;
  * Package: com.r0adkll.chipper.ui.adapters
  * Created by drew.heavner on 11/20/14.
  */
-public class FeaturedChiptuneAdapter extends RecyclerArrayAdapter<ChiptuneReference, FeaturedChiptuneAdapter.PlaylistChiptuneViewHolder> {
+public class FeaturedChiptuneAdapter extends RecyclerArrayAdapter<FeaturedChiptuneReference, FeaturedChiptuneAdapter.PlaylistChiptuneViewHolder> {
 
     @Inject
     ChiptuneProvider mChiptuneProvider;
@@ -66,7 +67,7 @@ public class FeaturedChiptuneAdapter extends RecyclerArrayAdapter<ChiptuneRefere
     }
 
     @Override
-    public boolean onQuery(ChiptuneReference item, String query) {
+    public boolean onQuery(FeaturedChiptuneReference item, String query) {
         Chiptune chiptune = mChiptuneProvider.getChiptune(item.chiptune_id);
         if(mOfflinePref.get()) {
             if(!mAtm.isOffline(chiptune)) return false;
@@ -77,10 +78,10 @@ public class FeaturedChiptuneAdapter extends RecyclerArrayAdapter<ChiptuneRefere
     }
 
     @Override
-    public void onSort(List<ChiptuneReference> items) {
-        Collections.sort(items, new Comparator<ChiptuneReference>() {
+    public void onSort(List<FeaturedChiptuneReference> items) {
+        Collections.sort(items, new Comparator<FeaturedChiptuneReference>() {
             @Override
-            public int compare(ChiptuneReference lhs, ChiptuneReference rhs) {
+            public int compare(FeaturedChiptuneReference lhs, FeaturedChiptuneReference rhs) {
                 int lhsSO = lhs.sort_order;
                 int rhsSO = rhs.sort_order;
                 return lhsSO < rhsSO ? -1 : (lhsSO == rhsSO ? 0 : 1);
@@ -90,7 +91,7 @@ public class FeaturedChiptuneAdapter extends RecyclerArrayAdapter<ChiptuneRefere
 
     @Override
     public void onBindViewHolder(final PlaylistChiptuneViewHolder holder, int i) {
-        ChiptuneReference chiptuneReference = getItem(i);
+        FeaturedChiptuneReference chiptuneReference = getItem(i);
         Chiptune chiptune = mChiptuneProvider.getChiptune(chiptuneReference.chiptune_id);
 
         // Bind data to view

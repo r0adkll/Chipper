@@ -2,6 +2,7 @@ package com.r0adkll.chipper.api;
 
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.Device;
+import com.r0adkll.chipper.api.model.FeaturedPlaylist;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.ServerTime;
 import com.r0adkll.chipper.api.model.User;
@@ -388,7 +389,7 @@ public interface ChipperService {
      * @param cb        the callback
      */
     @GET("/general/featured")
-    void getFeaturedPlaylist(Callback<Playlist> cb);
+    void getFeaturedPlaylist(Callback<FeaturedPlaylist> cb);
 
     /**
      * Get a map of all the collective vote values of all

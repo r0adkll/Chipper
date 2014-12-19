@@ -215,11 +215,8 @@ public class ChiptunesActivity extends BaseDrawerActivity
     private View.OnClickListener mFABClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-
             // Prepare intent to start playback
-            Intent playback = MusicPlayer.createShufflePlayback(getActivity());
-            startService(playback);
-
+            MusicPlayer.createShufflePlayback(getActivity());
         }
     };
 

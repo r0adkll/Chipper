@@ -11,6 +11,8 @@ import com.crashlytics.android.Crashlytics;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.ChiptuneReference;
 import com.r0adkll.chipper.api.model.Device;
+import com.r0adkll.chipper.api.model.FeaturedChiptuneReference;
+import com.r0adkll.chipper.api.model.FeaturedPlaylist;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.api.model.Vote;
@@ -51,7 +53,9 @@ public class ChipperApp extends Application{
                         Playlist.class,
                         ChiptuneReference.class,
                         Vote.class,
-                        Historian.Chronicle.class
+                        Historian.Chronicle.class,
+                        FeaturedPlaylist.class,
+                        FeaturedChiptuneReference.class
                 );
 
         // Initialize the Database ORM

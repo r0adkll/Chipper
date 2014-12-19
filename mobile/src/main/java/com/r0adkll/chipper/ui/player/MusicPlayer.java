@@ -25,6 +25,7 @@ import com.nispok.snackbar.Snackbar;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.ChiptuneReference;
+import com.r0adkll.chipper.api.model.FeaturedPlaylist;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.playback.MusicBrowserService;
@@ -38,6 +39,7 @@ import com.r0adkll.chipper.ui.adapters.OnItemClickListener;
 import com.r0adkll.chipper.ui.adapters.PlaylistChiptuneAdapter;
 import com.r0adkll.chipper.ui.adapters.QueueChiptuneAdapter;
 import com.r0adkll.chipper.ui.model.BaseFragment;
+import com.r0adkll.chipper.ui.model.DragController;
 import com.r0adkll.chipper.ui.widget.DividerDecoration;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.otto.Bus;
@@ -121,11 +123,11 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView, OnItem
      * @param chiptune      the chiptune to play
      * @return              the intent to send to the service
      */
-    public static Intent createPlayback(Context ctx, Chiptune chiptune){
+    public static void createPlayback(Context ctx, Chiptune chiptune){
         Intent intent = new Intent(ctx, MusicService.class);
         intent.setAction(MusicService.INTENT_ACTION_PLAY);
         intent.putExtra(MusicService.EXTRA_CHIPTUNE, chiptune.getId());
-        return intent;
+        ctx.startService(intent);
     }
 
     /**
@@ -136,12 +138,28 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView, OnItem
      * @param playlist      the playlist the chiptune belongs to
      * @return              the intent to send to the service
      */
-    public static Intent createPlayback(Context ctx, Chiptune chiptune, Playlist playlist){
+    public static void createPlayback(Context ctx, Chiptune chiptune, Playlist playlist){
         Intent intent = new Intent(ctx, MusicService.class);
         intent.setAction(MusicService.INTENT_ACTION_PLAY);
         intent.putExtra(MusicService.EXTRA_CHIPTUNE, chiptune.getId());
         intent.putExtra(MusicService.EXTRA_PLAYLIST, playlist.getId());
-        return intent;
+        ctx.startService(intent);
+    }
+
+    /**
+     * Create a playback intent to send to the MusicService to start playback
+     *
+     * @param ctx           the context reference
+     * @param chiptune      the chiptune to play
+     * @param playlist      the playlist the chiptune belongs to
+     * @return              the intent to send to the service
+     */
+    public static void createPlayback(Context ctx, Chiptune chiptune, FeaturedPlaylist playlist){
+        Intent intent = new Intent(ctx, MusicService.class);
+        intent.setAction(MusicService.INTENT_ACTION_PLAY);
+        intent.putExtra(MusicService.EXTRA_CHIPTUNE, chiptune.getId());
+        intent.putExtra(MusicService.EXTRA_FEATURED_PLAYLIST, playlist.getId());
+        ctx.startService(intent);
     }
 
     /**
@@ -150,20 +168,9 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView, OnItem
      * @param ctx       the context reference
      * @return          the intent to send to the service
      */
-    public static Intent createShufflePlayback(Context ctx){
+    public static void createShufflePlayback(Context ctx){
         Intent intent = new Intent(ctx, MusicService.class);
         intent.setAction(MusicService.INTENT_ACTION_COLDSTART);
-        return intent;
-    }
-
-    /**
-     * Start playback of a built intent to send to the
-     * music service
-     *
-     * @param ctx
-     * @param intent
-     */
-    public static void startPlayback(Context ctx, Intent intent){
         ctx.startService(intent);
     }
 
@@ -188,6 +195,7 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView, OnItem
     @Inject
     ChiptuneProvider chiptuneProvider;
 
+    @InjectView(R.id.overlay)                   ImageView mOverlay;
     @InjectView(R.id.recycle_view)              RecyclerView mRecyclerView;
     @InjectView(R.id.buffer_bar)                ProgressBar mBufferBar;
     @InjectView(R.id.title)                     TextView mTitle;
@@ -283,7 +291,15 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView, OnItem
         mRecyclerView.setAdapter(adapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
         mRecyclerView.addItemDecoration(new DividerDecoration(getActivity()));
+        mRecyclerView.addOnItemTouchListener(new DragController(mRecyclerView, mOverlay, R.id.handle));
         adapter.setOnItemClickListener(this);
+
+        adapter.setOnMoveItemListener(new QueueChiptuneAdapter.OnMoveItemListener() {
+            @Override
+            public void onItemMove(int start, int end) {
+
+            }
+        });
 
     }
 

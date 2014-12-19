@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 
 import com.activeandroid.query.Select;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -71,7 +72,7 @@ public class PushManager {
         if(PushUtils.checkPlayServices(activity, PushUtils.PLAY_SERVICES_RESOLUTION_REQUEST)){
 
             String token = getRegistrationId(activity);
-            if(token.isEmpty()){
+            if(TextUtils.isEmpty(token)){
                 registerInBackground(activity);
             }
 
@@ -147,16 +148,19 @@ public class PushManager {
                     // 'from' address in the message.
                     return regId;
                 } catch (IOException ex) {
+                    Timber.e(ex, "There was an error attempting to register for a push token");
                     // If there is an error, don't just keep trying to register.
                     // Require the user to click a button again, or perform
                     // exponential back-off.
+
+
                 }
                 return null;
             }
 
             @Override
             protected void onPostExecute(String regId) {
-                if(regId != null) {
+                if(!TextUtils.isEmpty(regId)) {
 
                     // You should send the registration ID to your server over HTTP, so it
                     // can use GCM/HTTP or CCS to send messages to your app.
@@ -165,6 +169,8 @@ public class PushManager {
                     // Persist the regID - no need to register again.
                     storeRegistrationId(context, regId);
 
+                }else{
+                    Timber.w("Unable to register for push token");
                 }
             }
         }.execute();

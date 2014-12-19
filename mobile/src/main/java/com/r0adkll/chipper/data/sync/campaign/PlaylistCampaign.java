@@ -126,11 +126,13 @@ public class PlaylistCampaign extends SyncCampaign{
 
                                 break;
                             } else if (idCheck && remotePlaylist.deleted) {
+                                hasRemote = true;
 
                                 // Remote playlist has been deleted, so delete the local reference too
                                 localPlaylist.delete();
                                 getSyncResult().stats.numDeletes++;
                                 Timber.d("Local playlist [%s] was deleted since the remote was marked as deleted", localPlaylist.name);
+                                break;
                             }
 
                         }
@@ -161,7 +163,7 @@ public class PlaylistCampaign extends SyncCampaign{
 
                 } // End Part 1 & 2)
 
-                // TODO: 3) Find remote playlists that don't exist locally and synchronize them
+                // 3) Find remote playlists that don't exist locally and synchronize them
                 for(Playlist remotePlaylist: remote){
                     if(isCanceled()) return;
 

@@ -20,20 +20,23 @@ This new version will now support a broader range of devices:
 
 1.  **Free**  
   - Ads
-  - Limited voting (i.e. 5 votes a day)
+  - Limited voting (10 votes a day)
   - No Offline
   - No Ringtones
   - No Sharing (Only Redeem)
 
+1a. **Silver - $0.99**
+ - Removes Ads
+ - Reduces 'Premium' price to $1.99
+ - Limited voting(+50 votes a day)
+ - Share Playlists
+
 2.  **Premium - $2.99**  
   - No Ads  
-  - Voting  
+  - Unlimited Voting  
   - Offline caching  
   - Ringtone features  
   - Share Playlists
-
-3.  **Subscription - $0.99/year**  
-  - Everything!
 
 ## Android TV
 

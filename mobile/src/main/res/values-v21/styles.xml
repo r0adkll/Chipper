@@ -29,7 +29,7 @@
         <item name="android:colorPrimary">@color/primary</item>
         <item name="android:colorPrimaryDark">@color/primaryDark</item>
         <item name="android:colorAccent">@color/accentColor</item>
-        <item name="android:colorControlHighlight">@color/secondary</item>
+        <item name="android:colorControlHighlight">@color/tvControlHighlight</item>
     </style>
 
     <!-- Base application theme. -->

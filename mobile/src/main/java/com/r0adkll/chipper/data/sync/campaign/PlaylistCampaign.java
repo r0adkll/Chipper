@@ -73,8 +73,8 @@ public class PlaylistCampaign extends SyncCampaign{
 
                             // Build cases
                             boolean idCheck = localPlaylist.id != null ? localPlaylist.id.equals(remotePlaylist.id) : false;
-                            boolean favoritesCheck = localPlaylist.name.equalsIgnoreCase(Playlist.FAVORITES) &&
-                                    remotePlaylist.name.equalsIgnoreCase(Playlist.FAVORITES);
+                            boolean favoritesCheck = Playlist.FAVORITES.equalsIgnoreCase(localPlaylist.name) &&
+                                    Playlist.FAVORITES.equalsIgnoreCase(remotePlaylist.name);
                             boolean areEqual = idCheck || favoritesCheck;
 
                             // Check for similar playlists

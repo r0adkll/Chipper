@@ -128,7 +128,7 @@ public class PlaylistStyle implements Style {
         public void bindHolder(ViewHolder viewHolder, int i, Playlist playlist) {
             PlaylistViewHolder holder = (PlaylistViewHolder) viewHolder;
 
-            if(playlist.name.equalsIgnoreCase(Playlist.FAVORITES)){
+            if(Playlist.FAVORITES.equalsIgnoreCase(playlist.name)){
                 holder.avatar.setImageResource(R.drawable.ic_action_favorite);
             }else{
                 holder.avatar.setImageResource(R.drawable.ic_action_queue_music);

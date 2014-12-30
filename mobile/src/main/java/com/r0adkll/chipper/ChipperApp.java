@@ -42,7 +42,6 @@ public class ChipperApp extends Application{
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics());
 
         // Initialize ActiveAndroid
         Configuration.Builder builder = new Configuration.Builder(this)
@@ -65,7 +64,7 @@ public class ChipperApp extends Application{
         if(BuildConfig.DEBUG){
             Timber.plant(new Timber.DebugTree());
         }else{
-            Timber.plant(new CrashlyticsTree());
+            Timber.plant(new CrashlyticsTree(this));
             Timber.plant(new FileTree(this, getLogFilename()));
         }
 

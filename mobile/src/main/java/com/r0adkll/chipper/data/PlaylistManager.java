@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.DialogInterface;
+import android.text.TextUtils;
 
 import com.activeandroid.query.Select;
 import com.r0adkll.chipper.R;
@@ -75,7 +76,8 @@ public class PlaylistManager  {
 
         // Absolutely ignore any playlist labeled 'Favorites' as this is a reserved playlist name
         if(name.equalsIgnoreCase(Playlist.FAVORITES) ||
-                name.equalsIgnoreCase(Playlist.FEATURED)){
+                name.equalsIgnoreCase(Playlist.FEATURED) ||
+                TextUtils.isEmpty(name)){
             return null;
         }
 
@@ -114,10 +116,7 @@ public class PlaylistManager  {
         for(Playlist playlist:playlists){
 
             // DO NOT DELETE the favorites playlist
-            if(playlist.name.equalsIgnoreCase("favorites")) continue;
-
-//            // Load the playlists chiptune references from the database so those can be restored as welll
-//            playlist.loadChiptuneReferences();
+            if(Playlist.FAVORITES.equalsIgnoreCase(playlist.name)) continue;
 
             // Delete locally
             playlist.deleted = true;

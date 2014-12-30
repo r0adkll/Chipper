@@ -217,7 +217,7 @@ public abstract class BaseDrawerActivity extends ActionBarActivity implements Go
      *
      * @return      get teh action bar
      */
-    protected Toolbar getActionBarToolbar() {
+    public Toolbar getActionBarToolbar() {
         if (mActionBarToolbar == null) {
             mActionBarToolbar = ButterKnife.findById(this, R.id.toolbar_actionbar);
             if (mActionBarToolbar != null) {

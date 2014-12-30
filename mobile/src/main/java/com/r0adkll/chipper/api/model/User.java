@@ -8,6 +8,8 @@ import android.provider.BaseColumns;
 import com.activeandroid.Model;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
+import com.activeandroid.query.From;
+import com.activeandroid.query.Select;
 
 import java.util.List;
 
@@ -84,7 +86,11 @@ public class User extends Model implements Parcelable{
      * @return  return the list of playlists associated with this user
      */
     public List<Playlist> getPlaylists(){
-        return getMany(Playlist.class, "owner");
+        return new Select()
+            .from(Playlist.class)
+            .where("owner=?", getId())
+            .and("deleted=?", false)
+            .execute();
     }
 
     @Override

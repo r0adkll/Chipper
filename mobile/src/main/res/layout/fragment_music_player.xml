@@ -7,7 +7,7 @@
         android:id="@+id/current_tune"
         android:layout_width="match_parent"
         android:layout_height="68dp"
-        android:background="@color/primaryDark"
+        android:background="#fafafa"
         android:elevation="6dp"
         android:outlineProvider="bounds"
         >
@@ -16,7 +16,8 @@
             android:id="@+id/circuitBoard"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/circuit_board" />
+            android:background="@drawable/circuit_board"
+            />
 
         <View
             android:id="@+id/top_bar"
@@ -33,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:indeterminate="true"
-            android:translationY="-6dp"
+            android:translationY="-6.5dp"
             android:visibility="gone"
             />
 
@@ -53,7 +54,7 @@
                 android:singleLine="true"
                 android:ellipsize="end"
                 android:text="@string/default_current_tune_title"
-                android:textColor="@color/body_text_1_inverse"
+                android:textColor="@color/body_text_primary_light"
                 android:textSize="18sp" />
 
             <TextView
@@ -65,7 +66,7 @@
                 android:singleLine="true"
                 android:ellipsize="end"
                 android:text="@string/default_current_tune_description"
-                android:textColor="@color/body_text_2_inverse"
+                android:textColor="@color/body_text_secondary_light"
                 android:textSize="13sp" />
 
         </LinearLayout>
@@ -129,7 +130,7 @@
         android:layout_height="68dp"
         android:layout_below="@+id/current_tune"
 
-        android:background="@color/secondary"
+        android:background="@color/tvControlHighlight"
         android:orientation="horizontal"
         android:paddingRight="12dp"
         android:paddingLeft="12dp"
@@ -257,7 +258,7 @@
         android:id="@+id/master_controls"
         android:layout_width="match_parent"
         android:layout_height="104dp"
-        android:background="@color/primaryDark"
+        android:background="#fafafa"
         android:elevation="6dp"
         android:outlineProvider="bounds"
 
@@ -294,7 +295,7 @@
                 android:paddingBottom="16dp"
 
                 android:text="0:00"
-                android:textColor="@color/white"
+                android:textColor="@color/body_text_primary_light"
                 />
 
             <SeekBar
@@ -318,7 +319,7 @@
                 android:paddingBottom="16dp"
 
                 android:text="3:30"
-                android:textColor="@color/white"
+                android:textColor="@color/body_text_primary_light"
                 />
 
         </RelativeLayout>

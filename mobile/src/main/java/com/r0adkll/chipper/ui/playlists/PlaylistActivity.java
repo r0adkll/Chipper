@@ -103,7 +103,7 @@ public class PlaylistActivity extends BaseDrawerActivity implements PlaylistView
             @Override
             public int onChangeSwipeMode(int position) {
                 Playlist item = adapter.getItem(position);
-                return item.name.equalsIgnoreCase("favorites") ?
+                return Playlist.FAVORITES.equalsIgnoreCase(item.name) ?
                         SwipeListView.SWIPE_MODE_NONE : SwipeListView.SWIPE_MODE_BOTH;
             }
 

@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.listeners.EventListener;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.data.Historian;
 import com.r0adkll.chipper.playback.events.PlaybackStartedEvent;
@@ -164,6 +165,25 @@ public class DashboardActivity extends BaseDrawerActivity implements DashboardVi
     public void showSnackBar(String text) {
         Snackbar.with(this)
                 .text(text)
+                .eventListener(new EventListener() {
+                    @Override
+                    public void onShow(int i) {
+                        // Animate FAB
+                        mFabShufflePlay.animate()
+                                .translationY(-Utils.dpToPx(getActivity(), i))
+                                .setDuration(300)
+                                .start();
+                    }
+
+                    @Override
+                    public void onDismiss(int i) {
+                        // Animate FAB
+                        mFabShufflePlay.animate()
+                                .translationY(0)
+                                .setDuration(300)
+                                .start();
+                    }
+                })
                 .show(this);
     }
 

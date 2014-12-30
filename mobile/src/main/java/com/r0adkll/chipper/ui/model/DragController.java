@@ -47,21 +47,23 @@ public class DragController implements RecyclerView.OnItemTouchListener {
 
             // Find The child view's handle
             View childView = rv.findChildViewUnder(e.getX(), e.getY());
-            View handle = ButterKnife.findById(childView, handleId);
+            if(childView != null) {
+                View handle = ButterKnife.findById(childView, handleId);
 
-            // Check for handle collision
-            Rect rect = new Rect();
-            handle.getHitRect(rect);
-            int[] childViewCoords = new int[2];
-            childView.getLocationOnScreen(childViewCoords);
-            int x = (int) e.getRawX() - childViewCoords[0];
-            int y = (int) e.getRawY() - childViewCoords[1];
+                // Check for handle collision
+                Rect rect = new Rect();
+                handle.getHitRect(rect);
+                int[] childViewCoords = new int[2];
+                childView.getLocationOnScreen(childViewCoords);
+                int x = (int) e.getRawX() - childViewCoords[0];
+                int y = (int) e.getRawY() - childViewCoords[1];
 
-            if(rect.contains(x, y)){
-                // Initialize draging
-                isDragging = true;
-                dragStart(e.getX(), e.getY());
-                return true;
+                if (rect.contains(x, y)) {
+                    // Initialize draging
+                    isDragging = true;
+                    dragStart(e.getX(), e.getY());
+                    return true;
+                }
             }
 
         }

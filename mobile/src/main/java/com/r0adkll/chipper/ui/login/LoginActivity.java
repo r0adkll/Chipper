@@ -5,12 +5,15 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.internal.widget.ViewUtils;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.GoogleAuthException;
@@ -26,6 +29,7 @@ import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.qualifiers.GenericPrefs;
+import com.r0adkll.chipper.ui.widget.ScrimInsetsRelativeLayout;
 import com.r0adkll.chipper.utils.CallbackHandler;
 import com.r0adkll.chipper.ui.model.BaseActivity;
 import com.r0adkll.deadskunk.utils.Utils;
@@ -71,6 +75,8 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
     @Inject LoginPresenter presenter;
     @InjectView(R.id.sign_in_button)        SignInButton mSignIn;
     @InjectView(R.id.skip_with_temp_acct)   TextView mTempAccount;
+    @InjectView(R.id.container)             ScrimInsetsRelativeLayout mContainer;
+    @InjectView(R.id.loading)               ProgressBar mProgress;
 
     private GoogleApiClient mAPIClient;
     private boolean mIntentInProgress;
@@ -100,6 +106,14 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
         mSignIn.setOnClickListener(this);
         mTempAccount.setOnClickListener(this);
         mSignIn.setSize(SignInButton.SIZE_WIDE);
+
+        mContainer.setOnInsetsCallback(new ScrimInsetsRelativeLayout.OnInsetsCallback() {
+            @Override
+            public void onInsetsChanged(Rect insets) {
+//                mContainer.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+                mTempAccount.setPadding(0, 0, 0, insets.bottom);
+            }
+        });
 
         // Set Translucent decor
         if(Utils.isKitKat()){
@@ -136,6 +150,9 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
         }else if(requestCode == AUTH_CODE_REQUEST_CODE){
             if(resultCode != RESULT_OK){
                 mSignInClicked = false;
+                mSignIn.setEnabled(true);
+                mProgress.setVisibility(View.GONE);
+                mSignIn.setVisibility(View.VISIBLE);
             }
 
             // Try to get the access token again
@@ -151,6 +168,10 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
                 @Override
                 public void onFailure(String msg) {
                     // Do Nothing
+                    mSignInClicked = false;
+                    mSignIn.setEnabled(true);
+                    mProgress.setVisibility(View.GONE);
+                    mSignIn.setVisibility(View.VISIBLE);
                 }
             });
         }
@@ -194,6 +215,8 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
                 mSignIn.setEnabled(false);
                 mSignInClicked = true;
                 resolveSignInError();
+                mProgress.setVisibility(View.VISIBLE);
+                mSignIn.setVisibility(View.GONE);
             } else if (mAPIClient.isConnected()) {
                 mSignIn.setEnabled(false);
 
@@ -209,6 +232,9 @@ public class LoginActivity extends BaseActivity implements LoginView, View.OnCli
                     public void onFailure(String msg) {
                         // Do Nothing
                         mSignIn.setEnabled(true);
+                        mSignInClicked = false;
+                        mProgress.setVisibility(View.GONE);
+                        mSignIn.setVisibility(View.VISIBLE);
                     }
                 });
             }

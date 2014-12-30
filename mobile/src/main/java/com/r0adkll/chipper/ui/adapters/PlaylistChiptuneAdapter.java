@@ -13,6 +13,7 @@ import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.ChiptuneReference;
 import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.data.ChiptuneProvider;
+import com.r0adkll.chipper.qualifiers.FlexSpaceHeader;
 import com.r0adkll.chipper.utils.prefs.BooleanPreference;
 import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
 
@@ -58,14 +59,6 @@ public class PlaylistChiptuneAdapter extends RecyclerArrayAdapter<ChiptuneRefere
     }
 
     @Override
-    public PlaylistChiptuneViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.layout_playlist_chiptune_item, viewGroup, false);
-
-        return new PlaylistChiptuneViewHolder(view);
-    }
-
-    @Override
     public boolean onQuery(ChiptuneReference item, String query) {
         Chiptune chiptune = mChiptuneProvider.getChiptune(item.chiptune_id);
         if(mOfflinePref.get()) {
@@ -89,7 +82,15 @@ public class PlaylistChiptuneAdapter extends RecyclerArrayAdapter<ChiptuneRefere
     }
 
     @Override
-    public void onBindViewHolder(final PlaylistChiptuneViewHolder holder, int i) {
+    public PlaylistChiptuneViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        View view = LayoutInflater.from(viewGroup.getContext())
+                .inflate(R.layout.layout_playlist_chiptune_item, viewGroup, false);
+
+        return new PlaylistChiptuneViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(final PlaylistChiptuneViewHolder holder, final int i) {
         ChiptuneReference chiptuneReference = getItem(i);
         Chiptune chiptune = mChiptuneProvider.getChiptune(chiptuneReference.chiptune_id);
 
@@ -104,7 +105,6 @@ public class PlaylistChiptuneAdapter extends RecyclerArrayAdapter<ChiptuneRefere
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int i = holder.getPosition();
                 onItemClick(v, i);
             }
         });

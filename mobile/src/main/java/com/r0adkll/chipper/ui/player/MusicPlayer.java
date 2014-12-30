@@ -237,8 +237,16 @@ public class MusicPlayer extends BaseFragment implements MusicPlayerView, OnItem
         // Set the scrubber listener
         mScrubber.setOnSeekBarChangeListener(mSeekBarChangeListener);
         setupRecyclerView();
-
         mSlidingLayout.setPanelSlideListener(this);
+
+        // Apply color tint to main control items
+        int color = getResources().getColor(R.color.navdrawer_icon_tint);
+        mPlayPause.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        mNext.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        mPrevious.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        mMasterPlayPause.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        mMasterNext.setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        mMasterPrevious.setColorFilter(color, PorterDuff.Mode.SRC_IN);
 
     }
 

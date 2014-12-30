@@ -20,29 +20,11 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- The Custom Actionbar -->
-        <android.support.v7.widget.Toolbar
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            style="@style/Widget.Chipper.HeaderBar"
-            android:id="@+id/toolbar_actionbar"
-            android:layout_height="@dimen/actionbar_extended_height"
-            android:layout_width="match_parent"
-            android:minHeight="?attr/actionBarSize"
-            android:gravity="bottom"
-            android:paddingBottom="@dimen/activity_padding"
-            android:transitionName="toolbar_title"
-
-            app:theme="@style/ThemeOverlay.Chipper.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.Chipper.ActionBar.Popup"
-            app:titleTextAppearance="@style/TextAppearance.Chipper.ExtendedActionBar.Title"
-            />
-
         <!-- The fragment content container, This will always be on the bottom-->
         <FrameLayout
             android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/toolbar_actionbar"
             android:background="@color/background_material_light"
             android:transitionName="playlist_background"
             >
@@ -54,7 +36,7 @@
                 android:layout_height="match_parent"
 
                 android:clipToPadding="false"
-                android:paddingTop="@dimen/half_padding"
+                android:paddingTop="136dp"
                 />
 
             <com.r0adkll.chipper.ui.widget.EmptyView
@@ -79,6 +61,64 @@
 
         </FrameLayout>
 
+        <View
+            android:id="@+id/flexible_space"
+            style="@style/Widget.Chipper.HeaderBar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/actionbar_extended_height"
+            android:transitionName="app_bar"
+            />
+
+        <!-- The Custom Actionbar -->
+        <android.support.v7.widget.Toolbar
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            style="@style/Widget.Chipper.HeaderBar.Transparent"
+            android:id="@+id/toolbar_actionbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+
+            app:theme="@style/ThemeOverlay.Chipper.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.Chipper.ActionBar.Popup"
+            app:titleTextAppearance="@style/TextAppearance.Chipper.ExtendedActionBar.Title"
+            />
+
+        <!-- The toolbar title -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/toolbar_margin_start"
+            android:elevation="@dimen/headerbar_elevation">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:minHeight="?attr/actionBarSize"
+                android:textColor="@android:color/white"
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="@android:color/transparent" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/flexible_space_height"
+                    android:background="@android:color/transparent" />
+            </LinearLayout>
+        </RelativeLayout>
+
         <include layout="@layout/layout_fab_play"
             android:id="@+id/fab_play"
             android:layout_width="@dimen/fab_button_height"
@@ -86,8 +126,9 @@
             android:layout_alignParentRight="true"
 
             android:layout_marginRight="16dp"
-            android:layout_marginTop="100dp"
             />
+        <!--
+            android:layout_marginTop="100dp"-->
 
     </RelativeLayout>
 

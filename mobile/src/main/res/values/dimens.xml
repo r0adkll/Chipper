@@ -32,6 +32,7 @@
     <dimen name="fab_elevation">8dp</dimen>
     <dimen name="fab_button_height">56dp</dimen>
     <dimen name="fab_icon_height">24dp</dimen>
+    <dimen name="toolbar_margin_start">72dp</dimen>
 
     <item name="slidingview_anchor_point" format="float" type="dimen">0.115</item>
 

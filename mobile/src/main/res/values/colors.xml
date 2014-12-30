@@ -6,9 +6,10 @@
     <color name="accentColor">#9FD700</color>
     <color name="controlHighlight">#9699cc00</color>
 
-    <color name="secondary">#333333</color>
+    <color name="tvControlHighlight">#333333</color>
+    <color name="secondary">#E91E63</color>
 
-    <color name="fab">#E91E63</color>
+    <color name="fab">@color/secondary</color>
     <color name="fabPressed">#2F2F2F</color>
 
     <color name="statusBar">#b2669900</color>

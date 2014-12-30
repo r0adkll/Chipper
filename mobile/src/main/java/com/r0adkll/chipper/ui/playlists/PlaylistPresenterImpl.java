@@ -1,7 +1,10 @@
 package com.r0adkll.chipper.ui.playlists;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.support.v7.widget.Toolbar;
 import android.util.Pair;
 import android.view.View;
 
@@ -18,6 +21,7 @@ import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.data.PlaylistManager;
 import com.r0adkll.chipper.data.model.ModelLoader;
 import com.r0adkll.chipper.data.model.OfflineRequest;
+import com.r0adkll.chipper.ui.model.BaseDrawerActivity;
 import com.r0adkll.chipper.ui.playlists.viewer.PlaylistViewerActivity;
 import com.r0adkll.chipper.utils.UIUtils;
 import com.r0adkll.deadskunk.utils.Utils;
@@ -162,16 +166,30 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
 
     @SuppressLint("NewApi")
     @Override
-    public void onPlaylistSelected(View view, Playlist playlist, int position) {
-        Intent intent = new Intent(mView.getActivity(), PlaylistViewerActivity.class);
+    public void onPlaylistSelected(final View view, Playlist playlist, int position) {
+        final Intent intent = new Intent(mView.getActivity(), PlaylistViewerActivity.class);
         intent.putExtra(PlaylistViewerActivity.EXTRA_PLAYLIST_ID, playlist.getId());
 
-        View title = ButterKnife.findById(view, R.id.title);
+        final Toolbar appbar = ((BaseDrawerActivity) mView.getActivity()).getActionBarToolbar();
 
-        if(Utils.isLollipop()) view.setElevation(Utils.dpToPx(mView.getActivity(), 8));
-        UIUtils.startActivityWithTransition(mView.getActivity(), intent,
-                new Pair<>(title, "toolbar_title"),
-                new Pair<>(view, "playlist_background"));
+        if(Utils.isLollipop()){
+            view.animate()
+                    .translationZBy(Utils.dpToPx(mView.getActivity(), 8))
+                    .setDuration(250)
+                    .setListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            UIUtils.startActivityWithTransition(mView.getActivity(), intent,
+                                    new Pair<View, String>(appbar, "app_bar"),
+                                    new Pair<>(view, "playlist_background"));
+                        }
+                    })
+                    .start();
+        }else{
+            UIUtils.startActivityWithTransition(mView.getActivity(), intent,
+                    new Pair<View, String>(appbar, "app_bar"),
+                    new Pair<>(view, "playlist_background"));
+        }
 
     }
 
@@ -180,8 +198,7 @@ public class PlaylistPresenterImpl implements PlaylistPresenter {
         From query = new Select()
                 .from(Playlist.class)
                 .where("owner=?", mUser.getId())
-                .and("deleted=?", false)
-                .and("name != ?", Playlist.FEATURED);
+                .and("deleted=?", false);
         return new ModelLoader<>(mView.getActivity(), Playlist.class, query, true);
     }
 }

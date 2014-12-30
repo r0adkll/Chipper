@@ -4,6 +4,7 @@
 
 package com.r0adkll.chipper.utils;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -24,6 +25,15 @@ import timber.log.Timber;
 public class CrashlyticsTree implements Timber.TaggedTree {
     private static final Pattern ANONYMOUS_CLASS = Pattern.compile("\\$\\d+$");
     private static final ThreadLocal<String> NEXT_TAG = new ThreadLocal<String>();
+
+    /**
+     * Constructor
+     * This initializes crashlytics to start crash reporting
+     * @param ctx
+     */
+    public CrashlyticsTree(Context ctx){
+        Fabric.with(ctx, new Crashlytics());
+    }
 
     @Override public void v(String message, Object... args) {
         throwShade(Log.VERBOSE, formatString(message, args), null);

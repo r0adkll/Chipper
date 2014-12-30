@@ -22,6 +22,7 @@ import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
@@ -97,13 +98,12 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
     @InjectView(R.id.fab_play)          FrameLayout mFabPlay;
     @InjectView(R.id.overlay)           ImageView mOverlay;
 
+    @InjectView(R.id.flexible_space)    View mFlexibleView;
     @InjectView(R.id.title)             TextView mTitleView;
-    @InjectView(R.id.flexible_space)    View mFlexibleSpaceView;
-    @InjectView(R.id.app_bar)           FrameLayout mAppBar;
 
     @Inject ChiptuneProvider chiptuneProvider;
-    @Inject PlaylistViewerPresenter presenter;
     @Inject PlaylistChiptuneAdapter adapter;
+    @Inject PlaylistViewerPresenter presenter;
     @Inject Bus mBus;
     @Inject CashMachine mAtm;
     @Inject @CurrentUser
@@ -116,7 +116,7 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
     private int mFlexibleSpaceHeight;
     private int mFlexibleSpaceShowFabOffset;
     private int mActionBarSize;
-    private boolean mFabIsShown;
+    private boolean mFabIsShown = true;
 
     // The local playlist reference
     private Playlist mPlaylist;
@@ -152,13 +152,27 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
         getSupportActionBar().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        setupRecyclerView();
-
         mTitleView.setText(mPlaylist.name);
         mFlexibleSpaceHeight = getResources().getDimensionPixelSize(R.dimen.flexible_space_height);
         mFlexibleSpaceShowFabOffset = getResources().getDimensionPixelOffset(R.dimen.flexible_space_show_fab_offset);
         mActionBarSize = getActionBarSize();
         mTotalFlexibleSpaceHeight = mFlexibleSpaceHeight + mActionBarSize;
+        mFlexibleView.getLayoutParams().height = mTotalFlexibleSpaceHeight;
+
+        ViewTreeObserver vto = mTitleView.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+                    mTitleView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                } else {
+                    mTitleView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+                handleScroll(mRecyclerView.getCurrentScrollY());
+            }
+        });
+
+        setupRecyclerView();
 
         // Now present the layout
         UIUtils.setupFAB(this, mFabPlay);
@@ -351,22 +365,7 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
 
     @Override
     public void onScrollChanged(int scrollY, boolean firstScroll, boolean dragging) {
-        updateFlexibleSpaceText(scrollY);
-
-        // Translate FAB
-        int maxFabTranslationY = mTotalFlexibleSpaceHeight - mFabPlay.getHeight() / 2;
-        int fabTranslationY = Math.max(mActionBarSize - mFabPlay.getHeight() / 2,
-                Math.min(maxFabTranslationY, -scrollY + mTotalFlexibleSpaceHeight - mFabPlay.getHeight() / 2));
-//        ViewHelper.setTranslationX(mFabPlay, mOverlayView.getWidth() - mFabMargin - mFab.getWidth());
-        ViewHelper.setTranslationY(mFabPlay, fabTranslationY);
-
-        // Show/hide FAB
-        if (ViewHelper.getTranslationY(mFabPlay) < mFlexibleSpaceShowFabOffset) {
-            hideFab();
-        } else {
-            showFab();
-        }
-
+        handleScroll(scrollY + mTotalFlexibleSpaceHeight);
     }
 
     @Override
@@ -379,8 +378,27 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
 
     }
 
+    private void handleScroll(int scrollY){
+        updateFlexibleSpaceText(scrollY);
+
+        // Translate FAB
+        int maxFabTranslationY = mTotalFlexibleSpaceHeight - mFabPlay.getHeight() / 2;
+        int fabTranslationY = Math.max(mActionBarSize - mFabPlay.getHeight() / 2,
+                Math.min(maxFabTranslationY, -scrollY + mTotalFlexibleSpaceHeight - mFabPlay.getHeight() / 2));
+//        ViewHelper.setTranslationX(mFabPlay, mOverlayView.getWidth() - mFabMargin - mFab.getWidth());
+        ViewHelper.setTranslationY(mFabPlay, fabTranslationY);
+
+        // Show/hide FAB
+        if (ViewHelper.getTranslationY(mFabPlay) < 200) {
+            hideFab();
+        } else {
+            showFab();
+        }
+    }
+
     private void updateFlexibleSpaceText(final int scrollY) {
-        ViewHelper.setTranslationY(mFlexibleSpaceView, -scrollY);
+        int maxFlexScrollY = Utils.clamp(scrollY, 0, mFlexibleSpaceHeight);
+        ViewHelper.setTranslationY(mFlexibleView, -maxFlexScrollY);
         int adjustedScrollY = scrollY;
         if (scrollY < 0) {
             adjustedScrollY = 0;
@@ -394,7 +412,7 @@ public class PlaylistViewerActivity extends BaseActivity implements PlaylistView
         ViewHelper.setPivotY(mTitleView, 0);
         ViewHelper.setScaleX(mTitleView, 1 + scale);
         ViewHelper.setScaleY(mTitleView, 1 + scale);
-        ViewHelper.setTranslationY(mTitleView, ViewHelper.getTranslationY(mFlexibleSpaceView) + mFlexibleSpaceView.getHeight() - mTitleView.getHeight() * (1 + scale));
+        ViewHelper.setTranslationY(mTitleView, ViewHelper.getTranslationY(mFlexibleView) + mFlexibleView.getHeight() - mTitleView.getHeight() * (1 + scale));
         int maxTitleTranslationY = getActionBarToolbar().getHeight() + mFlexibleSpaceHeight - (int) (mTitleView.getHeight() * (1 + scale));
         int titleTranslationY = (int) (maxTitleTranslationY * ((float) mFlexibleSpaceHeight - adjustedScrollY) / mFlexibleSpaceHeight);
         ViewHelper.setTranslationY(mTitleView, titleTranslationY);

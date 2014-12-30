@@ -32,6 +32,7 @@ import com.r0adkll.chipper.ui.widget.DividerDecoration;
 import com.r0adkll.chipper.ui.widget.EmptyView;
 import com.r0adkll.chipper.ui.widget.TightSwipeRefreshLayout;
 import com.r0adkll.chipper.utils.UIUtils;
+import com.r0adkll.deadskunk.utils.Utils;
 import com.r0adkll.postoffice.PostOffice;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -285,7 +286,7 @@ public class PopularActivity extends BaseDrawerActivity implements PopularView,
                     public void onShow(int i) {
                         // Animate FAB
                         mFABShufflePlay.animate()
-                                .translationY(-i)
+                                .translationY(-Utils.dpToPx(getActivity(), i))
                                 .setDuration(300)
                                 .start();
                     }

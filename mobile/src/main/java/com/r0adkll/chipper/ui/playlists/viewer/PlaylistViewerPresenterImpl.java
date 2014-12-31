@@ -198,7 +198,7 @@ public class PlaylistViewerPresenterImpl implements PlaylistViewerPresenter {
                         dialog.dismiss();
                     }
                 })
-                .setButtonTextColor(Dialog.BUTTON_POSITIVE, R.color.primary)
+                .setButtonTextColor(Dialog.BUTTON_POSITIVE, R.color.secondary)
                 .show(mView.getActivity().getFragmentManager());
     }
 

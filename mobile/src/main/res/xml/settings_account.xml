@@ -1,4 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <PreferenceCategory android:title="@string/setting_category_notifications">
+
+        <SwitchPreference
+            android:key="pref_acct_notifications"
+            android:title="@string/setting_acct_push_notification"
+            android:summary="@string/setting_acct_push_notification_summary"
+            />
+
+        <CheckBoxPreference
+            android:key="pref_acct_notification_featured"
+            android:title="@string/setting_acct_notif_feature"
+            android:summary="@string/setting_acct_notif_feature_summary"
+            android:dependency="pref_acct_notifications"
+            android:defaultValue="true"
+            />
+
+        <CheckBoxPreference
+            android:key="pref_acct_notification_redeemed"
+            android:title="@string/setting_acct_notif_redeem"
+            android:summary="@string/setting_acct_notif_redeem_summary"
+            android:dependency="pref_acct_notifications"
+            android:defaultValue="true"/>
+
+
+    </PreferenceCategory>
+
+
 </PreferenceScreen>

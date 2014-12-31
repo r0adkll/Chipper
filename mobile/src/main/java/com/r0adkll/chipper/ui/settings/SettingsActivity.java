@@ -1,6 +1,7 @@
 package com.r0adkll.chipper.ui.settings;
 
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -17,8 +18,13 @@ import android.widget.TextView;
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.data.CashMachine;
 import com.r0adkll.chipper.qualifiers.CurrentUser;
 import com.r0adkll.chipper.ui.model.BaseActivity;
+import com.r0adkll.deadskunk.utils.FileUtils;
+import com.r0adkll.deadskunk.utils.Utils;
+
+import java.io.File;
 
 import javax.inject.Inject;
 
@@ -191,6 +197,9 @@ public class SettingsActivity extends ActionBarActivity {
             addPreferencesFromResource(R.xml.settings_downloading);
             ActionBar ab =((SettingsActivity) getActivity()).getSupportActionBar();
             ab.setTitle(R.string.settings_downloading);
+
+            computeCacheSizes();
+
         }
 
         @Override
@@ -205,10 +214,49 @@ public class SettingsActivity extends ActionBarActivity {
         @Override
         public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
             switch (preference.getKey()){
-
+                case "pref_clear_offline_cache":
+                    if(FileUtils.deleteDirectory(new File(getActivity().getFilesDir(), CashMachine.CACHE_DIRECTORY_NAME))){
+                        computeCacheSizes();
+                        return true;
+                    }
+                    break;
             }
             return super.onPreferenceTreeClick(preferenceScreen, preference);
         }
+
+
+        private void computeCacheSizes(){
+
+            new AsyncTask<Void, Void, Long>(){
+                @Override
+                protected Long doInBackground(Void... params) {
+
+                    // Compute the cache sizes
+                    File dir = new File(getActivity().getFilesDir(), CashMachine.CACHE_DIRECTORY_NAME);
+                    long size = 0;
+
+                    for(File file: dir.listFiles()){
+                        size += file.length();
+                    }
+
+                    return size;
+                }
+
+                @Override
+                protected void onPostExecute(Long result) {
+
+                    // Get the menu item
+                    Preference offlineSize = getPreferenceManager().findPreference("pref_offline_size");
+
+                    // Condensed
+                    offlineSize.setSummary(Utils.condenseFileSize(result, Utils.TWO_DIGIT));
+
+
+                }
+            }.execute();
+
+        }
+
     }
 
     /**
@@ -226,7 +274,7 @@ public class SettingsActivity extends ActionBarActivity {
             ChipperApp.get(getActivity()).inject(this);
             addPreferencesFromResource(R.xml.settings_account);
             ActionBar ab =((SettingsActivity) getActivity()).getSupportActionBar();
-
+            ab.setTitle(R.string.settings_account);
         }
 
         @Override

@@ -36,7 +36,7 @@ public class CashMachine {
      *
      */
 
-    private static final String CACHE_DIRECTORY_NAME = "offline";
+    public static final String CACHE_DIRECTORY_NAME = "offline";
 
 
     /***********************************************************************************************

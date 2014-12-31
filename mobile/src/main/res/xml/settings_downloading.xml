@@ -29,7 +29,7 @@
         <Preference
             android:key="pref_offline_size"
             android:title="@string/setting_offline_size"
-            android:summary="2.3 GB"
+            android:summary="0.0 GB"
             android:selectable="false"
             />
 

@@ -11,7 +11,6 @@ import android.os.Handler;
 
 import com.activeandroid.content.ContentProvider;
 import com.r0adkll.chipper.ChipperApp;
-import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.account.GoogleAccountManager;
 import com.r0adkll.chipper.api.ChipperService;
 import com.r0adkll.chipper.api.model.Device;
@@ -20,14 +19,11 @@ import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.data.VoteManager;
 import com.r0adkll.chipper.data.model.PlaylistObserver;
-import com.r0adkll.chipper.push.PushManager;
-import com.r0adkll.chipper.push.PushUtils;
 import com.r0adkll.chipper.qualifiers.CurrentDevice;
 import com.r0adkll.chipper.qualifiers.CurrentUser;
-import com.r0adkll.chipper.ui.dashboard.DashboardActivity;
+import com.r0adkll.chipper.ui.screens.dashboard.DashboardActivity;
 import com.r0adkll.chipper.utils.Tools;
-import com.r0adkll.chipper.ui.all.ChiptunesActivity;
-import com.r0adkll.chipper.ui.login.LoginActivity;
+import com.r0adkll.chipper.ui.screens.login.LoginActivity;
 import com.r0adkll.deadskunk.utils.Utils;
 
 import javax.inject.Inject;

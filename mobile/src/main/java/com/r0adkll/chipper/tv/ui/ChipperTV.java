@@ -15,8 +15,6 @@ import com.r0adkll.chipper.qualifiers.CurrentDevice;
 import com.r0adkll.chipper.qualifiers.CurrentUser;
 import com.r0adkll.chipper.tv.ui.leanback.ChipperLeanback;
 import com.r0adkll.chipper.tv.ui.login.TVLoginActivity;
-import com.r0adkll.chipper.ui.all.ChiptunesActivity;
-import com.r0adkll.chipper.ui.login.LoginActivity;
 import com.r0adkll.chipper.utils.Tools;
 import com.r0adkll.deadskunk.utils.Utils;
 

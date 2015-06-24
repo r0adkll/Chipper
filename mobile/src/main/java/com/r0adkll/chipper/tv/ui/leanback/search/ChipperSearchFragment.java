@@ -2,8 +2,6 @@ package com.r0adkll.chipper.tv.ui.leanback.search;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.HandlerThread;
 import android.support.v17.leanback.app.SearchFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.ListRow;
@@ -17,10 +15,9 @@ import android.text.TextUtils;
 
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.tv.ui.leanback.playback.TVPlaybackActivity;
-import com.r0adkll.chipper.tv.ui.leanback.playlist.TVPlaylistActivity;
 import com.r0adkll.chipper.tv.ui.model.BaseSearchFragment;
 import com.r0adkll.chipper.tv.ui.model.ChiptunePresenter;
-import com.r0adkll.chipper.ui.player.MusicPlayer;
+import com.r0adkll.chipper.ui.screens.player.MusicPlayer;
 
 import java.util.List;
 

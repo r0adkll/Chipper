@@ -13,7 +13,6 @@ import android.widget.TextView;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.User;
-import com.r0adkll.chipper.ui.playlists.PlaylistView;
 import com.r0adkll.deadskunk.adapters.BetterListAdapter;
 import com.r0adkll.deadskunk.utils.Utils;
 import com.r0adkll.postoffice.model.Design;

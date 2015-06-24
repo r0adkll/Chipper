@@ -15,8 +15,8 @@ import com.r0adkll.chipper.account.GoogleAccountManager;
 import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.playback.MusicService;
 import com.r0adkll.chipper.ui.Chipper;
-import com.r0adkll.chipper.ui.featured.FeaturedActivity;
-import com.r0adkll.chipper.ui.playlists.PlaylistActivity;
+import com.r0adkll.chipper.ui.screens.featured.FeaturedActivity;
+import com.r0adkll.chipper.ui.screens.playlists.PlaylistActivity;
 
 import timber.log.Timber;
 

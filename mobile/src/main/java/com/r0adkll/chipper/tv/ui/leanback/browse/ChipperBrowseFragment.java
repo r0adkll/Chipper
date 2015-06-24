@@ -24,16 +24,13 @@ import com.nispok.snackbar.Snackbar;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.api.model.Chiptune;
 import com.r0adkll.chipper.api.model.Playlist;
-import com.r0adkll.chipper.data.ChiptuneProvider;
 import com.r0adkll.chipper.tv.ui.leanback.playback.TVPlaybackActivity;
-import com.r0adkll.chipper.tv.ui.leanback.playlist.TVPlaylistActivity;
-import com.r0adkll.chipper.tv.ui.leanback.search.ChipperSearchFragment;
 import com.r0adkll.chipper.tv.ui.leanback.search.SearchActivity;
 import com.r0adkll.chipper.tv.ui.model.BaseBrowseFragment;
 import com.r0adkll.chipper.tv.ui.model.ChiptunePresenter;
 import com.r0adkll.chipper.tv.ui.model.PlaylistPresenter;
 import com.r0adkll.chipper.tv.ui.model.PreferencePresenter;
-import com.r0adkll.chipper.ui.player.MusicPlayer;
+import com.r0adkll.chipper.ui.screens.player.MusicPlayer;
 
 import java.util.List;
 

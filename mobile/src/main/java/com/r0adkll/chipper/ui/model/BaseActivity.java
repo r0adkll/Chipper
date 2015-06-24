@@ -6,7 +6,7 @@ import android.support.v7.widget.Toolbar;
 
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
-import com.r0adkll.chipper.ui.player.MusicPlayer;
+import com.r0adkll.chipper.ui.screens.player.MusicPlayer;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import butterknife.ButterKnife;

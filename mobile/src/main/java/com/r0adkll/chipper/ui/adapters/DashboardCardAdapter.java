@@ -8,7 +8,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.r0adkll.chipper.R;
-import com.r0adkll.chipper.ui.dashboard.model.DashboardCard;
+import com.r0adkll.chipper.ui.screens.dashboard.model.DashboardCard;
 
 import java.util.List;
 

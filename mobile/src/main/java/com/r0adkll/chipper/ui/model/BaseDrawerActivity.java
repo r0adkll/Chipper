@@ -1,9 +1,7 @@
 package com.r0adkll.chipper.ui.model;
 
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Rect;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.DrawerLayout;
@@ -16,22 +14,19 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.activeandroid.content.ContentProvider;
 import com.r0adkll.chipper.ChipperApp;
 import com.r0adkll.chipper.R;
 import com.r0adkll.chipper.account.GoogleAccountManager;
-import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.data.events.OfflineModeChangeEvent;
-import com.r0adkll.chipper.data.model.PlaylistObserver;
 import com.r0adkll.chipper.push.PushManager;
-import com.r0adkll.chipper.ui.dashboard.DashboardActivity;
-import com.r0adkll.chipper.ui.featured.FeaturedActivity;
-import com.r0adkll.chipper.ui.player.MusicPlayer;
+import com.r0adkll.chipper.ui.screens.dashboard.DashboardActivity;
+import com.r0adkll.chipper.ui.screens.featured.FeaturedActivity;
+import com.r0adkll.chipper.ui.screens.player.MusicPlayer;
 import com.r0adkll.chipper.utils.prefs.BooleanPreference;
 import com.r0adkll.chipper.qualifiers.OfflineSwitchPreference;
-import com.r0adkll.chipper.ui.all.ChiptunesActivity;
-import com.r0adkll.chipper.ui.playlists.PlaylistActivity;
-import com.r0adkll.chipper.ui.popular.PopularActivity;
+import com.r0adkll.chipper.ui.screens.all.ChiptunesActivity;
+import com.r0adkll.chipper.ui.screens.playlists.PlaylistActivity;
+import com.r0adkll.chipper.ui.screens.popular.PopularActivity;
 import com.r0adkll.chipper.ui.settings.SettingsActivity;
 import com.r0adkll.chipper.ui.widget.ScrimInsetsScrollView;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;

@@ -28,7 +28,7 @@ import com.r0adkll.chipper.tv.ui.leanback.playback.TVPlaybackActivity;
 import com.r0adkll.chipper.tv.ui.model.BaseDetailsFragment;
 import com.r0adkll.chipper.tv.ui.model.ChiptunePresenter;
 import com.r0adkll.chipper.tv.ui.model.PlaylistDescriptionPresenter;
-import com.r0adkll.chipper.ui.player.MusicPlayer;
+import com.r0adkll.chipper.ui.screens.player.MusicPlayer;
 import com.r0adkll.deadskunk.utils.Utils;
 
 import java.util.List;

@@ -2,17 +2,9 @@ package com.r0adkll.chipper.tv.ui.model;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
 
 import com.r0adkll.chipper.ChipperApp;
-import com.r0adkll.chipper.R;
-import com.r0adkll.chipper.ui.player.MusicPlayer;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-import butterknife.ButterKnife;
-import butterknife.InjectView;
-import butterknife.Optional;
 import dagger.ObjectGraph;
 
 /**

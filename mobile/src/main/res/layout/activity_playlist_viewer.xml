@@ -137,7 +137,7 @@
         android:id="@+id/music_player"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="com.r0adkll.chipper.ui.player.MusicPlayer"
+        android:name="com.r0adkll.chipper.ui.screens.player.MusicPlayer"
         android:layout_alignParentBottom="true"
         tools:layout="@layout/fragment_music_player"
         />

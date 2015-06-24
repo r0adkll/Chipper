@@ -64,26 +64,26 @@
         </activity>
 
         <!-- The Login Activity -->
-        <activity android:name=".ui.login.LoginActivity"
+        <activity android:name=".ui.screens.login.LoginActivity"
             android:theme="@style/Theme.Chipper.NoActionbar"/>
 
         <!-- The main chiptune list activity -->
-        <activity android:name=".ui.all.ChiptunesActivity"/>
+        <activity android:name=".ui.screens.all.ChiptunesActivity"/>
 
         <!-- The Popular voted list activity-->
-        <activity android:name=".ui.popular.PopularActivity"/>
+        <activity android:name=".ui.screens.popular.PopularActivity"/>
 
         <!-- The Playlist Activity -->
-        <activity android:name=".ui.playlists.PlaylistActivity"/>
+        <activity android:name=".ui.screens.playlists.PlaylistActivity"/>
 
         <!-- The Playlist Viewing Activity -->
-        <activity android:name=".ui.playlists.viewer.PlaylistViewerActivity" />
+        <activity android:name=".ui.screens.playlists.viewer.PlaylistViewerActivity" />
 
         <!-- The Featured Playlist Activity -->
-        <activity android:name=".ui.featured.FeaturedActivity" />
+        <activity android:name=".ui.screens.featured.FeaturedActivity" />
 
         <!-- The Dashboard Activity -->
-        <activity android:name=".ui.dashboard.DashboardActivity" />
+        <activity android:name=".ui.screens.dashboard.DashboardActivity" />
 
         <!-- Settings Activity -->
         <activity android:name=".ui.settings.SettingsActivity"

@@ -3,21 +3,18 @@ apply plugin: 'io.fabric'
 apply plugin: 'hugo'
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.1"
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
 
     defaultConfig {
         applicationId "com.r0adkll.chipper"
         minSdkVersion 17
-        targetSdkVersion 21
+        targetSdkVersion 22
         versionCode 1
         versionName "2.0.0"
     }
 
     dexOptions {
-        incremental false
-        preDexLibraries false
-        jumboMode false
         javaMaxHeapSize "2048M"
     }
 
@@ -53,33 +50,30 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.android.support:support-v4:21.+'
-    compile 'com.android.support:appcompat-v7:21.+'
-    compile 'com.android.support:cardview-v7:21.0.+'
-    compile 'com.android.support:recyclerview-v7:21.0.+'
-    compile 'com.android.support:leanback-v17:21.0.+'
-    compile 'com.google.android.gms:play-services-base:6.5.+'
-    compile 'com.google.android.gms:play-services-plus:6.5.+'
-    compile 'com.google.android.gms:play-services-cast:6.5.+'
+    // TODO: Replace with 52Kit
+    compile 'com.52inc:52Kit-core:0.3.0'
+    compile 'com.android.support:leanback-v17:22.0.+'
+
+    compile 'com.google.android.gms:play-services-base:7.5.0'
+    compile 'com.google.android.gms:play-services-plus:7.5.0'
+    compile 'com.google.android.gms:play-services-cast:7.5.0'
 
     compile 'com.r0adkll:postoffice:1.1.+'
-    compile 'com.r0adkll:deadskunk:1.0.2-SNAPSHOT'
+    compile 'com.r0adkll:slidableactivity:+'
 
     compile 'com.github.frankiesardo:icepick:2.3.6'
     provided 'com.github.frankiesardo:icepick-processor:2.3.6'
 
     compile 'com.squareup:otto:1.+'
     compile 'com.squareup.picasso:picasso:2.3.4'
+
     compile 'com.squareup.okhttp:okhttp:2.0.0'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
+
     compile 'com.squareup.retrofit:retrofit:1.7.1'
     compile 'com.squareup.dagger:dagger:1.2.2'
     provided 'com.squareup.dagger:dagger-compiler:1.2.2'
 
-    compile 'com.jakewharton.timber:timber:2.4.+'
-    compile 'com.jakewharton:butterknife:6.0.0'
-
-    compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'com.timehop.stickyheadersrecyclerview:library:0.3.3@aar'
     compile 'com.fortysevendeg:swipelistview:1.0.+'
     compile 'com.nispok:snackbar:2.3.0'

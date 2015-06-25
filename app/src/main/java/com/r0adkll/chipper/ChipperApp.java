@@ -5,29 +5,13 @@ import android.app.Fragment;
 import android.app.Service;
 import android.content.Context;
 
-import com.activeandroid.ActiveAndroid;
-import com.activeandroid.Configuration;
-import com.crashlytics.android.Crashlytics;
-import com.r0adkll.chipper.api.model.Chiptune;
-import com.r0adkll.chipper.api.model.ChiptuneReference;
-import com.r0adkll.chipper.api.model.Device;
-import com.r0adkll.chipper.api.model.FeaturedChiptuneReference;
-import com.r0adkll.chipper.api.model.FeaturedPlaylist;
-import com.r0adkll.chipper.api.model.Playlist;
-import com.r0adkll.chipper.api.model.User;
-import com.r0adkll.chipper.api.model.Vote;
-import com.r0adkll.chipper.data.Historian;
+import com.ftinc.kit.mvp.BaseApplication;
+import com.r0adkll.chipper.AppComponent.Initializer;
 import com.r0adkll.chipper.utils.CrashlyticsTree;
-import com.r0adkll.chipper.utils.FileTree;
 import com.r0adkll.postoffice.PostOffice;
 import com.r0adkll.postoffice.model.Design;
 import com.r0adkll.postoffice.model.Stamp;
 
-import io.fabric.sdk.android.Fabric;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import dagger.ObjectGraph;
 import hugo.weaving.DebugLog;
 import timber.log.Timber;
 
@@ -36,37 +20,29 @@ import timber.log.Timber;
  * Package: com.r0adkll.chipper
  * Created by drew.heavner on 11/12/14.
  */
-public class ChipperApp extends Application{
-    private ObjectGraph objectGraph;
+public class ChipperApp extends BaseApplication{
+
+    /***********************************************************************************************
+     *
+     * Variables
+     *
+     */
+
+    private AppGraph mComponent;
+
+    /***********************************************************************************************
+     *
+     * Application Methods
+     *
+     */
+
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        // Initialize ActiveAndroid
-        Configuration.Builder builder = new Configuration.Builder(this)
-                .addModelClasses(
-                        User.class,
-                        Device.class,
-                        Chiptune.class,
-                        Playlist.class,
-                        ChiptuneReference.class,
-                        Vote.class,
-                        Historian.Chronicle.class,
-                        FeaturedPlaylist.class,
-                        FeaturedChiptuneReference.class
-                );
-
-        // Initialize the Database ORM
-        ActiveAndroid.initialize(builder.create());
-
-        // Plant Timber Trees
-        if(BuildConfig.DEBUG){
-            Timber.plant(new Timber.DebugTree());
-        }else{
-            Timber.plant(new CrashlyticsTree(this));
-            Timber.plant(new FileTree(this, getLogFilename()));
-        }
+        // Build Dagger2 graph
+        setupGraph();
 
         // Setup PostOffice stamp
         PostOffice.lick(new Stamp.Builder(this)
@@ -76,41 +52,63 @@ public class ChipperApp extends Application{
                 .setCanceledOnTouchOutside(true)
                 .build());
 
-        // Setup the object graph
-        buildObjectGraphAndInject();
     }
 
-    @DebugLog
-    public void buildObjectGraphAndInject(){
-        objectGraph = ObjectGraph.create(Modules.list(this));
-        objectGraph.inject(this);
-    }
-
-    /**
-     * Create a scoped object graph
+    /***********************************************************************************************
      *
-     * @param modules       the list of modules to add to the scope
-     * @return              the scoped graph
+     * Dagger Methods
+     *
      */
-    public ObjectGraph createScopedGraph(Object... modules){
-        return objectGraph.plus(modules);
+
+    /**
+     * Setup the Dagger object graph component
+     */
+    @DebugLog
+    private void setupGraph(){
+        mComponent = Initializer.init(this);
+        mComponent.inject(this);
     }
 
     /**
-     * Get the file log name
-     * @return
+     * Get the Application object graph component
+     *
+     * @return      the application graph
      */
-    private String getLogFilename(){
-        SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
-        return String.format("chipper_%s_%s.log", sdf.format(new Date()), BuildConfig.VERSION_NAME);
+    public AppGraph component(){
+        return mComponent;
     }
 
-    /**
-     * Inject an object with the object graph
+    /***********************************************************************************************
+     *
+     * Base Methods
+     *
      */
-    public void inject(Object o){
-        objectGraph.inject(o);
+
+    @Override
+    public Timber.Tree[] getDebugTrees() {
+        return new Timber.Tree[]{
+            new Timber.DebugTree()
+        };
     }
+
+    @Override
+    public Timber.Tree[] getReleaseTrees() {
+        return new Timber.Tree[]{
+            new CrashlyticsTree(this)
+        };
+    }
+
+    @Override
+    public Boolean isDebug() {
+        return BuildConfig.DEBUG;
+    }
+
+    /***********************************************************************************************
+     *
+     * Static Accessors
+     *
+     */
+
 
     /**
      * Get a reference to the Application

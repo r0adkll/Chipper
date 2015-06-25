@@ -30,19 +30,10 @@ import retrofit.converter.GsonConverter;
  *
  * Created by r0adkll on 11/10/14.
  */
-@Module(
-    complete = false,
-    library = true
-)
+@Module
 public final class ApiModule {
 
     public static final String DEVELOPMENT_BASE_URL = "http://192.168.1.85:6080/CHIPPER/V1/";
-    public static final String PRODUCTION_BASE_URL = "http://r0adkll.com:6080/CHIPPER/V1/";
-
-    @Provides @Singleton
-    Endpoint provideEndpoint(){
-        return Endpoints.newFixedEndpoint(PRODUCTION_BASE_URL);
-    }
 
     @Provides @Singleton
     Client provideClient(OkHttpClient client) {
@@ -63,11 +54,6 @@ public final class ApiModule {
                 .setErrorHandler(errorHandler)
                 .setConverter(new GsonConverter(new Gson()))
                 .build();
-    }
-
-    @Provides @Singleton
-    ChipperService provideChipperService(RestAdapter restAdapter) {
-        return restAdapter.create(ChipperService.class);
     }
 
     /**

@@ -3,12 +3,12 @@
 buildscript {
     repositories {
         jcenter()
-        mavenCentral()
         maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.2.3'
-        classpath 'com.jakewharton.hugo:hugo-plugin:1.1.0'
+        classpath 'com.jakewharton.hugo:hugo-plugin:1.2.1'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
         classpath 'io.fabric.tools:gradle:1.+'
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -19,8 +19,6 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
-        mavenCentral()
-        mavenLocal()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url 'https://maven.fabric.io/public' }
     }

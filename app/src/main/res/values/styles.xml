@@ -1,97 +1,24 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
-    <style name="Theme.Chipper" parent="Theme.AppCompat.Light">
+    <style name="Theme.Chipper.Base" parent="Theme.AppCompat.Light.NoActionBar">
+
         <!-- App's Color Palette -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primaryDark</item>
-        <item name="colorAccent">@color/accentColor</item>
-        <item name="colorControlHighlight">@color/controlHighlight</item>
+        <item name="colorAccent">@color/accent</item>
 
         <item name="windowActionModeOverlay">true</item>
-        <item name="windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
-        <item name="actionModeStyle">@style/Widget.Chipper.ActionMode</item>
 
     </style>
 
-    <style name="Theme.Chipper.Settings" parent="Theme.AppCompat.Light">
+    <style name="Theme.Chipper.Settings" parent="Theme.Chipper.Base">
+
         <!-- App's Color Palette -->
         <item name="colorPrimary">@color/primaryDark</item>
         <item name="colorPrimaryDark">@color/primary</item>
         <item name="colorAccent">@color/primary</item>
-        <item name="colorControlHighlight">@color/controlHighlight</item>
-
-        <item name="actionBarTheme">@style/ThemeOverlay.Chipper.ActionBar</item>
-        <item name="actionBarPopupTheme">@style/ThemeOverlay.Chipper.ActionBar.Popup</item>
-        <item name="titleTextAppearance">@style/TextAppearance.Chipper.ActionBar.Title</item>
     </style>
-
-    <style name="Theme.Chipper.Translucent" parent="Theme.Chipper">
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@color/transparent</item>
-    </style>
-
-    <!-- Base application theme. -->
-    <style name="Theme.Chipper.NoActionbar" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- App's Color Palette -->
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primaryDark</item>
-        <item name="colorAccent">@color/accentColor</item>
-    </style>
-
-    <!--============================================================================================
-
-        Styles
-
-    -->
-
-    <style name="ThemeOverlay.Chipper.ActionBar" parent="">
-        <item name="android:textColorPrimary">#fff</item>
-        <item name="colorControlNormal">#fff</item>
-        <item name="colorControlHighlight">#3fff</item>
-    </style>
-
-    <style name="Theme.Chipper.ActionBar" parent="">
-        <item name="android:textColorPrimary">#fff</item>
-        <item name="colorControlNormal">#fff</item>
-        <item name="colorControlHighlight">#3fff</item>
-    </style>
-
-    <style name="ThemeOverlay.Chipper.ActionBar.Popup" parent="ThemeOverlay.AppCompat.Light" />
-
-    <style name="TextAppearance.Chipper.ActionBar.Title" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
-        <item name="android:textColor">#fff</item>
-    </style>
-
-    <style name="TextAppearance.Chipper.ExtendedActionBar.Title" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
-        <item name="android:textColor">#fff</item>
-        <item name="android:textSize">24sp</item>
-    </style>
-
-    <style name="Widget.Chipper.HeaderBar" parent="">
-        <item name="android:background">@drawable/actionbar_background</item>
-        <item name="android:elevation" tools:ignore="NewApi">@dimen/headerbar_elevation</item>
-    </style>
-
-    <style name="Widget.Chipper.HeaderBar.Transparent" parent="">
-        <item name="android:background">@color/transparent</item>
-        <item name="android:elevation" tools:ignore="NewApi">@dimen/headerbar_elevation</item>
-    </style>
-
-    <style name="Widget.Chipper.ActionMode" parent="Widget.AppCompat.ActionMode">
-        <item name="background">@drawable/cab_background_top_chipper</item>
-    </style>
-
-    <style name="Widget.Chipper.DrawerItem.Title" parent="">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">48dp</item>
-        <item name="android:textColor">@color/colorDrawerText</item>
-        <item name="android:textSize">@dimen/abc_text_size_button_material</item>
-        <item name="android:gravity">start|center_vertical</item>
-        <item name="android:layout_gravity">start|center_vertical</item>
-        <item name="android:fontFamily" tools:ignore="NewApi">sans-serif-medium</item>
-    </style>
-
 
 </resources>

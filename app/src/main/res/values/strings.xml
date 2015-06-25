@@ -2,9 +2,6 @@
 <resources>
 
     <string name="app_name">Chipper</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-    <string name="placeholder_lorem_ipsum">Lorem ipsum dolor set it</string>
     <string name="navdrawer_item_dashboard">Dashboard</string>
     <string name="navdrawer_item_chiptunes">Chiptunes</string>
     <string name="navdrawer_item_popular">Popular</string>
@@ -14,30 +11,12 @@
     <string name="navdrawer_item_offline">Offline mode</string>
     <string name="navdrawer_item_settings">Settings</string>
     <string name="navdrawer_item_feedback">Send feedback</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="add_playlist_dialog_item">Add playlist</string>
 
     <string name="error_network">A network error has occured, please check your connection.</string>
     <string name="error_no_response">There was no response from the server.</string>
     <string name="error_network_http_error">There was an issue in communicating with the server.</string>
     <string name="error_unknown">An unknown error has occurred.</string>
-    <string name="action_play">Play</string>
-    <string name="action_pause">Pause</string>
-    <string name="action_next">Next</string>
-    <string name="action_previous">Previous</string>
-    <string name="action_upvote">Upvote</string>
-    <string name="action_downvote">Downvote</string>
-    <string name="default_current_tune_title">Press play</string>
-    <string name="default_current_tune_description">to play a random tune</string>
-    <string name="action_offline">Offline</string>
-    <string name="action_share">Share</string>
-    <string name="app_name_tv">Chipper for TV</string>
-    <string name="service_name">ChipperPlaybackService</string>
-
-    <string name="empty_msg_chiptunes">There are no\nchiptunes to display</string>
-    <string name="empty_msg_playlist_viewer">You don\'t have any\nchiptunes in this playlist.</string>
-    <string name="empty_msg_featured">The featured playlist\nhas not been loaded\nyet.</string>
 
     <string name="setting_auto_upvote">Auto Upvote</string>
     <string name="setting_auto_upvote_summary">Automatically upvote when you favorite a chiptune</string>
@@ -66,21 +45,17 @@
     <string name="settings_downloading">Downloading</string>
     <string name="settings_general">General settings</string>
     <string name="settings_about">About</string>
+
     <string name="action_submit_feature">Submit as Feature</string>
     <string name="action_submit_feature_condensed">Feature this</string>
     <string name="dialog_submit_feature_title">Enter a feature title</string>
     <string name="dialog_submit_feature_msg">Choose a display title for this feature playlist.</string>
     <string name="dialog_button_submit">Submit</string>
-    <string name="dashboard_recents_header_title">Recently played</string>
-    <string name="dashboard_mostplayed_header_title">Most played</string>
-    <string name="dashboard_recents_empty_msg">No recents available</string>
+
     <string name="setting_category_dashboard">Dashboard</string>
     <string name="setting_num_recents">Number of displayed recents</string>
     <string name="setting_num_mostplayed">Number of most frequently played</string>
-    <string name="action_favorite">Favorite</string>
-    <string name="dashboard_mostplayed_server_header_title">Globally most played</string>
-    <string name="dashboard_mostplayed_empty_msg">No chiptunes available</string>
-    <string name="dashboard_mostcompleted_server_header_title">Globally most completed</string>
+
     <string name="settings_account">Account</string>
     <string name="setting_acct_push_notification">Push notifications</string>
     <string name="setting_acct_push_notification_summary">Enable all push notifications on this device</string>

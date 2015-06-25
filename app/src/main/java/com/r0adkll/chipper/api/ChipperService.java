@@ -1,13 +1,13 @@
 package com.r0adkll.chipper.api;
 
 import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.api.model.Chronicle;
 import com.r0adkll.chipper.api.model.Device;
 import com.r0adkll.chipper.api.model.FeaturedPlaylist;
 import com.r0adkll.chipper.api.model.Playlist;
 import com.r0adkll.chipper.api.model.ServerTime;
 import com.r0adkll.chipper.api.model.User;
 import com.r0adkll.chipper.api.model.Vote;
-import com.r0adkll.chipper.data.Historian;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +21,7 @@ import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.Path;
 import retrofit.http.Query;
+import rx.Observable;
 
 /**
  * API Definitions for the new Java Chipper API
@@ -31,22 +32,18 @@ public interface ChipperService {
 
     /**
      * Get server's time endpoint that reports the servers time and version
-     *
-     * @param cb    the callback
      */
     @GET("/time")
-    void time(Callback<ServerTime> cb);
+    Observable<ServerTime> time();
 
     /**
      * The Login/Create endpoint for authorizing the chipper api
      *
-     * @param cb    the auth callback
      */
     @FormUrlEncoded
     @POST("/auth")
-    void auth(@Field("email") String email,
-              @Field("token") String gPlusToken,
-              Callback<User> cb);
+    Observable<User> auth(@Field("email") String email,
+                          @Field("token") String gPlusToken);
 
     /**
      * TODO: Create this endpoint in the API
@@ -56,13 +53,11 @@ public interface ChipperService {
      *
      * @param email         the email address they wish to use
      * @param password      the password to use that is hashed on the server
-     * @param cb            the auth callback
      */
     @FormUrlEncoded
     @POST("/auth/login")
-    void login(@Field("email") String email,
-               @Field("password") String password,
-               Callback<User> cb);
+    Observable<User> login(@Field("email") String email,
+                           @Field("password") String password);
 
     /**
      * TODO: Create this endpoint in the API
@@ -71,13 +66,11 @@ public interface ChipperService {
      *
      * @param email         the email address they wish to use
      * @param password      their password to create an account with
-     * @param cb            the callback with the user object on the server
      */
     @FormUrlEncoded
     @POST("/auth/create")
-    void create(@Field("email") String email,
-                @Field("password") String password,
-                Callback<User> cb);
+    Observable<User> create(@Field("email") String email,
+                            @Field("password") String password);
 
     /**
      * Register a new device, or update an existing one with a matching device_id
@@ -86,15 +79,13 @@ public interface ChipperService {
      * @param model         the model of the device ({@link android.os.Build#MANUFACTURER} + {@link android.os.Build#PRODUCT})
      * @param sdk           the sdk int version of this device
      * @param tablet        whether this device is a tablet or not
-     * @param cb            the callback
      */
     @FormUrlEncoded
     @POST("/user/devices")
-    void registerDevice(@Field("device_id") String deviceId,
+    Observable<Device> registerDevice(@Field("device_id") String deviceId,
                         @Field("model") String model,
                         @Field("sdk") int sdk,
-                        @Field("tablet") boolean tablet,
-                        Callback<Device> cb);
+                        @Field("tablet") boolean tablet);
 
     /**
      * Verify a PlayStore purchase against the server
@@ -105,31 +96,26 @@ public interface ChipperService {
      */
     @FormUrlEncoded
     @POST("/user/{id}/premium")
-    void verifyPlayStorePurchase(@Path("id") String userId,
-                                 @Field("purchase_token") String purchaseToken,
-                                 Callback cb);
+    Observable<Object> verifyPlayStorePurchase(@Path("id") String userId,
+                                 @Field("purchase_token") String purchaseToken);
 
     /**
      * Get a list of devices for the provided user
      *
      * @param userId        the user id for whose devices to get
-     * @param cb            the callback
      */
     @GET("/user/{id}/devices")
-    void getUsersDevices(@Path("id") String userId,
-                         Callback<List<Device>> cb);
+    Observable<List<Device>> getUsersDevices(@Path("id") String userId);
 
     /**
      * Get a single device
      *
      * @param userId        the id of the user the device belongs to
      * @param deviceId      the id of the device to get
-     * @param cb            the callback
      */
     @GET("/user/{id}/devices/{deviceId}")
-    void getDevice(@Path("id") String userId,
-                   @Path("deviceId") String deviceId,
-                   Callback<Device> cb);
+    Observable<Device> getDevice(@Path("id") String userId,
+                                 @Path("deviceId") String deviceId);
 
     /**
      * Register a push token to this device
@@ -137,36 +123,30 @@ public interface ChipperService {
      * @param userId        the id of the user the device belongs to
      * @param deviceId      the id of the device to update
      * @param pushToken     the push token to update
-     * @param cb            the callback
      */
     @FormUrlEncoded
     @POST("/user/{id}/devices/{deviceId}")
-    void registerPushToken(@Path("id") String userId,
-                           @Path("deviceId") String deviceId,
-                           @Field("push_token") String pushToken,
-                           Callback<Device> cb);
+    Observable<Device> registerPushToken(@Path("id") String userId,
+                                         @Path("deviceId") String deviceId,
+                                         @Field("push_token") String pushToken);
 
     /**
      * Delete a specified device
      *
      * @param userId        the id of the user the device belongs to
      * @param deviceId      the id of the device to delete
-     * @param cb            the callback
      */
     @DELETE("/user/{id}/devices/{deviceId}")
-    void deleteDevice(@Path("id") String userId,
-                      @Path("deviceId") String deviceId,
-                      Callback cb);
+    Observable<Object> deleteDevice(@Path("id") String userId,
+                      @Path("deviceId") String deviceId);
 
     /**
      * Get all of the user's playlists that he owns
      *
      * @param userId        the id of the user the playlists belong to
-     * @param cb            the callback
      */
     @GET("/user/{id}/playlists")
-    void getPlaylists(@Path("id") String userId,
-                      Callback<List<Playlist>> cb);
+    Observable<List<Playlist>> getPlaylists(@Path("id") String userId);
 
     /**
      * Synchronously get all the user's playlists stored on the server
@@ -184,21 +164,18 @@ public interface ChipperService {
      * @param body          the playlist update/create json
      */
     @POST("/user/{id}/playlists")
-    void createPlaylist(@Path("id") String userId,
-                        @Body Map<String, Object> body,
-                        Callback<Playlist> cb);
+    Observable<Playlist> createPlaylist(@Path("id") String userId,
+                                        @Body Map<String, Object> body);
 
     /**
      * Get a specified playlist
      *
      * @param userId        the id of the user the playlist belongs to
      * @param playlistId    the id of the playlist to get
-     * @param cb            the callback
      */
     @GET("/user/{id}/playlists/{pid}")
-    void getPlaylist(@Path("id") String userId,
-                     @Path("pid") String playlistId,
-                     Callback<Playlist> cb);
+    Observable<Playlist> getPlaylist(@Path("id") String userId,
+                                     @Path("pid") String playlistId);
 
     /**
      * Update an existing playlist
@@ -206,13 +183,11 @@ public interface ChipperService {
      * @param userId            the id of the user this playlist belongs to
      * @param playlistId        the id of the playlist to update
      * @param body              the playlist update body
-     * @param cb                the callback
      */
     @POST("/user/{id}/playlists/{pid}")
-    void updatePlaylist(@Path("id") String userId,
-                        @Path("pid") String playlistId,
-                        @Body Map<String, Object> body,
-                        Callback<Playlist> cb);
+    Observable<Playlist> updatePlaylist(@Path("id") String userId,
+                                        @Path("pid") String playlistId,
+                                        @Body Map<String, Object> body);
 
     /**
      * Synchronously update an existing playlist with the server
@@ -232,12 +207,10 @@ public interface ChipperService {
      *
      * @param userId        the id of the user the playlist belongs to
      * @param playlistId    the id of the playlist to delete
-     * @param cb            the callback
      */
     @DELETE("/user/{id}/playlists/{pid}")
-    void deletePlaylist(@Path("id") String userId,
-                        @Path("pid") String playlistId,
-                        Callback<Map<String, String>> cb);
+    Observable<Map<String, String>> deletePlaylist(@Path("id") String userId,
+                                                   @Path("pid") String playlistId);
 
     /**
      * Delete a specified playlist synchronously
@@ -256,14 +229,12 @@ public interface ChipperService {
      * @param userId        the id of the user the playlist belongs to
      * @param playlistId    the id of the playlist to share
      * @param permission    (OPTIONAL) the permission of the now shared playlist
-     * @param cb            the callback
      */
     @FormUrlEncoded
     @POST("/user/{id}/playlists/{pid}/share")
-    void sharePlaylist(@Path("id") String userId,
-                       @Path("pid") String playlistId,
-                       @Field("permission") String permission,
-                       Callback<Map<String, String>> cb);
+    Observable<Map<String, String>>  sharePlaylist(@Path("id") String userId,
+                                                   @Path("pid") String playlistId,
+                                                   @Field("permission") String permission);
 
     /**
      * Get a list of playlists that are shared with you
@@ -272,8 +243,7 @@ public interface ChipperService {
      * @param cb        the callback
      */
     @GET("/user/{id}/shared/playlists")
-    void getSharedPlaylists(@Path("id") String userId,
-                            Callback<List<Playlist>> cb);
+    Observable<List<Playlist>> getSharedPlaylists(@Path("id") String userId);
 
     /**
      * Get a specific shared playlist by it's id
@@ -374,14 +344,14 @@ public interface ChipperService {
      *
      * @param userId        the the id of the user
      * @param chiptuneId    the id of the chiptune that stat is about
-     * @param statsType     the stats increment type, see {@link com.r0adkll.chipper.data.Historian.Chronicle}
+     * @param statsType     the stats increment type, see {@link Chronicle}
      * @param cb            the callback
      */
     @POST("/user/{id}/stats/{chiptuneId}/{type}")
     void postStats(@Path("id") String userId,
                    @Path("chiptuneId") String chiptuneId,
                    @Path("type") String statsType,
-                   Callback<Historian.Chronicle> cb);
+                   Callback<Chronicle> cb);
 
     /**
      * Get the current featured playlist
@@ -418,7 +388,7 @@ public interface ChipperService {
      */
     @GET("/general/mostplayed")
     void getMostPlayed(@Query("limit") int limit,
-                       Callback<List<Historian.Chronicle>> cb);
+                       Callback<List<Chronicle>> cb);
 
     /**
      * Get teh most skipped chiptunes from the server with a given limit
@@ -428,7 +398,7 @@ public interface ChipperService {
      */
     @GET("/general/mostskipped")
     void getMostSkipped(@Query("limit") int limit,
-                        Callback<List<Historian.Chronicle>> cb);
+                        Callback<List<Chronicle>> cb);
 
     /**
      * Get the most completed chiptunes from the server with a given limit
@@ -438,7 +408,7 @@ public interface ChipperService {
      */
     @GET("/general/mostcompleted")
     void getMostCompleted(@Query("limit") int limit,
-                          Callback<List<Historian.Chronicle>> cb);
+                          Callback<List<Chronicle>> cb);
 
     /**
      * If you are an administrator, you can upload featured playlists

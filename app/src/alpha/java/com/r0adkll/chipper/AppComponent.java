@@ -1,7 +1,7 @@
 package com.r0adkll.chipper;
 
 import com.r0adkll.chipper.api.ApiModule;
-import com.r0adkll.chipper.ui.UiModule;
+import com.r0adkll.chipper.ui.NewUiModule;
 
 import javax.inject.Singleton;
 
@@ -16,7 +16,7 @@ import dagger.Component;
         AppModule.class,
         AlphaModule.class,
         ApiModule.class,
-        UiModule.class
+        NewUiModule.class
     }
 )
 public interface AppComponent extends AppGraph{
@@ -27,7 +27,7 @@ public interface AppComponent extends AppGraph{
                     .appModule(new AppModule(app))
                     .alphaModule(new AlphaModule())
                     .apiModule(new ApiModule())
-                    .uiModule(new UiModule())
+                    .uiModule(new NewUiModule())
                     .build();
         }
         private Initializer(){}

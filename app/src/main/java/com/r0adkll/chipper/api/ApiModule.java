@@ -5,6 +5,7 @@ import android.app.Application;
 import com.google.gson.Gson;
 import com.r0adkll.chipper.api.model.Device;
 import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.utils.TimberLog;
 import com.r0adkll.chipper.utils.Tools;
 import com.squareup.okhttp.OkHttpClient;
 
@@ -20,6 +21,7 @@ import dagger.Provides;
 import retrofit.Endpoint;
 import retrofit.Endpoints;
 import retrofit.RestAdapter;
+import retrofit.RestAdapter.LogLevel;
 import retrofit.client.Client;
 import retrofit.client.OkClient;
 import retrofit.converter.GsonConverter;
@@ -33,8 +35,6 @@ import retrofit.converter.GsonConverter;
 @Module
 public final class ApiModule {
 
-    public static final String DEVELOPMENT_BASE_URL = "http://192.168.1.85:6080/CHIPPER/V1/";
-
     @Provides @Singleton
     Client provideClient(OkHttpClient client) {
         return new OkClient(client);
@@ -46,12 +46,18 @@ public final class ApiModule {
     }
 
     @Provides @Singleton
-    RestAdapter provideRestAdapter(Endpoint endpoint, Client client, ApiHeaders headers, ChipperErrorHandler errorHandler) {
+    RestAdapter provideRestAdapter(Endpoint endpoint,
+                                   Client client,
+                                   LogLevel logLevel,
+                                   ApiHeaders headers,
+                                   ChipperErrorHandler errorHandler) {
         return new RestAdapter.Builder()
                 .setClient(client)
                 .setEndpoint(endpoint)
                 .setRequestInterceptor(headers)
                 .setErrorHandler(errorHandler)
+                .setLog(new TimberLog())
+                .setLogLevel(logLevel)
                 .setConverter(new GsonConverter(new Gson()))
                 .build();
     }

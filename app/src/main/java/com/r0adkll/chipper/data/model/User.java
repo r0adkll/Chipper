@@ -1,51 +1,57 @@
-package com.r0adkll.chipper.api.model;
+package com.r0adkll.chipper.data.model;
 
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.provider.BaseColumns;
 
-import com.activeandroid.Model;
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
-import com.activeandroid.query.From;
-import com.activeandroid.query.Select;
+import com.bluelinelabs.logansquare.annotation.JsonField;
+import com.bluelinelabs.logansquare.annotation.JsonObject;
 
-import java.util.List;
+import ollie.Model;
+import ollie.annotation.Column;
+import ollie.annotation.Table;
 
 /**
  * Created by r0adkll on 11/1/14.
  */
-@Table(name = "Users", id = BaseColumns._ID)
+@JsonObject
+@Table("users")
 public class User extends Model implements Parcelable{
 
-    @Column(name = "userId")
-    public String id;
+    @JsonField(name = "id")
+    @Column("user_id")
+    public String userId;
 
-    @Column
+    @JsonField
+    @Column("email")
     public String email;
 
-    @Column
+    @JsonField
+    @Column("premium")
     public boolean premium;
 
-    @Column
+    @JsonField
+    @Column("admin")
     public boolean admin;
 
     /**
      * Do note that this is only valid for registering a new device, after the device is created
      * these tokens are invalidated
      */
-    @Column
+    @JsonField
+    @Column("public_key")
     public String public_key;
 
     /**
      * Do note that this is only valid for registering a new device, after the device is created
      * these tokens are invalidated
      */
-    @Column
+    @JsonField
+    @Column("private_key")
     public String private_key;
 
-    @Column(name = "is_current_user")
+    @JsonField
+    @Column("is_current_user")
     public boolean isCurrentUser = false;
 
 
@@ -63,7 +69,7 @@ public class User extends Model implements Parcelable{
      */
     public User(Parcel in){
         super();
-        id = in.readString();
+        userId = in.readString();
         email = in.readString();
         premium = in.readInt() == 0 ? false : true;
         public_key = in.readString();
@@ -80,19 +86,6 @@ public class User extends Model implements Parcelable{
         save();
     }
 
-    /**
-     * Get a list of playlists for this user
-     *
-     * @return  return the list of playlists associated with this user
-     */
-    public List<Playlist> getPlaylists(){
-        return new Select()
-            .from(Playlist.class)
-            .where("owner=?", getId())
-            .and("deleted=?", false)
-            .execute();
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -100,7 +93,7 @@ public class User extends Model implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
+        dest.writeString(userId);
         dest.writeString(email);
         dest.writeInt(premium ? 1 : 0);
         dest.writeString(public_key);

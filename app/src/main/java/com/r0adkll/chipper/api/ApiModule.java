@@ -3,14 +3,11 @@ package com.r0adkll.chipper.api;
 import android.app.Application;
 
 import com.google.gson.Gson;
-import com.r0adkll.chipper.api.model.Device;
-import com.r0adkll.chipper.api.model.User;
+import com.r0adkll.chipper.data.model.Device;
+import com.r0adkll.chipper.data.model.User;
 import com.r0adkll.chipper.utils.TimberLog;
 import com.r0adkll.chipper.utils.Tools;
 import com.squareup.okhttp.OkHttpClient;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.LinkedHashMap;
 
@@ -19,7 +16,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import retrofit.Endpoint;
-import retrofit.Endpoints;
 import retrofit.RestAdapter;
 import retrofit.RestAdapter.LogLevel;
 import retrofit.client.Client;

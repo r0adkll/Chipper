@@ -1,4 +1,4 @@
-package com.r0adkll.chipper.api.model;
+package com.r0adkll.chipper.data.model;
 
 import com.bluelinelabs.logansquare.annotation.JsonField;
 import com.bluelinelabs.logansquare.annotation.JsonObject;

@@ -1,19 +1,11 @@
-package com.r0adkll.chipper.api.model;
+package com.r0adkll.chipper.data.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.provider.BaseColumns;
 import android.text.TextUtils;
 
-import com.activeandroid.ActiveAndroid;
-import com.activeandroid.Model;
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
-import com.activeandroid.query.Select;
-import com.google.gson.annotations.SerializedName;
-import com.r0adkll.chipper.data.CashMachine;
-import com.r0adkll.chipper.data.ChiptuneProvider;
-import com.r0adkll.chipper.data.PlaylistManager;
+import com.bluelinelabs.logansquare.annotation.JsonField;
+import com.bluelinelabs.logansquare.annotation.JsonObject;
 import com.r0adkll.chipper.utils.Tools;
 
 import java.util.ArrayList;
@@ -24,12 +16,19 @@ import java.util.List;
 import java.util.Map;
 
 import hugo.weaving.DebugLog;
+import ollie.Model;
+import ollie.annotation.Column;
+import ollie.annotation.ForeignKey;
+import ollie.annotation.Table;
+
+import static ollie.annotation.ForeignKey.ReferentialAction.CASCADE;
 
 /**
  * Created by r0adkll on 11/2/14.
  */
-@Table(name = "FeaturedPlaylists", id = BaseColumns._ID)
-public class FeaturedPlaylist extends Model implements Parcelable{
+@JsonObject
+@Table("playlists")
+public class Playlist extends Model implements Parcelable{
 
     /***********************************************************************************************
      *
@@ -38,13 +37,31 @@ public class FeaturedPlaylist extends Model implements Parcelable{
      */
 
     /**
+     * Create a new playlist associated with a certain user
+     *
+     * @param name      the name of the new playlist
+     * @param user      the user that created the playlist
+     * @return          the new playlist
+     */
+    public static Playlist create(String name, User user){
+        Playlist plist = new Playlist();
+        plist.name = name;
+        plist.owner = user;
+        plist.updated = Tools.time();
+        plist.updated_by_user = user;
+        plist.token = "";
+        plist.permissions = "read";
+        return plist;
+    }
+
+    /**
      * Generate a new playlist based on another one, one that may have been deleted per-se
      *
      * @param playlist      the playlist to create from
      * @return              the new playlist
      */
-    public static FeaturedPlaylist create(FeaturedPlaylist playlist){
-        FeaturedPlaylist p = new FeaturedPlaylist();
+    public static Playlist create(Playlist playlist){
+        Playlist p = new Playlist();
         // Update the basic values now
         p.id = playlist.id;
         p.name = playlist.name;
@@ -72,27 +89,41 @@ public class FeaturedPlaylist extends Model implements Parcelable{
 
     /***********************************************************************************************
      *
+     * Constants
+     *
+     */
+
+    public static final String FAVORITES = "Favorites";
+    public static final String FEATURED = "Featured";
+
+    /***********************************************************************************************
+     *
      * Variables
      *
      */
 
-    @Column(name = "playlist_id")
-    public String id;
+    @JsonField(name = "id")
+    @Column("playlist_id")
+    public String playlistId;
 
-    @Column(
-        onUpdate = Column.ForeignKeyAction.CASCADE,
-        onDelete = Column.ForeignKeyAction.CASCADE
+    @JsonField
+    @Column("user")
+    @ForeignKey(
+        onUpdate = CASCADE,
+        onDelete = CASCADE
     )
     public User owner;
 
-    @Column(index = true)
+    @JsonField
+    @Column("name")
     public String name;
 
     /**
      * This variable is ONLY sent down when requesting the Featured playlist
      * it is otherwise null with every other playlist
      */
-    @Column
+    @JsonField
+    @Column("feature_title")
     public String feature_title;
 
     @Column
@@ -119,12 +150,12 @@ public class FeaturedPlaylist extends Model implements Parcelable{
      * for later use by the function {@link #chiptuneReferences()}
      */
     @SerializedName("tunes")
-    public List<FeaturedChiptuneReference> tuneRefs;
+    public List<ChiptuneReference> tuneRefs;
 
     /**
      * Default Constructor
      */
-    public FeaturedPlaylist(){
+    public Playlist(){
         super();
     }
 
@@ -133,7 +164,7 @@ public class FeaturedPlaylist extends Model implements Parcelable{
      *
      * @param in        the reconstructing parcelable
      */
-    public FeaturedPlaylist(Parcel in){
+    public Playlist(Parcel in){
         super();
         id = in.readString();
         owner = in.readParcelable(User.class.getClassLoader());
@@ -145,7 +176,7 @@ public class FeaturedPlaylist extends Model implements Parcelable{
         permissions = in.readString();
 
         tuneRefs = new ArrayList<>();
-        in.readTypedList(tuneRefs, FeaturedChiptuneReference.CREATOR);
+        in.readTypedList(tuneRefs, ChiptuneReference.CREATOR);
     }
 
     /***********************************************************************************************
@@ -159,7 +190,7 @@ public class FeaturedPlaylist extends Model implements Parcelable{
      *
      * @param playlist      the playlist to update from
      */
-    public boolean update(FeaturedPlaylist playlist){
+    public boolean update(Playlist playlist){
         if(playlist.getId() != null) return false;
 
         // Update the basic values now
@@ -212,10 +243,10 @@ public class FeaturedPlaylist extends Model implements Parcelable{
 
         // 3) Batch delete all the Chiptune references from the database
         if(getId() != null) {
-            List<FeaturedChiptuneReference> references = chiptuneReferences();
+            List<ChiptuneReference> references = chiptuneReferences();
             ActiveAndroid.beginTransaction();
             try {
-                for (FeaturedChiptuneReference reference : references) {
+                for (ChiptuneReference reference : references) {
                     reference.delete();
                 }
                 ActiveAndroid.setTransactionSuccessful();
@@ -244,7 +275,7 @@ public class FeaturedPlaylist extends Model implements Parcelable{
             try{
                 int N = tuneRefs.size();
                 for(int i=0; i<N; i++){
-                    FeaturedChiptuneReference reference = tuneRefs.get(i);
+                    ChiptuneReference reference = tuneRefs.get(i);
                     reference.playlist = this;
                     reference.sort_order = i;
                     reference.save();
@@ -260,12 +291,12 @@ public class FeaturedPlaylist extends Model implements Parcelable{
      * Get the list of chiptune references associated with this class
      * @return
      */
-    private List<FeaturedChiptuneReference> chiptuneReferences(){
-        List<FeaturedChiptuneReference> references = getMany(FeaturedChiptuneReference.class, "playlist");
+    private List<ChiptuneReference> chiptuneReferences(){
+        List<ChiptuneReference> references = getMany(ChiptuneReference.class, "playlist");
         if(references != null){
-            Collections.sort(references, new Comparator<FeaturedChiptuneReference>() {
+            Collections.sort(references, new Comparator<ChiptuneReference>() {
                 @Override
-                public int compare(FeaturedChiptuneReference lhs, FeaturedChiptuneReference rhs) {
+                public int compare(ChiptuneReference lhs, ChiptuneReference rhs) {
                     int lhsSO = lhs.sort_order;
                     int rhsSO = rhs.sort_order;
                     return lhsSO < rhsSO ? -1 : (lhsSO == rhsSO ? 0 : 1);
@@ -288,10 +319,10 @@ public class FeaturedPlaylist extends Model implements Parcelable{
      *
      * @return      the sanatized list of chiptune references
      */
-    public List<FeaturedChiptuneReference> sanatizeChiptuneReferences(){
-        List<FeaturedChiptuneReference> refs = new ArrayList<>();
-        for(FeaturedChiptuneReference ref: tuneRefs){
-            refs.add(FeaturedChiptuneReference.create(ref));
+    public List<ChiptuneReference> sanatizeChiptuneReferences(){
+        List<ChiptuneReference> refs = new ArrayList<>();
+        for(ChiptuneReference ref: tuneRefs){
+            refs.add(ChiptuneReference.create(ref));
         }
         return refs;
     }
@@ -312,8 +343,8 @@ public class FeaturedPlaylist extends Model implements Parcelable{
      * @return              true if the chiptune is in this playlist
      */
     public boolean contains(Chiptune chiptune){
-        List<FeaturedChiptuneReference> references = chiptuneReferences();
-        for(FeaturedChiptuneReference ref: references){
+        List<ChiptuneReference> references = chiptuneReferences();
+        for(ChiptuneReference ref: references){
             if(ref.chiptune_id.equals(chiptune.id)){
                 return true;
             }
@@ -338,8 +369,8 @@ public class FeaturedPlaylist extends Model implements Parcelable{
      */
     public List<Chiptune> getChiptunes(ChiptuneProvider provider){
         List<Chiptune> tunes = new ArrayList<>();
-        List<FeaturedChiptuneReference> refs = chiptuneReferences();
-        for(FeaturedChiptuneReference reference: refs){
+        List<ChiptuneReference> refs = chiptuneReferences();
+        for(ChiptuneReference reference: refs){
 
             // Load the chiptune
             Chiptune chiptune = null;
@@ -369,7 +400,7 @@ public class FeaturedPlaylist extends Model implements Parcelable{
         if(!contains(tune)) {
 
             // Generate ChiptuneReference and add it to this playlist
-            FeaturedChiptuneReference reference = new FeaturedChiptuneReference();
+            ChiptuneReference reference = new ChiptuneReference();
             reference.chiptune_id = tune.id;
             reference.playlist = this;
             reference.sort_order = chiptuneReferences().size();
@@ -405,7 +436,7 @@ public class FeaturedPlaylist extends Model implements Parcelable{
         try{
             for(Chiptune tune: filteredTunes){
 
-                FeaturedChiptuneReference reference = new FeaturedChiptuneReference();
+                ChiptuneReference reference = new ChiptuneReference();
                 reference.chiptune_id = tune.id;
                 reference.playlist = this;
                 reference.sort_order = chiptuneReferences().size();
@@ -432,8 +463,8 @@ public class FeaturedPlaylist extends Model implements Parcelable{
     @DebugLog
     public boolean remove(Chiptune tune){
         // Get Chiptune Reference, and delete it from the database, then update the playlist to the server
-        FeaturedChiptuneReference reference = new Select()
-                .from(FeaturedChiptuneReference.class)
+        ChiptuneReference reference = new Select()
+                .from(ChiptuneReference.class)
                 .where("chiptune_id = ?", tune.id)
                 .and("playlist = ?", this)
                 .limit(1)
@@ -463,28 +494,38 @@ public class FeaturedPlaylist extends Model implements Parcelable{
     public boolean rearrange(Chiptune tune, int index){
 
         // first, find chiptunes old reference
-        FeaturedChiptuneReference reference = new Select()
-                .from(FeaturedChiptuneReference.class)
+        ChiptuneReference reference = new Select()
+                .from(ChiptuneReference.class)
                 .where("chiptune_id = ?", tune.id)
                 .and("playlist = ?", this)
                 .limit(1)
                 .executeSingle();
 
         if(reference != null){
-
-            // Now iterate through the items after this new insert and update there sort order accordingly
-            List<FeaturedChiptuneReference> references = chiptuneReferences();
-            references.remove(reference);
-            references.add(index, reference);
-            avengeSortOrder(references);
-
-            // Update this playlists updated time
-            updated = Tools.time();
-            save();
+            rearrange(reference, index);
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Re-arrange a chiptune in this playlist to it's new index
+     *
+     * @param index     the index to move it to
+     * @return          the results
+     */
+    @DebugLog
+    public void rearrange(ChiptuneReference reference, int index){
+        // Now iterate through the items after this new insert and update there sort order accordingly
+        List<ChiptuneReference> references = chiptuneReferences();
+        references.remove(reference);
+        references.add(index, reference);
+        avengeSortOrder(references);
+
+        // Update this playlists updated time
+        updated = Tools.time();
+        save();
     }
 
     /**
@@ -493,11 +534,11 @@ public class FeaturedPlaylist extends Model implements Parcelable{
      *
      * @param references
      */
-    private void avengeSortOrder(List<FeaturedChiptuneReference> references){
+    private void avengeSortOrder(List<ChiptuneReference> references){
         ActiveAndroid.beginTransaction();
         try {
             for (int i = 0; i < references.size(); i++) {
-                FeaturedChiptuneReference ref = references.get(i);
+                ChiptuneReference ref = references.get(i);
                 ref.sort_order = i;
                 ref.save();
             }
@@ -525,9 +566,9 @@ public class FeaturedPlaylist extends Model implements Parcelable{
             map.put("permission", permissions);
         }
 
-        List<FeaturedChiptuneReference> references = chiptuneReferences();
+        List<ChiptuneReference> references = chiptuneReferences();
         List<String> tunes = new ArrayList<>();
-        for(FeaturedChiptuneReference ref: references){
+        for(ChiptuneReference ref: references){
             tunes.add(ref.chiptune_id);
         }
 
@@ -543,10 +584,10 @@ public class FeaturedPlaylist extends Model implements Parcelable{
      * @return          true if every chiptune in this playlist is offline, false otherwise
      */
     public boolean isOffline(CashMachine atm){
-        List<FeaturedChiptuneReference> tunes = chiptuneReferences();
+        List<ChiptuneReference> tunes = chiptuneReferences();
         if(tunes == null || tunes.isEmpty()) return false;
 
-        for(FeaturedChiptuneReference tune: tunes){
+        for(ChiptuneReference tune: tunes){
             if(!atm.isOffline(tune.chiptune_id)){
                 return false;
             }
@@ -556,10 +597,10 @@ public class FeaturedPlaylist extends Model implements Parcelable{
     }
 
     public boolean isPartiallyOffline(CashMachine atm){
-        List<FeaturedChiptuneReference> tunes = chiptuneReferences();
+        List<ChiptuneReference> tunes = chiptuneReferences();
         if(tunes == null || tunes.isEmpty()) return false;
 
-        for(FeaturedChiptuneReference tune: tunes){
+        for(ChiptuneReference tune: tunes){
             if(atm.isOffline(tune.chiptune_id)){
                 return true;
             }
@@ -600,15 +641,15 @@ public class FeaturedPlaylist extends Model implements Parcelable{
         dest.writeTypedList(tuneRefs);
     }
 
-    public static final Creator<FeaturedPlaylist> CREATOR = new Creator<FeaturedPlaylist>() {
+    public static final Creator<Playlist> CREATOR = new Creator<Playlist>() {
         @Override
-        public FeaturedPlaylist createFromParcel(Parcel source) {
-            return new FeaturedPlaylist(source);
+        public Playlist createFromParcel(Parcel source) {
+            return new Playlist(source);
         }
 
         @Override
-        public FeaturedPlaylist[] newArray(int size) {
-            return new FeaturedPlaylist[size];
+        public Playlist[] newArray(int size) {
+            return new Playlist[size];
         }
     };
 

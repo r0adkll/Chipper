@@ -1,18 +1,17 @@
 package com.r0adkll.chipper.api;
 
-import com.r0adkll.chipper.api.model.Chiptune;
-import com.r0adkll.chipper.api.model.Chronicle;
-import com.r0adkll.chipper.api.model.Device;
-import com.r0adkll.chipper.api.model.FeaturedPlaylist;
-import com.r0adkll.chipper.api.model.Playlist;
+import com.r0adkll.chipper.data.model.Chiptune;
+import com.r0adkll.chipper.data.model.Chronicle;
+import com.r0adkll.chipper.data.model.Device;
+import com.r0adkll.chipper.data.model.FeaturedPlaylist;
+import com.r0adkll.chipper.data.model.Playlist;
 import com.r0adkll.chipper.api.model.ServerTime;
-import com.r0adkll.chipper.api.model.User;
-import com.r0adkll.chipper.api.model.Vote;
+import com.r0adkll.chipper.data.model.User;
+import com.r0adkll.chipper.data.model.Vote;
 
 import java.util.List;
 import java.util.Map;
 
-import retrofit.Callback;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.Field;

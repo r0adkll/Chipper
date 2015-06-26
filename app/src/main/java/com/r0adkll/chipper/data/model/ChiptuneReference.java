@@ -1,18 +1,21 @@
-package com.r0adkll.chipper.api.model;
+package com.r0adkll.chipper.data.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.provider.BaseColumns;
 
-import com.activeandroid.Model;
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
-import com.google.gson.annotations.SerializedName;
+import com.bluelinelabs.logansquare.annotation.JsonField;
+import com.bluelinelabs.logansquare.annotation.JsonObject;
+
+import ollie.Model;
+import ollie.annotation.Column;
+import ollie.annotation.ForeignKey;
+import ollie.annotation.Table;
 
 /**
  * Created by r0adkll on 11/16/14.
  */
-@Table(name = "playlist_chiptunes", id = BaseColumns._ID)
+@JsonObject
+@Table("playlist_chiptunes")
 public class ChiptuneReference extends Model implements Parcelable {
 
     /***********************************************************************************************
@@ -33,24 +36,25 @@ public class ChiptuneReference extends Model implements Parcelable {
      *
      */
 
-    @Column(index = true, notNull = true)
-    @SerializedName("id")
+    @Column("chiptune_id")
+    @JsonField(name = "id")
     public String chiptune_id;
 
-    @Column(
-        notNull = true,
-        onDelete = Column.ForeignKeyAction.CASCADE,
-        onUpdate = Column.ForeignKeyAction.CASCADE
+    @Column("playlist")
+    @ForeignKey(
+            onDelete = ForeignKey.ReferentialAction.CASCADE,
+            onUpdate = ForeignKey.ReferentialAction.CASCADE
     )
     public Playlist playlist;
 
-    @Column(notNull = true)
-    public int sort_order;
+    @JsonField
+    @Column("sort_order")
+    public Integer sort_order;
 
     /**
      * Default Constructor
      */
-    public ChiptuneReference(){super();}
+    public ChiptuneReference(){}
 
     /**
      * Parcel COnstructor

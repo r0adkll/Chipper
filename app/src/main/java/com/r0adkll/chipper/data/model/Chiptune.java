@@ -1,18 +1,23 @@
-package com.r0adkll.chipper.api.model;
+package com.r0adkll.chipper.data.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.activeandroid.Model;
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
+
+import com.bluelinelabs.logansquare.annotation.JsonField;
+import com.bluelinelabs.logansquare.annotation.JsonObject;
 
 import java.util.concurrent.TimeUnit;
+
+import ollie.Model;
+import ollie.annotation.Column;
+import ollie.annotation.Table;
 
 /**
  * Created by r0adkll on 11/9/14.
  */
-@Table(name = "Chiptunes")
+@JsonObject
+@Table("chiptunes")
 public class Chiptune extends Model implements Parcelable{
 
     /***********************************************************************************************
@@ -21,19 +26,30 @@ public class Chiptune extends Model implements Parcelable{
      *
      */
 
-    @Column(name = "chiptune_id", index = true)
-    public String id;
-    @Column public String title;
-    @Column public String artist;
-    @Column public String stream_url;
-    @Column public long length;
+    @JsonField(name = "id")
+    @Column("chiptune_id")
+    public String chiptuneId;
+
+    @JsonField
+    @Column("title")
+    public String title;
+
+    @JsonField
+    @Column("artist")
+    public String artist;
+
+    @JsonField
+    @Column("stream_url")
+    public String stream_url;
+
+    @JsonField
+    @Column("length")
+    public long length;
 
     /**
      * Default Constructor
      */
-    public Chiptune(){
-        super();
-    }
+    public Chiptune(){}
 
     /**
      * Parcel Constructor
@@ -41,7 +57,7 @@ public class Chiptune extends Model implements Parcelable{
      */
     public Chiptune(Parcel in){
         super();
-        id = in.readString();
+        chiptuneId = in.readString();
         title = in.readString();
         artist = in.readString();
         stream_url = in.readString();
@@ -67,7 +83,7 @@ public class Chiptune extends Model implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
+        dest.writeString(chiptuneId);
         dest.writeString(title);
         dest.writeString(artist);
         dest.writeString(stream_url);

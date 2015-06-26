@@ -1,7 +1,7 @@
 package com.r0adkll.chipper.utils;
 
 
-import com.r0adkll.chipper.api.model.Chiptune;
+import com.r0adkll.chipper.data.model.Chiptune;
 
 import java.util.Comparator;
 

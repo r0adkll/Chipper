@@ -1,18 +1,20 @@
-package com.r0adkll.chipper.api.model;
+package com.r0adkll.chipper.data.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.activeandroid.Model;
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
+import com.bluelinelabs.logansquare.annotation.JsonField;
+import com.bluelinelabs.logansquare.annotation.JsonObject;
 
-import java.util.Map;
+import ollie.Model;
+import ollie.annotation.Column;
+import ollie.annotation.Table;
 
 /**
  * Created by r0adkll on 11/15/14.
  */
-@Table(name = "Votes")
+@JsonObject
+@Table("votes")
 public class Vote extends Model implements Parcelable{
 
     public static final String TYPE_UP = "up";
@@ -22,41 +24,34 @@ public class Vote extends Model implements Parcelable{
     public static final int DOWN = -1;
     public static final int NONE = 0;
 
-    @Column(name = "vote_id")
-    public String id;
+    @JsonField(name = "id")
+    @Column("vote_id")
+    public String voteId;
 
-    @Column(index = true)
+    @JsonField
+    @Column("tune_id")
     public String tune_id;
 
-    @Column
+    @JsonField
+    @Column("value")
     public int value;
 
-    @Column
+    @JsonField
+    @Column("updated")
     public long updated;
-
 
     /**
      * Default Constructor
      */
-    public Vote(){ super(); }
+    public Vote(){}
 
     /**
      * Parcel Constructor
      */
-    public Vote(Parcel in){
-        super();
-        id = in.readString();
+    private Vote(Parcel in){
+        voteId = in.readString();
         tune_id = in.readString();
         value = in.readInt();
-    }
-
-    public Vote(Map<String, Object> map){
-        super();
-        id = (String) map.get("id");
-        tune_id = (String) map.get("tune_id");
-
-        Double val = (Double) map.get("value");
-        value = val.intValue();
     }
 
     /***********************************************************************************************
@@ -72,7 +67,7 @@ public class Vote extends Model implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
+        dest.writeString(voteId);
         dest.writeString(tune_id);
         dest.writeInt(value);
         dest.writeLong(updated);

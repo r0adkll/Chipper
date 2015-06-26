@@ -1,8 +1,6 @@
 package com.r0adkll.chipper.api;
 
 import com.google.gson.Gson;
-import com.r0adkll.chipper.api.model.Device;
-import com.r0adkll.chipper.api.model.User;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

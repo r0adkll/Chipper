@@ -1,4 +1,4 @@
-package com.r0adkll.chipper.api.model;
+package com.r0adkll.chipper.data.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -1,39 +1,66 @@
-package com.r0adkll.chipper.api.model;
+package com.r0adkll.chipper.data.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.activeandroid.Model;
-import com.activeandroid.annotation.Column;
-import com.activeandroid.annotation.Table;
+import com.bluelinelabs.logansquare.annotation.JsonField;
+import com.bluelinelabs.logansquare.annotation.JsonObject;
+
+import ollie.Model;
+import ollie.annotation.Column;
+import ollie.annotation.Table;
 
 /**
  * Created by r0adkll on 11/2/14.
  */
-@Table(name = "Devices")
+@JsonObject
+@Table("devices")
 public class Device extends Model implements Parcelable{
 
-    @Column(name = "dev_id")
-    public String id;
-    @Column public String device_id;
-    @Column public String model;
-    @Column public int sdk;
-    @Column public boolean tablet;
-    @Column public long updated;
-    @Column public String push_token;
-    @Column public String private_key;
-    @Column public String public_key;
+    @JsonField(name = "id")
+    @Column("dev_id")
+    public String _id;
+
+    @JsonField
+    @Column("device_id")
+    public String device_id;
+
+    @JsonField
+    @Column("model")
+    public String model;
+
+    @JsonField
+    @Column("sdk")
+    public Integer sdk;
+
+    @JsonField
+    @Column("tablet")
+    public Boolean tablet;
+
+    @JsonField
+    @Column("updated")
+    public Long updated;
+
+    @JsonField
+    @Column("push_token")
+    public String push_token;
+
+    @JsonField
+    @Column("private_key")
+    public String private_key;
+
+    @JsonField
+    @Column("public_key")
+    public String public_key;
 
     /**
      * Default constructor
      */
-    public Device(){
-        super();
-    }
+    public Device(){}
 
-    public Device(Parcel in){
+    private Device(Parcel in){
         super();
-        id = in.readString();
+        _id = in.readString();
         device_id = in.readString();
         model = in.readString();
         sdk = in.readInt();
@@ -50,10 +77,10 @@ public class Device extends Model implements Parcelable{
      * @param device        the device to update with
      */
     public void update(Device device){
-        if(device.getId() != null) return;
+        if(device.id != null) return;
 
         // Update all it's fields
-        id = device.id;
+        _id = device._id;
         device_id = device.device_id;
         model = device.model;
         sdk = device.sdk;
@@ -74,7 +101,7 @@ public class Device extends Model implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
+        dest.writeString(_id);
         dest.writeString(device_id);
         dest.writeString(model);
         dest.writeInt(sdk);

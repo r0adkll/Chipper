@@ -240,7 +240,6 @@ public interface ChipperService {
      * Get a list of playlists that are shared with you
      *
      * @param userId    the id of the user the playlists are shared with
-     * @param cb        the callback
      */
     @GET("/user/{id}/shared/playlists")
     Observable<List<Playlist>> getSharedPlaylists(@Path("id") String userId);
@@ -250,12 +249,10 @@ public interface ChipperService {
      *
      * @param userId              the id of the user that the playlist is shared with
      * @param sharedPlaylistId    the id of the shared playlist
-     * @param cb                  the callback
      */
     @GET("/user/{id}/shared/playlists/{spid}")
-    void getSharedPlaylist(@Path("id") String userId,
-                           @Path("spid") String sharedPlaylistId,
-                           Callback<Playlist> cb);
+    Observable<Playlist> getSharedPlaylist(@Path("id") String userId,
+                                           @Path("spid") String sharedPlaylistId);
 
     /**
      * Update a playlist that is shared with you, but only if the owner has set the permission
@@ -263,12 +260,10 @@ public interface ChipperService {
      *
      * @param userId                the id of the user that the playlist is shared with
      * @param sharedPlaylistId      the id of the shared playlist
-     * @param cb                    the callback
      */
     @POST("/user/{id}/shared/playlists/{spid}")
-    void updateSharedPlaylist(@Path("id") String userId,
-                              @Path("spid") String sharedPlaylistId,
-                              Callback<Playlist> cb);
+    Observable<Playlist> updateSharedPlaylist(@Path("id") String userId,
+                                              @Path("spid") String sharedPlaylistId);
 
 
     /**
@@ -277,12 +272,10 @@ public interface ChipperService {
      *
      * @param userId                the id of the user that the playlist is shared with
      * @param sharedPlaylistId      the id of the shared playlist
-     * @param cb                    the callback
      */
     @DELETE("/user/{id}/shared/playlists/{spid}")
-    void removeSharedPlaylist(@Path("id") String userId,
-                              @Path("spid") String sharedPlaylistId,
-                              Callback cb);
+    Observable<Object> removeSharedPlaylist(@Path("id") String userId,
+                                            @Path("spid") String sharedPlaylistId);
 
     /**
      * Redeem a shared playlists' token that was received from one of the specially
@@ -290,23 +283,19 @@ public interface ChipperService {
      *
      * @param userId    the id of the user
      * @param token     the shared playlist token used to redeem the playlist
-     * @param cb        the callback
      */
     @FormUrlEncoded
     @POST("/user/{id}/shared/redeem")
-    void redeemSharedPlaylist(@Path("id") String userId,
-                              @Field("token") String token,
-                              Callback cb);
+    Observable<Object> redeemSharedPlaylist(@Path("id") String userId,
+                                            @Field("token") String token);
 
     /**
      * Return the map of all the user's vote values
      *
      * @param userId    the id of the user
-     * @param cb        the callback
      */
     @GET("/user/{id}/votes")
-    void getUserVotes(@Path("id") String userId,
-                      Callback<List<Vote>> cb);
+    Observable<List<Vote>> getUserVotes(@Path("id") String userId);
 
     /**
      * Vote on a chiptune
@@ -314,25 +303,21 @@ public interface ChipperService {
      * @param userId        the id of the user
      * @param voteType      the type of vote i.e. 'up' or 'down'
      * @param tuneId        the id of the chiptune to vote upon
-     * @param cb            the callback
      */
     @POST("/user/{id}/vote/{type}/{tuneId}")
-    void vote(@Path("id") String userId,
-              @Path("type") String voteType,
-              @Path("tuneId") String tuneId,
-              Callback<Map<String, Object>> cb);
+    Observable<Map<String, Object>> vote(@Path("id") String userId,
+                                         @Path("type") String voteType,
+                                         @Path("tuneId") String tuneId);
 
     /**
      * Batch vote on several chiptunes at once
      *
      * @param userId        the id of the user
      * @param body          the body containing the vote params
-     * @param cb            the callback
      */
     @POST("/user/{id}/vote/batch")
-    void batchVote(@Path("id") String userId,
-                   @Body List<Map<String, Object>> body,
-                   Callback cb);
+    Observable<Object> batchVote(@Path("id") String userId,
+                                 @Body List<Map<String, Object>> body);
 
 
     /**
@@ -345,70 +330,56 @@ public interface ChipperService {
      * @param userId        the the id of the user
      * @param chiptuneId    the id of the chiptune that stat is about
      * @param statsType     the stats increment type, see {@link Chronicle}
-     * @param cb            the callback
      */
     @POST("/user/{id}/stats/{chiptuneId}/{type}")
-    void postStats(@Path("id") String userId,
-                   @Path("chiptuneId") String chiptuneId,
-                   @Path("type") String statsType,
-                   Callback<Chronicle> cb);
+    Observable<Chronicle> postStats(@Path("id") String userId,
+                                    @Path("chiptuneId") String chiptuneId,
+                                    @Path("type") String statsType);
 
     /**
      * Get the current featured playlist
-     *
-     * @param cb        the callback
      */
     @GET("/general/featured")
-    void getFeaturedPlaylist(Callback<FeaturedPlaylist> cb);
+    Observable<FeaturedPlaylist> getFeaturedPlaylist();
 
     /**
      * Get a map of all the collective vote values of all
      * the songs available.
-     *
-     * @param cb    the callback
      */
     @GET("/general/votes")
-    void getVotes(Callback<Map<String, Integer>> cb);
+    Observable<Map<String, Integer>> getVotes();
 
     /**
      * Get the master list of chiptunes that give the name, title, stream url
      * lenght of play time, etc.
-     *
-     * @param cb        the callback
      */
     @GET("/general/chiptunes")
-    void getChiptunes(Callback<List<Chiptune>> cb);
+    Observable<List<Chiptune>> getChiptunes();
 
     /**
      * Get the most played chiptunes from the server with a given
      * limit (DEFAULT 5)
      *
      * @param limit     the # of most played chiptunes to return (DEFAULT: 5)
-     * @param cb        the callback
      */
     @GET("/general/mostplayed")
-    void getMostPlayed(@Query("limit") int limit,
-                       Callback<List<Chronicle>> cb);
+    Observable<List<Chronicle>> getMostPlayed(@Query("limit") int limit);
 
     /**
      * Get teh most skipped chiptunes from the server with a given limit
      *
      * @param limit     the # of most skipped chiptunes to return (DEFAULT: 5)
-     * @param cb        the callback
      */
     @GET("/general/mostskipped")
-    void getMostSkipped(@Query("limit") int limit,
-                        Callback<List<Chronicle>> cb);
+    Observable<List<Chronicle>> getMostSkipped(@Query("limit") int limit);
 
     /**
      * Get the most completed chiptunes from the server with a given limit
      *
      * @param limit     the # of completely played chiptunes to return (DEFAULT: 5)
-     * @param cb        the callback
      */
     @GET("/general/mostcompleted")
-    void getMostCompleted(@Query("limit") int limit,
-                          Callback<List<Chronicle>> cb);
+    Observable<List<Chronicle>> getMostCompleted(@Query("limit") int limit);
 
     /**
      * If you are an administrator, you can upload featured playlists
@@ -417,10 +388,8 @@ public interface ChipperService {
      * that it has updated.
      *
      * @param body      the featured playlist body
-     * @param cb        the callback
      */
     @POST("/admin/featured")
-    void updateFeaturePlaylist(@Body Map<String, Object> body,
-                               Callback<Playlist> cb);
+    Observable<Playlist> updateFeaturePlaylist(@Body Map<String, Object> body);
 
 }

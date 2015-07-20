@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.bluelinelabs.logansquare.annotation.JsonField;
+import com.bluelinelabs.logansquare.annotation.JsonIgnore;
 import com.bluelinelabs.logansquare.annotation.JsonObject;
 
 import ollie.Model;
@@ -18,21 +19,46 @@ import ollie.annotation.Table;
 @Table("users")
 public class User extends Model implements Parcelable{
 
+    /***********************************************************************************************
+     *
+     * Columns & Fields
+     *
+     */
+
     @JsonField(name = "id")
     @Column("user_id")
     public String userId;
 
+    /**
+     * The user's email address
+     */
     @JsonField
     @Column("email")
     public String email;
 
+    /**
+     * This flag indicates that the user has upgraded their account to premium using in-app
+     * premium
+     */
     @JsonField
     @Column("premium")
-    public boolean premium;
+    public Boolean premium;
 
+    /**
+     * This flag indicates that the user has used Chipper before the major '2.0.0' re-re-haul
+     * to Material Goodness
+     */
+    @JsonField
+    @Column("legacy")
+    public Boolean legacy;
+
+    /**
+     * This flags the user as an Administrator. An Elite few that have special powers in the
+     * realm of chipper.
+     */
     @JsonField
     @Column("admin")
-    public boolean admin;
+    public Boolean admin;
 
     /**
      * Do note that this is only valid for registering a new device, after the device is created
@@ -50,25 +76,24 @@ public class User extends Model implements Parcelable{
     @Column("private_key")
     public String private_key;
 
-    @JsonField
+    /**
+     * This value is set when the user logs in to differentiate from other user objects
+     */
+    @JsonIgnore
     @Column("is_current_user")
-    public boolean isCurrentUser = false;
-
+    public Boolean isCurrentUser = false;
 
     /**
      * Default Constructor
      */
-    public User(){
-        super();
-    }
+    public User(){}
 
     /**
      * Parcel Constructor
      *
      * @param in    The parcel input
      */
-    public User(Parcel in){
-        super();
+    private User(Parcel in){
         userId = in.readString();
         email = in.readString();
         premium = in.readInt() == 0 ? false : true;
@@ -76,6 +101,12 @@ public class User extends Model implements Parcelable{
         private_key = in.readString();
         isCurrentUser = in.readInt() == 1 ? true : false;
     }
+
+    /***********************************************************************************************
+     *
+     * Methods
+     *
+     */
 
     /**
      * Clear the session keypair and save this

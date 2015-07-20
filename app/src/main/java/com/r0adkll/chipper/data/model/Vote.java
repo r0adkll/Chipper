@@ -11,11 +11,19 @@ import ollie.annotation.Column;
 import ollie.annotation.Table;
 
 /**
+ * This class represent's a user's vote on a particular chiptune
+ *
  * Created by r0adkll on 11/15/14.
  */
 @JsonObject
 @Table("votes")
 public class Vote extends Model implements Parcelable{
+
+    /***********************************************************************************************
+     *
+     * Constants
+     *
+     */
 
     public static final String TYPE_UP = "up";
     public static final String TYPE_DOWN = "down";
@@ -23,6 +31,12 @@ public class Vote extends Model implements Parcelable{
     public static final int UP = 1;
     public static final int DOWN = -1;
     public static final int NONE = 0;
+
+    /***********************************************************************************************
+     *
+     * Columns & Fields
+     *
+     */
 
     @JsonField(name = "id")
     @Column("vote_id")
@@ -34,11 +48,11 @@ public class Vote extends Model implements Parcelable{
 
     @JsonField
     @Column("value")
-    public int value;
+    public Integer value;
 
     @JsonField
     @Column("updated")
-    public long updated;
+    public Long updated;
 
     /**
      * Default Constructor
@@ -52,6 +66,7 @@ public class Vote extends Model implements Parcelable{
         voteId = in.readString();
         tune_id = in.readString();
         value = in.readInt();
+        updated = in.readLong();
     }
 
     /***********************************************************************************************

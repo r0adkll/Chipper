@@ -1,10 +1,14 @@
 package com.r0adkll.chipper.api;
 
 import com.google.gson.Gson;
+import com.r0adkll.chipper.data.model.Device;
+import com.r0adkll.chipper.data.model.User;
+import com.r0adkll.chipper.utils.qualifiers.DeviceId;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import ollie.query.Select;
 import retrofit.RequestInterceptor;
 
 /**
@@ -19,8 +23,8 @@ public final class ApiHeaders implements RequestInterceptor{
     @Inject
     Gson gson;
 
-//    @Inject @DeviceId
-//    String deviceId;
+    @Inject @DeviceId
+    String deviceId;
 
     @Inject
     public ApiHeaders(){}
@@ -28,24 +32,22 @@ public final class ApiHeaders implements RequestInterceptor{
     @Override
     public void intercept(RequestFacade request) {
 
-//        // Get the current logged in user
-//        User currentUser = new Select()
-//                .from(User.class)
-//                .where("is_current_user=?", true)
-//                .limit(1)
-//                .executeSingle();
-//
-//        // Get the current device
-//        Device currentDevice = new Select()
-//                .from(Device.class)
-//                .where("device_id=?", deviceId)
-//                .limit(1)
-//                .executeSingle();
-//
-//        if(currentUser != null && currentDevice == null){
-//            request.addHeader(AUTHORIZATION_HEADER, ApiModule.generateUserAuthParam(gson, currentUser));
-//        }else if(currentUser != null && currentDevice != null){
-//            request.addHeader(AUTHORIZATION_HEADER, ApiModule.generateDeviceAuthParam(gson, currentUser, currentDevice));
-//        }
+        // Get the current logged in user
+        User currentUser = Select.from(User.class)
+                .where("is_current_user=?", true)
+                .limit("1")
+                .fetchSingle();
+
+        // Get the current device
+        Device currentDevice = Select.from(Device.class)
+                .where("device_id=?", deviceId)
+                .limit("1")
+                .fetchSingle();
+
+        if(currentUser != null && currentDevice == null){
+            request.addHeader(AUTHORIZATION_HEADER, ApiModule.generateUserAuthParam(gson, currentUser));
+        }else if(currentUser != null && currentDevice != null){
+            request.addHeader(AUTHORIZATION_HEADER, ApiModule.generateDeviceAuthParam(gson, currentUser, currentDevice));
+        }
     }
 }

@@ -27,7 +27,7 @@ public class Chiptune extends Model implements Parcelable{
      */
 
     @JsonField(name = "id")
-    @Column("chiptune_id")
+    @Column("chiptuneId")
     public String chiptuneId;
 
     @JsonField
@@ -55,7 +55,7 @@ public class Chiptune extends Model implements Parcelable{
      * Parcel Constructor
      * @param in
      */
-    public Chiptune(Parcel in){
+    private Chiptune(Parcel in){
         super();
         chiptuneId = in.readString();
         title = in.readString();
@@ -64,17 +64,11 @@ public class Chiptune extends Model implements Parcelable{
         length = in.readLong();
     }
 
-    /**
-     * Get a formated string representation of this chiptunes play length
+    /***********************************************************************************************
      *
-     * @return      the formatted length, i.e. 1:23, or 0:23
+     * Methods
+     *
      */
-    public String getFormattedLength(){
-        return String.format("%d:%02d",
-                TimeUnit.MILLISECONDS.toMinutes(length),
-                TimeUnit.MILLISECONDS.toSeconds(length) -
-                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(length)));
-    }
 
     @Override
     public int describeContents() {
@@ -90,6 +84,9 @@ public class Chiptune extends Model implements Parcelable{
         dest.writeLong(length);
     }
 
+    /**
+     * Parcelable creator class
+     */
     public static final Creator<Chiptune> CREATOR = new Creator<Chiptune>() {
         @Override
         public Chiptune createFromParcel(Parcel source) {

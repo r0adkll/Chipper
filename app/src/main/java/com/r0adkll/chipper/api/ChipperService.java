@@ -1,9 +1,7 @@
 package com.r0adkll.chipper.api;
 
 import com.r0adkll.chipper.data.model.Chiptune;
-import com.r0adkll.chipper.data.model.Chronicle;
 import com.r0adkll.chipper.data.model.Device;
-import com.r0adkll.chipper.data.model.FeaturedPlaylist;
 import com.r0adkll.chipper.data.model.Playlist;
 import com.r0adkll.chipper.api.model.ServerTime;
 import com.r0adkll.chipper.data.model.User;
@@ -339,7 +337,7 @@ public interface ChipperService {
      * Get the current featured playlist
      */
     @GET("/general/featured")
-    Observable<FeaturedPlaylist> getFeaturedPlaylist();
+    Observable<Playlist> getFeaturedPlaylist();
 
     /**
      * Get a map of all the collective vote values of all

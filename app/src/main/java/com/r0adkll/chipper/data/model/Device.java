@@ -17,6 +17,12 @@ import ollie.annotation.Table;
 @Table("devices")
 public class Device extends Model implements Parcelable{
 
+    /***********************************************************************************************
+     *
+     * Columns & Fields
+     *
+     */
+
     @JsonField(name = "id")
     @Column("dev_id")
     public String _id;
@@ -58,18 +64,26 @@ public class Device extends Model implements Parcelable{
      */
     public Device(){}
 
+    /**
+     * Parcelable Constructor
+     */
     private Device(Parcel in){
-        super();
         _id = in.readString();
         device_id = in.readString();
         model = in.readString();
         sdk = in.readInt();
-        tablet = in.readInt() == 0 ? false : true;
+        tablet = in.readInt() != 0;
         updated = in.readLong();
         push_token = in.readString();
         private_key = in.readString();
         public_key = in.readString();
     }
+
+    /***********************************************************************************************
+     *
+     * Helper Methods
+     *
+     */
 
     /**
      * Update this device with a model device Gson'd from the server
@@ -93,6 +107,12 @@ public class Device extends Model implements Parcelable{
         // Save to disk
         save();
     }
+
+    /***********************************************************************************************
+     *
+     * Parcelable Methods
+     *
+     */
 
     @Override
     public int describeContents() {

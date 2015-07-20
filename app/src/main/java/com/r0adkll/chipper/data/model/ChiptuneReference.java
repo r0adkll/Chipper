@@ -9,9 +9,13 @@ import com.bluelinelabs.logansquare.annotation.JsonObject;
 import ollie.Model;
 import ollie.annotation.Column;
 import ollie.annotation.ForeignKey;
+import ollie.annotation.NotNull;
 import ollie.annotation.Table;
 
 /**
+ * A playlists reference to a chiptune to allow for the one-to-many database
+ * relations
+ *
  * Created by r0adkll on 11/16/14.
  */
 @JsonObject
@@ -26,7 +30,7 @@ public class ChiptuneReference extends Model implements Parcelable {
 
     public static ChiptuneReference create(ChiptuneReference ref){
         ChiptuneReference cr = new ChiptuneReference();
-        cr.chiptune_id = ref.chiptune_id;
+        cr.chiptuneId = ref.chiptuneId;
         return cr;
     }
 
@@ -38,15 +42,22 @@ public class ChiptuneReference extends Model implements Parcelable {
 
     @Column("chiptune_id")
     @JsonField(name = "id")
-    public String chiptune_id;
+    public String chiptuneId;
 
+    /**
+     * The playlist this belongs to
+     */
     @Column("playlist")
     @ForeignKey(
-            onDelete = ForeignKey.ReferentialAction.CASCADE,
-            onUpdate = ForeignKey.ReferentialAction.CASCADE
+        onDelete = ForeignKey.ReferentialAction.CASCADE,
+        onUpdate = ForeignKey.ReferentialAction.CASCADE
     )
+    @NotNull
     public Playlist playlist;
 
+    /**
+     * The Sort order for this item in a given playlist
+     */
     @JsonField
     @Column("sort_order")
     public Integer sort_order;
@@ -57,14 +68,19 @@ public class ChiptuneReference extends Model implements Parcelable {
     public ChiptuneReference(){}
 
     /**
-     * Parcel COnstructor
+     * Parcel Constructor
      * @param in
      */
-    public ChiptuneReference(Parcel in){
-        chiptune_id = in.readString();
+    private ChiptuneReference(Parcel in){
+        chiptuneId = in.readString();
         sort_order = in.readInt();
     }
 
+    /***********************************************************************************************
+     *
+     * Parcelable Methods
+     *
+     */
 
     @Override
     public int describeContents() {
@@ -73,7 +89,7 @@ public class ChiptuneReference extends Model implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(chiptune_id);
+        dest.writeString(chiptuneId);
         dest.writeInt(sort_order);
     }
 

@@ -1,7 +1,9 @@
 ![chipper icon](play_banner.png)
 
-Chipper
+Chipper - _Discontinued_
 =======
+
+_Chipper is no longer supported, but its old source is here to stay!_
 
 A keygen jukebox with over 1400 chiptunes sourced from key generators to play from. Create playlists and have them automatically synced to the [Chipper Server](https://github.com/r0adkll/chipper-java-server) and synced across all of you devices. Join the community and upgrade to premium to be able to vote on chiptunes and contribute to the popular list.
 
